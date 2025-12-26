@@ -45,7 +45,7 @@ export default function SignUpScreen() {
                 </Link>
                 {step !== 'phone' && (
                     <div className="flex gap-1">
-                        <div className="w-8 h-1 rounded-full bg-primary"></div>
+                        <div className="w-8 h-1 rounded-full bg-primary"></div> {/* Phone Step Indicator */}
                         <div className={`w-8 h-1 rounded-full ${step === 'otp' ? 'bg-primary' : 'bg-primary/30'}`}></div>
                         <div className={`w-8 h-1 rounded-full ${step === 'profile' ? 'bg-primary' : 'bg-primary/30'}`}></div>
                     </div>
