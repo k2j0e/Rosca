@@ -1,0 +1,459 @@
+[
+  {
+    "id": "epmd3susc",
+    "name": "New Gucci Shoes",
+    "category": "Travel",
+    "amount": 300,
+    "frequency": "monthly",
+    "duration": 10,
+    "maxMembers": 10,
+    "payoutTotal": 3000,
+    "startDate": "2025-12-26",
+    "description": "Need these in my life!!!",
+    "rules": [
+      "Admin approval required for payout",
+      "Late payments incur -5 reputation points"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80",
+    "isPrivate": false,
+    "status": "open",
+    "adminId": "u8",
+    "members": [
+      {
+        "userId": "u9",
+        "name": "Ian Intern",
+        "avatar": "https://ui-avatars.com/api/?name=Ian+Intern&background=random",
+        "joinedAt": "2025-12-26T08:34:14.705Z",
+        "role": "member",
+        "payoutPreference": "early",
+        "status": "paid",
+        "payoutMonth": 1
+      },
+      {
+        "userId": "u8",
+        "name": "Hannah Host",
+        "avatar": "https://ui-avatars.com/api/?name=Hannah+Host&background=random",
+        "joinedAt": "2025-12-26T08:33:01.271Z",
+        "role": "admin",
+        "status": "paid",
+        "payoutMonth": 2
+      }
+    ],
+    "events": [
+      {
+        "id": "7kaggzdow",
+        "type": "join",
+        "message": "Ian Intern joined the circle",
+        "timestamp": "2025-12-26T08:35:05.111Z",
+        "meta": {
+          "userId": "u9",
+          "userName": "Ian Intern",
+          "userAvatar": "https://ui-avatars.com/api/?name=Ian+Intern&background=random"
+        }
+      },
+      {
+        "id": "31q8oldcp",
+        "type": "info",
+        "message": "Circle created",
+        "timestamp": "2025-12-26T08:33:01.271Z"
+      }
+    ]
+  },
+  {
+    "id": "xpriripf4",
+    "name": "Saving for College",
+    "category": "Other",
+    "amount": 5000,
+    "frequency": "monthly",
+    "duration": 10,
+    "maxMembers": 10,
+    "payoutTotal": 50000,
+    "startDate": "2025-12-26",
+    "description": "TO save for my college tuition",
+    "rules": [
+      "Admin approval required for payout",
+      "Late payments incur -5 reputation points"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80",
+    "isPrivate": false,
+    "status": "open",
+    "adminId": "u3",
+    "members": [
+      {
+        "userId": "u3",
+        "name": "Charlie Chef",
+        "avatar": "https://ui-avatars.com/api/?name=Charlie+Chef&background=random",
+        "joinedAt": "2025-12-26T07:42:28.265Z",
+        "role": "admin",
+        "status": "paid",
+        "payoutMonth": 1
+      },
+      {
+        "userId": "u4",
+        "name": "Diana Doc",
+        "avatar": "https://ui-avatars.com/api/?name=Diana+Doc&background=random",
+        "joinedAt": "2025-12-26T07:50:01.795Z",
+        "role": "member",
+        "payoutPreference": "any",
+        "status": "pending",
+        "payoutMonth": 2
+      },
+      {
+        "userId": "u8",
+        "name": "Hannah Host",
+        "avatar": "https://ui-avatars.com/api/?name=Hannah+Host&background=random",
+        "joinedAt": "2025-12-26T08:05:05.117Z",
+        "role": "member",
+        "payoutPreference": "late",
+        "status": "paid_pending",
+        "payoutMonth": 3
+      },
+      {
+        "userId": "u7",
+        "name": "George Gamer",
+        "avatar": "https://ui-avatars.com/api/?name=George+Gamer&background=random",
+        "joinedAt": "2025-12-26T07:51:06.743Z",
+        "role": "member",
+        "payoutPreference": "late",
+        "status": "pending",
+        "payoutMonth": 4
+      },
+      {
+        "userId": "u5",
+        "name": "Evan Eng",
+        "avatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random",
+        "joinedAt": "2025-12-26T08:14:59.101Z",
+        "role": "member",
+        "payoutPreference": "any",
+        "status": "paid"
+      }
+    ],
+    "events": [
+      {
+        "id": "1h18wp334",
+        "type": "join",
+        "message": "Hannah Host joined the circle",
+        "timestamp": "2025-12-26T08:05:32.550Z",
+        "meta": {
+          "userId": "u8",
+          "userName": "Hannah Host",
+          "userAvatar": "https://ui-avatars.com/api/?name=Hannah+Host&background=random"
+        }
+      },
+      {
+        "id": "qry4ew4eu",
+        "type": "join",
+        "message": "George Gamer joined the circle",
+        "timestamp": "2025-12-26T07:51:41.289Z",
+        "meta": {
+          "userId": "u7",
+          "userName": "George Gamer",
+          "userAvatar": "https://ui-avatars.com/api/?name=George+Gamer&background=random"
+        }
+      },
+      {
+        "id": "cnnm1cgsj",
+        "type": "join",
+        "message": "Fiona Farmer joined the circle",
+        "timestamp": "2025-12-26T07:51:39.972Z",
+        "meta": {
+          "userId": "u6",
+          "userName": "Fiona Farmer",
+          "userAvatar": "https://ui-avatars.com/api/?name=Fiona+Farmer&background=random"
+        }
+      },
+      {
+        "id": "25b929k2n",
+        "type": "join",
+        "message": "Diana Doc joined the circle",
+        "timestamp": "2025-12-26T07:51:38.211Z",
+        "meta": {
+          "userId": "u4",
+          "userName": "Diana Doc",
+          "userAvatar": "https://ui-avatars.com/api/?name=Diana+Doc&background=random"
+        }
+      },
+      {
+        "id": "myvgyksuo",
+        "type": "info",
+        "message": "Circle created",
+        "timestamp": "2025-12-26T07:42:28.265Z"
+      }
+    ]
+  },
+  {
+    "id": "mgiotnj9q",
+    "name": "New Golf Set",
+    "category": "Travel",
+    "amount": 500,
+    "frequency": "weekly",
+    "duration": 10,
+    "maxMembers": 10,
+    "payoutTotal": 5000,
+    "startDate": "2025-12-26",
+    "description": "A weekly circle for Travel.",
+    "rules": [
+      "Admin approval required for payout",
+      "Late payments incur -5 reputation points"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80",
+    "isPrivate": false,
+    "status": "open",
+    "adminId": "u1",
+    "members": [
+      {
+        "userId": "u1",
+        "name": "Alice Admin",
+        "avatar": "https://ui-avatars.com/api/?name=Alice+Admin&background=0D8ABC&color=fff",
+        "joinedAt": "2025-12-26T07:27:35.254Z",
+        "role": "admin",
+        "status": "paid"
+      },
+      {
+        "userId": "u3",
+        "name": "Charlie Chef",
+        "avatar": "https://ui-avatars.com/api/?name=Charlie+Chef&background=random",
+        "joinedAt": "2025-12-26T07:31:23.167Z",
+        "role": "member",
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u5",
+        "name": "Evan Eng",
+        "avatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random",
+        "joinedAt": "2025-12-26T08:17:37.722Z",
+        "role": "member",
+        "payoutPreference": "late",
+        "status": "paid"
+      }
+    ],
+    "events": [
+      {
+        "id": "6an4d3bvt",
+        "type": "join",
+        "message": "Evan Eng joined the circle",
+        "timestamp": "2025-12-26T08:18:35.582Z",
+        "meta": {
+          "userId": "u5",
+          "userName": "Evan Eng",
+          "userAvatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random"
+        }
+      }
+    ]
+  },
+  {
+    "id": "g76ag4r5q",
+    "name": "New Bike",
+    "category": "Travel",
+    "amount": 100,
+    "frequency": "weekly",
+    "duration": 15,
+    "maxMembers": 15,
+    "payoutTotal": 1500,
+    "startDate": "2025-12-26",
+    "description": "To Purchase a new bike!",
+    "rules": [
+      "Admin approval required for payout",
+      "Late payments incur -5 reputation points"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80",
+    "isPrivate": false,
+    "status": "open",
+    "adminId": "u1",
+    "members": [
+      {
+        "userId": "u1",
+        "name": "Alice Admin",
+        "avatar": "https://ui-avatars.com/api/?name=Alice+Admin&background=0D8ABC&color=fff",
+        "joinedAt": "2025-12-26T07:10:52.805Z",
+        "role": "admin",
+        "status": "paid"
+      },
+      {
+        "userId": "u5",
+        "name": "Evan Eng",
+        "avatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random",
+        "joinedAt": "2025-12-26T08:23:32.289Z",
+        "role": "member",
+        "payoutPreference": "early",
+        "status": "paid"
+      }
+    ],
+    "events": [
+      {
+        "id": "x194xka4m",
+        "type": "join",
+        "message": "Evan Eng joined the circle",
+        "timestamp": "2025-12-26T08:24:01.925Z",
+        "meta": {
+          "userId": "u5",
+          "userName": "Evan Eng",
+          "userAvatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random"
+        }
+      }
+    ]
+  },
+  {
+    "id": "jc845r7zt",
+    "name": "Whistler Vacation Fund",
+    "category": "Travel",
+    "amount": 500,
+    "frequency": "weekly",
+    "duration": 10,
+    "maxMembers": 10,
+    "payoutTotal": 5000,
+    "startDate": "2025-12-26",
+    "description": "Go to Whistler to ski",
+    "rules": [
+      "Admin approval required for payout",
+      "Late payments incur -5 reputation points"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80",
+    "isPrivate": false,
+    "status": "open",
+    "adminId": "r017vq9uy",
+    "members": [
+      {
+        "userId": "r017vq9uy",
+        "name": "Hadi Adra",
+        "avatar": "https://ui-avatars.com/api/?name=Hadi%20Adra&background=random",
+        "joinedAt": "2025-12-26T07:03:59.827Z",
+        "role": "admin",
+        "status": "pending"
+      },
+      {
+        "userId": "u1",
+        "name": "Alice Admin",
+        "avatar": "https://ui-avatars.com/api/?name=Alice+Admin&background=0D8ABC&color=fff",
+        "joinedAt": "2025-12-26T07:07:12.885Z",
+        "role": "member",
+        "payoutPreference": "any",
+        "status": "pending"
+      }
+    ]
+  },
+  {
+    "id": "test-circle-1",
+    "name": "Global Nomads Fund",
+    "category": "Travel",
+    "amount": 500,
+    "frequency": "monthly",
+    "duration": 10,
+    "maxMembers": 10,
+    "payoutTotal": 5000,
+    "startDate": "2025-12-26T07:02:37.507Z",
+    "description": "A dedicated savings circle for our dream vacations in 2026!",
+    "rules": [
+      "Pay on time",
+      "Respect the order",
+      "No early withdrawals"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop",
+    "isPrivate": false,
+    "status": "active",
+    "adminId": "u1",
+    "members": [
+      {
+        "userId": "u1",
+        "name": "Alice Admin",
+        "avatar": "https://ui-avatars.com/api/?name=Alice+Admin&background=0D8ABC&color=fff",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "admin",
+        "payoutMonth": 1,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u2",
+        "name": "Bob Builder",
+        "avatar": "https://ui-avatars.com/api/?name=Bob+Builder&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 2,
+        "payoutPreference": "any",
+        "status": "paid"
+      },
+      {
+        "userId": "u3",
+        "name": "Charlie Chef",
+        "avatar": "https://ui-avatars.com/api/?name=Charlie+Chef&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 3,
+        "payoutPreference": "any",
+        "status": "late"
+      },
+      {
+        "userId": "u4",
+        "name": "Diana Doc",
+        "avatar": "https://ui-avatars.com/api/?name=Diana+Doc&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 4,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u5",
+        "name": "Evan Eng",
+        "avatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 5,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u6",
+        "name": "Fiona Farmer",
+        "avatar": "https://ui-avatars.com/api/?name=Fiona+Farmer&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 6,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u7",
+        "name": "George Gamer",
+        "avatar": "https://ui-avatars.com/api/?name=George+Gamer&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 7,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u8",
+        "name": "Hannah Host",
+        "avatar": "https://ui-avatars.com/api/?name=Hannah+Host&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 8,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u9",
+        "name": "Ian Intern",
+        "avatar": "https://ui-avatars.com/api/?name=Ian+Intern&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 9,
+        "payoutPreference": "any",
+        "status": "pending"
+      },
+      {
+        "userId": "u10",
+        "name": "Judy Judge",
+        "avatar": "https://ui-avatars.com/api/?name=Judy+Judge&background=random",
+        "joinedAt": "2025-12-26T07:02:37.507Z",
+        "role": "member",
+        "payoutMonth": 10,
+        "payoutPreference": "any",
+        "status": "pending"
+      }
+    ]
+  }
+]

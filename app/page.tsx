@@ -1,65 +1,87 @@
-import Image from "next/image";
+"use strict";
 
-export default function Home() {
+import Link from "next/link";
+import { getCircles, getCurrentUser } from "@/lib/data";
+import { redirect } from "next/navigation";
+
+export default function HomeScreen() {
+  const user = getCurrentUser();
+  if (!user) {
+    redirect('/welcome');
+  }
+
+  const circles = getCircles();
+  const myCircles = circles.filter(c => c.members.some(m => m.userId === user.id));
+  const activeCircles = myCircles.length;
+  // Calculate total committed 
+  const totalCommitted = myCircles.reduce((sum, circle) => sum + (circle.amount * circle.duration), 0);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl pb-20 font-display text-text-main dark:text-white">
+      {/* Header */}
+      <div className="px-6 pt-12 pb-6">
+        <h1 className="text-3xl font-bold mb-1">Good morning,</h1>
+        <h2 className="text-3xl font-bold text-primary">{user.name}</h2>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="px-4 grid grid-cols-2 gap-4 mb-8">
+        <div className="bg-primary text-white p-5 rounded-2xl shadow-lg shadow-primary/20">
+          <span className="material-symbols-outlined text-3xl mb-3 opacity-90">account_balance_wallet</span>
+          <div>
+            <p className="text-xs opacity-80 uppercase font-bold tracking-wider mb-1">Committed</p>
+            <p className="text-2xl font-bold">${totalCommitted.toLocaleString()}</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="bg-white dark:bg-surface-dark p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
+          <span className="material-symbols-outlined text-3xl mb-3 text-secondary">pie_chart</span>
+          <div>
+            <p className="text-xs text-text-sub dark:text-text-sub-dark uppercase font-bold tracking-wider mb-1">Active Circles</p>
+            <p className="text-2xl font-bold text-text-main dark:text-white">{activeCircles}</p>
+          </div>
         </div>
-      </main>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="px-6 mb-8">
+        <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
+        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+          <Link href="/create/financials">
+            <div className="flex flex-col items-center gap-2 min-w-[80px]">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                <span className="material-symbols-outlined text-2xl">add</span>
+              </div>
+              <span className="text-xs font-medium">New Circle</span>
+            </div>
+          </Link>
+          <Link href="/explore">
+            <div className="flex flex-col items-center gap-2 min-w-[80px]">
+              <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-text-main dark:text-white">
+                <span className="material-symbols-outlined text-2xl">explore</span>
+              </div>
+              <span className="text-xs font-medium">Explore</span>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Recent Updates (Mock) */}
+      <div className="px-6 flex-1">
+        <h3 className="text-lg font-bold mb-4">Updates</h3>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4 bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-gray-100 dark:border-white/5">
+            <div className="w-10 h-10 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined">payments</span>
+            </div>
+            <div>
+              <p className="font-bold text-sm">Payment Received</p>
+              <p className="text-xs text-text-sub">From generic ROSCA #3</p>
+            </div>
+            <span className="ml-auto text-xs text-text-sub">2h</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

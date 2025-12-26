@@ -1,0 +1,82 @@
+[
+  {
+    "id": "u1",
+    "name": "Alice Admin",
+    "phoneNumber": "+15550000001",
+    "avatar": "https://ui-avatars.com/api/?name=Alice+Admin&background=0D8ABC&color=fff",
+    "location": "New York, USA",
+    "trustScore": 900
+  },
+  {
+    "id": "u2",
+    "name": "Bob Builder",
+    "phoneNumber": "+15550000002",
+    "avatar": "https://ui-avatars.com/api/?name=Bob+Builder&background=random",
+    "location": "London, UK",
+    "trustScore": 850
+  },
+  {
+    "id": "u3",
+    "name": "Charlie Chef",
+    "phoneNumber": "+15550000003",
+    "avatar": "https://ui-avatars.com/api/?name=Charlie+Chef&background=random",
+    "location": "Paris, France",
+    "trustScore": 800
+  },
+  {
+    "id": "u4",
+    "name": "Diana Doc",
+    "phoneNumber": "+15550000004",
+    "avatar": "https://ui-avatars.com/api/?name=Diana+Doc&background=random",
+    "location": "Berlin, Germany",
+    "trustScore": 880
+  },
+  {
+    "id": "u5",
+    "name": "Evan Eng",
+    "phoneNumber": "+15550000005",
+    "avatar": "https://ui-avatars.com/api/?name=Evan+Eng&background=random",
+    "location": "Tokyo, Japan",
+    "trustScore": 920
+  },
+  {
+    "id": "u6",
+    "name": "Fiona Farmer",
+    "phoneNumber": "+15550000006",
+    "avatar": "https://ui-avatars.com/api/?name=Fiona+Farmer&background=random",
+    "location": "Sydney, Australia",
+    "trustScore": 750
+  },
+  {
+    "id": "u7",
+    "name": "George Gamer",
+    "phoneNumber": "+15550000007",
+    "avatar": "https://ui-avatars.com/api/?name=George+Gamer&background=random",
+    "location": "Toronto, Canada",
+    "trustScore": 810
+  },
+  {
+    "id": "u8",
+    "name": "Hannah Host",
+    "phoneNumber": "+15550000008",
+    "avatar": "https://ui-avatars.com/api/?name=Hannah+Host&background=random",
+    "location": "Dubai, UAE",
+    "trustScore": 860
+  },
+  {
+    "id": "u9",
+    "name": "Ian Intern",
+    "phoneNumber": "+15550000009",
+    "avatar": "https://ui-avatars.com/api/?name=Ian+Intern&background=random",
+    "location": "Singapore",
+    "trustScore": 700
+  },
+  {
+    "id": "u10",
+    "name": "Judy Judge",
+    "phoneNumber": "+15550000010",
+    "avatar": "https://ui-avatars.com/api/?name=Judy+Judge&background=random",
+    "location": "Rio, Brazil",
+    "trustScore": 950
+  }
+]
