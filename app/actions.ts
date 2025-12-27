@@ -21,8 +21,12 @@ const DEFAULT_USER_MOCK: User = {
     history: []
 };
 
+import { cookies } from "next/headers";
+
+// ... (existing imports)
+
 export async function signOutAction() {
-    deleteUserSession();
+    (await cookies()).delete('session_user_id');
     redirect('/welcome');
 }
 
@@ -38,7 +42,8 @@ export async function signInAction(formData: FormData) {
 
     if (user) {
         // Login successful
-        await updateUser(user as any); // cast for now if needed, or update type
+        (await cookies()).set('session_user_id', user.id);
+
         // Add delay to ensure persistence before redirect
         await new Promise(resolve => setTimeout(resolve, 500));
         redirect('/');
@@ -74,12 +79,13 @@ export async function createAccountAction(formData: FormData) {
     await registerUser(newUser);
 
     // 2. Set as Current Session (Log them in)
-    await updateUser(newUser);
+    (await cookies()).set('session_user_id', newUser.id);
 
     // Small delay to ensure DB consistency
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    redirect('/');
+    // Redirect to profile to show off the new account, then they can go home
+    redirect('/profile');
 }
 
 export async function createCircleAction(formData: FormData) {

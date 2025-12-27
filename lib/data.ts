@@ -86,15 +86,21 @@ function mapUser(pUser: any): User {
     };
 }
 
+import { cookies } from "next/headers";
+
+// ... (existing helper function)
+
 // --- User Session Management ---
 
-// For MVP, we simulated "current user" with a file. 
-// Now, we will default to the seeded user "Amara" for simplicity if no auth is present.
-// In a real app, this would check cookies/headers.
 export async function getCurrentUser(): Promise<User | null> {
     try {
-        const user = await prisma.user.findFirst({
-            where: { phoneNumber: '+15550109999' } // Amara
+        const cookieStore = await cookies();
+        const userId = cookieStore.get('session_user_id')?.value;
+
+        if (!userId) return null;
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
         });
         return user ? mapUser(user) : null;
     } catch (error) {
