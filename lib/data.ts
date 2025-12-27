@@ -184,8 +184,8 @@ export async function getCircles(): Promise<Circle[]> {
         coverImage: (c.coverImage || undefined) as string | undefined,
         members: c.members.map(m => ({
             userId: m.userId,
-            name: m.user.name,
-            avatar: m.user.avatar || '',
+            name: m.user?.name || 'Unknown User', // Safety check
+            avatar: m.user?.avatar || '',         // Safety check
             joinedAt: m.joinedAt.toISOString(),
             role: m.role as any,
             status: m.status as any,

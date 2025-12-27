@@ -84,8 +84,8 @@ export async function createAccountAction(formData: FormData) {
     // Small delay to ensure DB consistency
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Redirect to profile to show off the new account, then they can go home
-    redirect('/profile');
+    // Redirect to home as requested
+    redirect('/');
 }
 
 export async function createCircleAction(formData: FormData) {

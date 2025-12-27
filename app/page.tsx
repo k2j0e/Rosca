@@ -1,4 +1,5 @@
 "use strict";
+export const dynamic = 'force-dynamic';
 
 import Link from "next/link";
 import { getCircles, getCurrentUser } from "@/lib/data";
