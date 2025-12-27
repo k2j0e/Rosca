@@ -6,18 +6,22 @@ import { usePathname } from "next/navigation";
 export default function DashboardNav({
     circleId,
     circleName,
-    isAdmin
+    isAdmin,
+    status
 }: {
     circleId: string;
     circleName: string;
     isAdmin: boolean;
+    status: 'recruiting' | 'active' | 'completed' | 'open'; // 'open' is legacy
 }) {
     const pathname = usePathname();
+
+    const isRecruiting = status === 'recruiting';
 
     const tabs = [
         { name: "Overview", path: `/circles/${circleId}/dashboard`, exact: true },
         { name: "Members", path: `/circles/${circleId}/dashboard/members`, exact: false },
-        { name: "My Turn", path: `/circles/${circleId}/dashboard/commitment`, exact: false },
+        { name: isRecruiting ? "My Turn 🔒" : "My Turn", path: `/circles/${circleId}/dashboard/commitment`, exact: false, disabled: isRecruiting },
     ];
 
     const isActive = (path: string, exact: boolean) => {
@@ -49,14 +53,18 @@ export default function DashboardNav({
             <div className="flex w-full">
                 {tabs.map((tab) => {
                     const active = isActive(tab.path, tab.exact);
+                    const disabled = tab.disabled;
                     return (
                         <Link
                             key={tab.path}
-                            href={tab.path}
+                            href={disabled ? '#' : tab.path}
                             className={`flex-1 pb-3 pt-2 text-sm text-center border-b-[3px] transition-colors ${active
                                 ? "font-bold text-primary border-primary"
-                                : "font-semibold text-text-sub dark:text-text-sub-dark border-transparent hover:text-text-main dark:hover:text-white"
+                                : disabled
+                                    ? "font-medium text-gray-300 dark:text-gray-700 border-transparent cursor-not-allowed"
+                                    : "font-semibold text-text-sub dark:text-text-sub-dark border-transparent hover:text-text-main dark:hover:text-white"
                                 }`}
+                            onClick={(e) => disabled && e.preventDefault()}
                         >
                             {tab.name}
                         </Link>

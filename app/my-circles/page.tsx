@@ -64,11 +64,11 @@ export default async function MyCirclesScreen() {
                                         </div>
 
                                         {/* Status Badge */}
-                                        <div className={`px-2.5 py-1 rounded-md text-xs font-bold capitalize tabular-nums tracking-wide ${circle.status === 'open'
-                                            ? 'bg-gray-100 text-gray-500 dark:bg-white/10 dark:text-gray-400'
+                                        <div className={`px-2.5 py-1 rounded-md text-xs font-bold capitalize tabular-nums tracking-wide ${circle.status === 'recruiting'
+                                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
                                             : circle.status === 'active'
                                                 ? 'bg-[#E8FBF5] text-[#0FAE7A] dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                : 'bg-blue-50 text-blue-600'
+                                                : 'bg-gray-100 text-gray-500'
                                             }`}>
                                             {circle.status}
                                         </div>

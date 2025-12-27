@@ -1,6 +1,6 @@
 "use server";
 
-import { createCircle, Circle, joinCircle, MOCK_USER, deleteUserSession, updateUser, getCurrentUser, User, findUserByPhone, registerUser, updateCircleMembers, Member, updateMemberStatus } from "@/lib/data";
+import { createCircle, Circle, joinCircle, MOCK_USER, deleteUserSession, updateUser, getCurrentUser, User, findUserByPhone, registerUser, updateCircleMembers, Member, updateMemberStatus, updateCircleStatus } from "@/lib/data";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -137,11 +137,13 @@ export async function createCircleAction(formData: FormData) {
         payoutTotal: amount * membersCount, // Simplification for MVP
         duration: membersCount, // 1 round per member
         maxMembers: membersCount, // Set capacity
-        status: "open",
+        status: "recruiting",
         members: [], // Creator will be added by function
         description: description || `A ${frequency} circle for ${category}.`,
         rules,
         coverImage,
+        payoutSchedule: JSON.parse(formData.get("payoutSchedule") as string || "[]"),
+        settings: {}, // Future use
     }, currentUser);
 
     console.log(`Created circle with ID: ${newCircle.id}. Redirecting to profile.`);
@@ -235,4 +237,19 @@ export async function verifyPaymentAction(circleId: string, memberId: string) {
     await updateMemberStatus(circleId, memberId, 'paid');
     revalidatePath(`/circles/${circleId}`);
     // revalidatePath(`/circles/${circleId}/admin/members`); // If we had a specific admin page for this
+}
+
+export async function launchCircleAction(circleId: string) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+
+    await updateCircleStatus(circleId, 'active');
+
+    // In a real app, this is where we'd lock in the startDate if it was floating,
+    // and trigger the first round notifications.
+
+    revalidatePath(`/circles/${circleId}`);
+    revalidatePath(`/circles/${circleId}/dashboard`);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
 }

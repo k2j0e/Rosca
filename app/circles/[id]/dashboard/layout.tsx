@@ -23,6 +23,7 @@ export default async function DashboardLayout(props: {
                 circleId={circle.id}
                 circleName={circle.name}
                 isAdmin={isAdmin}
+                status={(circle.status as any) || 'open'}
             />
             {children}
         </div>

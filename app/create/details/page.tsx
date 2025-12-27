@@ -57,6 +57,8 @@ function CreateDetailsContent() {
                     <input type="hidden" name="category" value={category} />
                     <input type="hidden" name="privacy" value={privacy} />
                     <input type="hidden" name="rules" value={JSON.stringify(rules)} />
+                    <input type="hidden" name="startDate" value={searchParams.get("startDate") || ""} />
+                    <input type="hidden" name="payoutSchedule" value={searchParams.get("payoutSchedule") || "[]"} />
 
                     {/* Cover Photo */}
                     <div>

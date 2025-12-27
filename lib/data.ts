@@ -71,9 +71,14 @@ export interface Circle {
     rules?: string[];
     coverImage?: string;
     isPrivate: boolean;
-    status: 'open' | 'active' | 'completed';
+    status: 'recruiting' | 'active' | 'completed';
     adminId: string;
     events: CircleEvent[];
+    payoutSchedule?: string[]; // Array of ISO date strings
+    settings?: {
+        allowLateJoins?: boolean;
+        requireVerification?: boolean;
+    };
 }
 
 // Helper to map Prisma User to our User type (handling JSON parsing and Date serialization)
@@ -203,11 +208,14 @@ export async function getCircles(): Promise<Circle[]> {
                 payoutMonth: m.payoutMonth ?? undefined
             })),
             events: c.events.map(e => ({
-                ...e,
+                id: e.id,
                 type: e.type as any,
+                message: e.message,
                 timestamp: e.timestamp.toISOString(),
                 meta: e.meta as any
-            }))
+            })),
+            payoutSchedule: (c.payoutSchedule as string[]) || undefined,
+            settings: (c.settings as any) || undefined
         }));
     } catch (error) {
         console.error("Error fetching circles:", error);
@@ -252,7 +260,9 @@ export async function getCircle(id: string): Promise<Circle | undefined> {
             message: e.message,
             timestamp: e.timestamp.toISOString(),
             meta: e.meta as any
-        }))
+        })),
+        payoutSchedule: (c.payoutSchedule as string[]) || undefined,
+        settings: (c.settings as any) || undefined
     };
 }
 
@@ -271,13 +281,18 @@ export async function createCircle(data: Partial<Circle>, creator: User) {
             rules: data.rules || [],
             coverImage: (data.coverImage || undefined) as string | undefined,
             isPrivate: data.isPrivate || false,
-            status: 'open',
             adminId: creator.id,
+
+            // Advanced Settings & Status
+            status: 'recruiting',
+            payoutSchedule: data.payoutSchedule,
+            settings: data.settings,
+
             members: {
                 create: {
                     userId: creator.id,
                     role: 'admin',
-                    status: 'pending' // or paid?
+                    status: 'pending'
                 }
             },
             events: {
@@ -367,5 +382,23 @@ export async function updateMemberStatus(circleId: string, userId: string, newSt
                 });
             }
         }
+    }
+}
+
+export async function updateCircleStatus(circleId: string, status: 'active' | 'completed' | 'recruiting') {
+    await prisma.circle.update({
+        where: { id: circleId },
+        data: { status }
+    });
+
+    if (status === 'active') {
+        await prisma.circleEvent.create({
+            data: {
+                circleId,
+                type: 'info',
+                message: 'Circle officially started!',
+                timestamp: new Date()
+            }
+        });
     }
 }

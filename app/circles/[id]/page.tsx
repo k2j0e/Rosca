@@ -31,26 +31,25 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                 <h1 className="text-center text-[32px] font-bold leading-tight tracking-[-0.015em] text-text-main dark:text-white">
                     {circle.name}
                 </h1>
-                <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 text-xs font-bold text-primary">
-                        {circle.category}
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 text-xs font-bold text-primary">
+                    {circle.category}
+                </span>
+                {circle.status === 'recruiting' && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-bold text-blue-700 dark:text-blue-400">
+                        Recruiting
                     </span>
-                    {circle.status === 'open' && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-bold text-green-700 dark:text-green-400">
-                            Open
-                        </span>
-                    )}
-                </div>
-
-                <div className="flex flex-col items-center mt-4 mb-2">
-                    <span className="text-text-sub dark:text-text-sub-dark text-lg font-medium">
-                        Monthly Pot
-                    </span>
-                    <span className="text-[48px] font-extrabold text-primary leading-none tracking-tight">
-                        ${circle.payoutTotal.toLocaleString()}
-                    </span>
-                </div>
+                )}
             </div>
+
+            <div className="flex flex-col items-center mt-4 mb-2">
+                <span className="text-text-sub dark:text-text-sub-dark text-lg font-medium">
+                    Monthly Pot
+                </span>
+                <span className="text-[48px] font-extrabold text-primary leading-none tracking-tight">
+                    ${circle.payoutTotal.toLocaleString()}
+                </span>
+            </div>
+
 
             {/* Key Stats Grid */}
             <div className="grid grid-cols-3 gap-3 px-4 mb-6">
@@ -175,7 +174,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
 
 
             {/* Static Bottom Actions */}
-            <div className="w-full p-4 pb-8 bg-transparent">
+            <div className="w-full p-4 pb-24 bg-transparent">
                 <div className="max-w-md mx-auto w-full flex gap-3">
                     <div className="flex-1">
                         <InviteButton
@@ -200,6 +199,6 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                 </div>
             </div>
 
-        </div>
+        </div >
     );
 }

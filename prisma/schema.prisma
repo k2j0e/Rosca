@@ -46,8 +46,12 @@ model Circle {
   rules        String[]
   coverImage   String?
   isPrivate    Boolean  @default(false)
-  status       String   // 'open', 'active', 'completed'
+  status       String   // 'recruiting', 'active', 'completed'
   
+  // Advanced Settings
+  payoutSchedule Json?  // Array of dates for rounds
+  settings       Json?  // { allowLateJoins: boolean, ... }
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
