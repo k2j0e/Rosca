@@ -111,8 +111,9 @@ export async function getCurrentUser(): Promise<User | null> {
             where: { id: userId }
         });
         return user ? mapUser(user) : null;
-    } catch (error) {
-        console.error("Error getting current user:", error);
+    } catch (error: any) {
+        console.error("CRITICAL ERROR getting current user:", error);
+        // Fallback for debugging - remove this later
         return null;
     }
 }
