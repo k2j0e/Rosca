@@ -23,7 +23,7 @@ export default function CreateFinancials() {
             members: numRounds.toString(), // assuming rounds == members for simple rotation
             freq: frequency
         });
-        router.push(`/create/details?${params.toString()}`);
+        router.push(`/create/schedule?${params.toString()}`);
     };
 
     const toggleFrequency = (freq: "Weekly" | "Monthly" | "Bi-Weekly") => {
