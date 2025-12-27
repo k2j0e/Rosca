@@ -11,22 +11,36 @@ export default async function HomeScreen() {
     redirect('/welcome');
   }
 
-  // Debugging: Comment out circles to isolate the crash
-  // const circles = await getCircles() || [];
-  // const myCircles = circles.filter(c => c && c.members && c.members.some(m => m.userId === user.id));
-  const activeCircles = 0; // myCircles.length;
-  const totalCommitted = 0; // myCircles.reduce((sum, circle) => sum + ((circle.amount || 0) * (circle.duration || 0)), 0);
+  const circles = await getCircles() || [];
+  const myCircles = circles.filter(c => c && c.members && c.members.some(m => m.userId === user.id));
+  const activeCircles = myCircles.length;
+  // Calculate total committed 
+  const totalCommitted = myCircles.reduce((sum, circle) => sum + ((circle.amount || 0) * (circle.duration || 0)), 0);
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl pb-20 font-display text-text-main dark:text-white">
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <h1 className="text-3xl font-bold mb-1">Good morning,</h1>
-        <h2 className="text-3xl font-bold text-primary">Member</h2>
+        <h2 className="text-3xl font-bold text-primary">{user.name}</h2>
       </div>
 
-      <div className="px-6">
-        <p>Debug Mode: Circles disabled</p>
+      {/* Summary Cards */}
+      <div className="px-4 grid grid-cols-2 gap-4 mb-8">
+        <div className="bg-primary text-white p-5 rounded-2xl shadow-lg shadow-primary/20">
+          <span className="material-symbols-outlined text-3xl mb-3 opacity-90">account_balance_wallet</span>
+          <div>
+            <p className="text-xs opacity-80 uppercase font-bold tracking-wider mb-1">Committed</p>
+            <p className="text-2xl font-bold">${totalCommitted.toLocaleString()}</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-surface-dark p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
+          <span className="material-symbols-outlined text-3xl mb-3 text-secondary">pie_chart</span>
+          <div>
+            <p className="text-xs text-text-sub dark:text-text-sub-dark uppercase font-bold tracking-wider mb-1">Active Circles</p>
+            <p className="text-2xl font-bold text-text-main dark:text-white">{activeCircles}</p>
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
