@@ -76,13 +76,21 @@ export interface Circle {
     events: CircleEvent[];
 }
 
-// Helper to map Prisma User to our User type (handling JSON parsing)
+// Helper to map Prisma User to our User type (handling JSON parsing and Date serialization)
 function mapUser(pUser: any): User {
     return {
-        ...pUser,
-        badges: pUser.badges as string[],
-        stats: pUser.stats as any,
-        history: pUser.history as any
+        id: pUser.id,
+        phoneNumber: pUser.phoneNumber,
+        name: pUser.name,
+        avatar: pUser.avatar || '',
+        location: pUser.location || undefined,
+        bio: pUser.bio || undefined,
+        trustScore: pUser.trustScore,
+        memberSince: pUser.memberSince,
+        // Ensure arrays/objects, never null
+        badges: (pUser.badges as string[]) || [],
+        stats: (pUser.stats as any) || { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
+        history: (pUser.history as any) || []
     };
 }
 
@@ -165,40 +173,45 @@ export const MOCK_USER = null;
 // --- Circle Operations ---
 
 export async function getCircles(): Promise<Circle[]> {
-    const circles = await prisma.circle.findMany({
-        include: {
-            members: { include: { user: true } },
-            events: true,
-            admin: true
-        },
-        orderBy: { createdAt: 'desc' }
-    });
+    try {
+        const circles = await prisma.circle.findMany({
+            include: {
+                members: { include: { user: true } },
+                events: true,
+                admin: true
+            },
+            orderBy: { createdAt: 'desc' }
+        });
 
-    return circles.map(c => ({
-        ...c,
-        category: c.category as CircleCategory,
-        frequency: c.frequency as any,
-        status: c.status as any,
-        startDate: c.startDate.toISOString(),
-        description: (c.description || undefined) as string | undefined,
-        coverImage: (c.coverImage || undefined) as string | undefined,
-        members: c.members.map(m => ({
-            userId: m.userId,
-            name: m.user?.name || 'Unknown User', // Safety check
-            avatar: m.user?.avatar || '',         // Safety check
-            joinedAt: m.joinedAt.toISOString(),
-            role: m.role as any,
-            status: m.status as any,
-            payoutPreference: m.payoutPreference as any,
-            payoutMonth: m.payoutMonth ?? undefined
-        })),
-        events: c.events.map(e => ({
-            ...e,
-            type: e.type as any,
-            timestamp: e.timestamp.toISOString(),
-            meta: e.meta as any
-        }))
-    }));
+        return circles.map(c => ({
+            ...c,
+            category: c.category as CircleCategory,
+            frequency: c.frequency as any,
+            status: c.status as any,
+            startDate: c.startDate.toISOString(),
+            description: (c.description || undefined) as string | undefined,
+            coverImage: (c.coverImage || undefined) as string | undefined,
+            members: c.members.map(m => ({
+                userId: m.userId,
+                name: m.user?.name || 'Unknown User',
+                avatar: m.user?.avatar || '',
+                joinedAt: m.joinedAt.toISOString(),
+                role: m.role as any,
+                status: m.status as any,
+                payoutPreference: m.payoutPreference as any,
+                payoutMonth: m.payoutMonth ?? undefined
+            })),
+            events: c.events.map(e => ({
+                ...e,
+                type: e.type as any,
+                timestamp: e.timestamp.toISOString(),
+                meta: e.meta as any
+            }))
+        }));
+    } catch (error) {
+        console.error("Error fetching circles:", error);
+        return [];
+    }
 }
 
 export async function getCircle(id: string): Promise<Circle | undefined> {
