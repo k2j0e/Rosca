@@ -54,12 +54,24 @@ export async function signInAction(formData: FormData) {
     }
 }
 
+export async function checkUserExistsAction(phone: string) {
+    const user = await findUserByPhone(phone);
+    return !!user;
+}
+
 export async function createAccountAction(formData: FormData) {
     const name = formData.get('name') as string;
     const phone = formData.get('phone') as string;
     const location = formData.get('location') as string;
 
     if (!name || !phone) return;
+
+    // Check if user already exists
+    const existingUser = await findUserByPhone(phone);
+    if (existingUser) {
+        // Prevent overwriting existing account
+        redirect('/signin?error=account_exists');
+    }
 
     // Create new user object
     const newUser: User = {
