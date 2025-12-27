@@ -201,10 +201,10 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
             </div>
 
 
-            {/* Floating Action Button (Only show if pending) */}
+            {/* Floating Action Button (Only show if pending and NOT recruiting) */}
             {
-                !isPaid && (
-                    <Link href={`/circles/${circle.id}/dashboard/commitment`} className="fixed bottom-6 right-6 z-40 animate-in zoom-in duration-300">
+                !isPaid && circle.status !== 'recruiting' && (
+                    <Link href={`/circles/${circle.id}/dashboard/commitment`} className="fixed bottom-24 right-6 z-40 animate-in zoom-in duration-300">
                         <button className="flex items-center gap-2 bg-text-main dark:bg-white text-white dark:text-text-main px-6 py-4 rounded-full shadow-2xl hover:scale-105 transition-transform">
                             <span className="material-symbols-outlined">payments</span>
                             <span className="font-bold">Make Contribution</span>
