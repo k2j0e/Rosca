@@ -93,8 +93,8 @@ export default function CreateFinancials() {
                                     key={freq}
                                     onClick={() => toggleFrequency(freq)}
                                     className={`px-6 py-3 rounded-2xl text-sm font-bold whitespace-nowrap transition-all shadow-sm ${frequency === freq
-                                            ? "bg-primary text-white ring-2 ring-primary ring-offset-2 ring-offset-[#f2f1ef]"
-                                            : "bg-white dark:bg-surface-dark text-text-sub dark:text-text-sub-dark hover:bg-gray-50"
+                                        ? "bg-primary text-white ring-2 ring-primary ring-offset-2 ring-offset-[#f2f1ef]"
+                                        : "bg-white dark:bg-surface-dark text-text-sub dark:text-text-sub-dark hover:bg-gray-50"
                                         }`}
                                 >
                                     {freq}
@@ -154,17 +154,17 @@ export default function CreateFinancials() {
                         </div>
                     </div>
 
-                </div>
+                    {/* Static Action Button */}
+                    <div className="mt-4 mb-8">
+                        <button
+                            onClick={handleNext}
+                            className="w-full bg-primary text-white font-bold text-lg py-4 rounded-full shadow-xl flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors"
+                        >
+                            Review Structure
+                            <span className="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
 
-                {/* Sticky Footer */}
-                <div className="fixed bottom-20 left-4 right-4 z-40 max-w-[calc(100%-2rem)] mx-auto md:max-w-[416px]">
-                    <button
-                        onClick={handleNext}
-                        className="w-full bg-[#333333] text-white font-bold text-lg py-4 rounded-full shadow-xl flex items-center justify-center gap-2 hover:bg-black transition-colors"
-                    >
-                        Review Structure
-                        <span className="material-symbols-outlined">arrow_forward</span>
-                    </button>
                 </div>
 
             </div>
