@@ -42,7 +42,7 @@ export async function signInAction(formData: FormData) {
 
     if (user) {
         // Login successful
-        (await cookies()).set('session_user_id', user.id);
+        (await cookies()).set('session_user_id', user.id, { path: '/' });
 
         // Add delay to ensure persistence before redirect
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -79,7 +79,7 @@ export async function createAccountAction(formData: FormData) {
     await registerUser(newUser);
 
     // 2. Set as Current Session (Log them in)
-    (await cookies()).set('session_user_id', newUser.id);
+    (await cookies()).set('session_user_id', newUser.id, { path: '/' });
 
     // Small delay to ensure DB consistency
     await new Promise(resolve => setTimeout(resolve, 500));

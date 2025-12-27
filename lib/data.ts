@@ -79,18 +79,18 @@ export interface Circle {
 // Helper to map Prisma User to our User type (handling JSON parsing and Date serialization)
 function mapUser(pUser: any): User {
     return {
-        id: pUser.id,
-        phoneNumber: pUser.phoneNumber,
-        name: pUser.name,
-        avatar: pUser.avatar || '',
-        location: pUser.location || undefined,
-        bio: pUser.bio || undefined,
-        trustScore: pUser.trustScore,
-        memberSince: pUser.memberSince,
+        id: String(pUser.id),
+        phoneNumber: String(pUser.phoneNumber),
+        name: String(pUser.name || 'User'),
+        avatar: String(pUser.avatar || ''),
+        location: pUser.location ? String(pUser.location) : undefined,
+        bio: pUser.bio ? String(pUser.bio) : undefined,
+        trustScore: Number(pUser.trustScore || 0),
+        memberSince: String(pUser.memberSince || '2025'),
         // Ensure arrays/objects, never null
-        badges: (pUser.badges as string[]) || [],
-        stats: (pUser.stats as any) || { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
-        history: (pUser.history as any) || []
+        badges: Array.isArray(pUser.badges) ? pUser.badges : [],
+        stats: pUser.stats && typeof pUser.stats === 'object' ? pUser.stats : { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
+        history: Array.isArray(pUser.history) ? pUser.history : []
     };
 }
 

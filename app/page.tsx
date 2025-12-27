@@ -22,7 +22,7 @@ export default async function HomeScreen() {
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <h1 className="text-3xl font-bold mb-1">Good morning,</h1>
-        <h2 className="text-3xl font-bold text-primary">{user.name}</h2>
+        <h2 className="text-3xl font-bold text-primary">Member</h2>
       </div>
 
       <div className="px-6">
