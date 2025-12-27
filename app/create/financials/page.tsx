@@ -14,7 +14,7 @@ export default function CreateFinancials() {
     const [membersCount, setMembersCount] = useState<number>(10); // Derived or set? Design implies rounds == members often, but let's keep separate or derived. Design says "10 Rounds" and small "10 MEMBERS" badge below. Let's link them for now as per typical ROSCA.
 
     const contribution = targetAmount; // Design says "Contribution Amount $500", "Per person, per round".
-    const totalPot = contribution * membersCount; // "Each member gets $5,000 one-time" -> 500 * 10
+    const totalPot = contribution * numRounds; // "Each member gets $5,000 one-time" -> 500 * 10
     const durationLabel = frequency === "Weekly" ? "Weeks" : frequency === "Monthly" ? "Months" : "Bi-Weeks";
 
     const handleNext = () => {
@@ -34,8 +34,11 @@ export default function CreateFinancials() {
     const decrementRounds = () => setNumRounds(curr => Math.max(curr - 1, 3));
 
     // Update members count when rounds change (simple rotation model)
-    // useEffect(() => setMembersCount(numRounds), [numRounds]); 
+    // For this MVP, we assume a standard ROSCA where members == rounds
+    const actualMembersCount = numRounds;
+
     // We can just use numRounds for display as members count for now as they are 1:1 in simple ROSCAs
+    const membersCountDisplay = actualMembersCount;
 
     return (
         <div className="bg-[#f2f1ef] dark:bg-background-dark min-h-screen flex flex-col items-center justify-center font-display pb-20">
