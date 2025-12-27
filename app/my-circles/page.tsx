@@ -1,6 +1,8 @@
 "use strict";
 
 import Link from "next/link";
+export const dynamic = 'force-dynamic';
+
 import { getCircles, getCurrentUser } from "@/lib/data";
 
 export default async function MyCirclesScreen() {
