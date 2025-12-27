@@ -149,7 +149,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
             </div>
 
             {/* Admin/Creator Profile */}
-            <div className="flex flex-col px-4 mb-24">
+            <div className="flex flex-col px-4 mb-4">
                 <h3 className="text-text-main dark:text-white font-bold text-lg mb-3">
                     Meet the Stewards
                 </h3>
@@ -174,14 +174,14 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
 
 
 
-            {/* Sticky Bottom Actions */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 z-[60] pb-[env(safe-area-inset-bottom)]">
+            {/* Static Bottom Actions */}
+            <div className="w-full p-4 pb-8 bg-transparent">
                 <div className="max-w-md mx-auto w-full flex gap-3">
                     <div className="flex-1">
                         <InviteButton
                             circleId={circle.id}
                             text="Share"
-                            className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10"
+                            className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark"
                         />
                     </div>
                     {user && circle.members.some(m => m.userId === user.id) ? (
