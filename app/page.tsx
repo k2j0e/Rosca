@@ -11,11 +11,11 @@ export default async function HomeScreen() {
     redirect('/welcome');
   }
 
-  const circles = await getCircles();
-  const myCircles = circles.filter(c => c.members.some(m => m.userId === user.id));
+  const circles = await getCircles() || [];
+  const myCircles = circles.filter(c => c && c.members && c.members.some(m => m.userId === user.id));
   const activeCircles = myCircles.length;
   // Calculate total committed 
-  const totalCommitted = myCircles.reduce((sum, circle) => sum + (circle.amount * circle.duration), 0);
+  const totalCommitted = myCircles.reduce((sum, circle) => sum + ((circle.amount || 0) * (circle.duration || 0)), 0);
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl pb-20 font-display text-text-main dark:text-white">
