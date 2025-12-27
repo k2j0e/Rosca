@@ -55,7 +55,9 @@ export async function signInAction(formData: FormData) {
 }
 
 export async function checkUserExistsAction(phone: string) {
+    console.log(`[Action] Checking if user exists for phone: ${phone}`);
     const user = await findUserByPhone(phone);
+    console.log(`[Action] User found: ${!!user} (ID: ${user?.id})`);
     return !!user;
 }
 
