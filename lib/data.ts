@@ -310,15 +310,15 @@ export async function joinCircle(circleId: string, user: User, preference: 'earl
             }
         });
 
-        // Add Event
-        await prisma.circleEvent.create({
+        // Add Event - Removed per user request (only log on acceptance)
+        /* await prisma.circleEvent.create({
             data: {
                 circleId,
                 type: 'join',
                 message: `${user.name} requested to join`,
                 meta: { userId: user.id, userName: user.name }
             }
-        });
+        }); */
     }
 }
 
