@@ -34,11 +34,11 @@ export async function signInAction(formData: FormData) {
         redirect('/signin?error=missing_phone');
     }
 
-    const user = findUserByPhone(phone);
+    const user = await findUserByPhone(phone);
 
     if (user) {
         // Login successful
-        updateUser(user);
+        await updateUser(user as any); // cast for now if needed, or update type
         // Add delay to ensure persistence before redirect
         await new Promise(resolve => setTimeout(resolve, 500));
         redirect('/');
@@ -71,10 +71,10 @@ export async function createAccountAction(formData: FormData) {
     };
 
     // 1. Save to Registry (Permanent storage)
-    registerUser(newUser);
+    await registerUser(newUser);
 
     // 2. Set as Current Session (Log them in)
-    updateUser(newUser);
+    await updateUser(newUser);
 
     // Small delay to ensure DB consistency
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -106,10 +106,10 @@ export async function createCircleAction(formData: FormData) {
     const rules = JSON.parse(formData.get("rules") as string || "[]");
     const coverImage = formData.get("coverImage") as string;
 
-    const currentUser = getCurrentUser();
+    const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Must be logged in to create a circle");
 
-    const newCircle = createCircle({
+    const newCircle = await createCircle({
         name,
         category,
         amount, // This is technically contribution per person
@@ -141,11 +141,11 @@ export async function joinCircleAction(formData: FormData) {
         throw new Error("Circle ID is required");
     }
 
-    const currentUser = getCurrentUser();
+    const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Must be logged in to join");
 
     // Add real user to circle
-    joinCircle(circleId, currentUser, preference);
+    await joinCircle(circleId, currentUser, preference);
 
     // In a real app we might presumably log the intent somewhere
     console.log(`User joining circle ${circleId} with preference: ${preference} and intent: ${intent}`);
@@ -155,13 +155,13 @@ export async function joinCircleAction(formData: FormData) {
 
 export async function updatePayoutOrderAction(circleId: string, members: Member[]) {
     // In a real app, verify admin status here
-    updateCircleMembers(circleId, members);
+    await updateCircleMembers(circleId, members);
     // reduce delay for smoother feel, or keep it for feedback
     await new Promise(resolve => setTimeout(resolve, 500));
 }
 
 export async function updateMemberStatusAction(circleId: string, userId: string, newStatus: 'approved' | 'rejected') {
-    const currentUser = getCurrentUser();
+    const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Unauthorized");
 
     // In a real app we'd check admin permissions here using circle.adminId
@@ -169,7 +169,7 @@ export async function updateMemberStatusAction(circleId: string, userId: string,
     // Map "approved" to "pending" (meaning they are now a Pending Member awaiting payment)
     const dbStatus = newStatus === 'approved' ? 'pending' : 'rejected';
 
-    updateMemberStatus(circleId, userId, dbStatus);
+    await updateMemberStatus(circleId, userId, dbStatus);
 
     revalidatePath(`/circles/${circleId}`);
 
@@ -180,12 +180,12 @@ export async function updateMemberStatusAction(circleId: string, userId: string,
 }
 
 export async function markContributionPaidAction(circleId: string) {
-    const currentUser = getCurrentUser();
+    const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Unauthorized");
 
     // Fetch circle to check current status
     const { getCircle } = await import("@/lib/data"); // Dynamic import to avoid circular dependency issues if any, though likely fine
-    const circle = getCircle(circleId);
+    const circle = await getCircle(circleId);
     if (!circle) throw new Error("Circle not found");
 
     const member = circle.members.find(m => m.userId === currentUser.id);
@@ -201,18 +201,18 @@ export async function markContributionPaidAction(circleId: string) {
         return; // Already paid or pending verification
     }
 
-    updateMemberStatus(circleId, currentUser.id, 'paid_pending');
+    await updateMemberStatus(circleId, currentUser.id, 'paid_pending');
     revalidatePath(`/circles/${circleId}`);
     revalidatePath(`/circles/${circleId}/dashboard/commitment`);
 }
 
 export async function verifyPaymentAction(circleId: string, memberId: string) {
-    const currentUser = getCurrentUser();
+    const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Unauthorized");
 
     // In real app, check if currentUser is Admin of circleId here
 
-    updateMemberStatus(circleId, memberId, 'paid');
+    await updateMemberStatus(circleId, memberId, 'paid');
     revalidatePath(`/circles/${circleId}`);
     // revalidatePath(`/circles/${circleId}/admin/members`); // If we had a specific admin page for this
 }

@@ -7,14 +7,14 @@ import { markContributionPaidAction } from "@/app/actions";
 
 export default async function DashboardCommitment(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
-    const currentUser = getCurrentUser() || MOCK_USER;
+    const circle = await getCircle(params.id);
+    const currentUser = await getCurrentUser() || MOCK_USER;
 
     if (!circle) {
         notFound();
     }
 
-    const myMember = circle.members.find(m => m.userId === currentUser.id);
+    const myMember = currentUser ? circle.members.find(m => m.userId === currentUser.id) : null;
     const isMember = !!myMember;
 
     // Dynamic Date Calculation (Next 1st of the month)
@@ -23,7 +23,7 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
     const nextPaymentDate = nextMonth.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
     // Trust Score from user profile
-    const trustScore = currentUser.trustScore || 850;
+    const trustScore = currentUser?.trustScore || 850;
 
     return (
         <div className="flex flex-col h-full">

@@ -4,13 +4,13 @@ import Link from "next/link";
 import { getCircles, getCurrentUser } from "@/lib/data";
 import { redirect } from "next/navigation";
 
-export default function HomeScreen() {
-  const user = getCurrentUser();
+export default async function HomeScreen() {
+  const user = await getCurrentUser();
   if (!user) {
     redirect('/welcome');
   }
 
-  const circles = getCircles();
+  const circles = await getCircles();
   const myCircles = circles.filter(c => c.members.some(m => m.userId === user.id));
   const activeCircles = myCircles.length;
   // Calculate total committed 

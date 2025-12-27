@@ -6,8 +6,8 @@ import { getCircle, getCurrentUser } from "@/lib/data";
 
 export default async function CircleDashboard(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
-    const currentUser = getCurrentUser(); // Get real user
+    const circle = await getCircle(params.id);
+    const currentUser = await getCurrentUser(); // Get real user
 
     if (!circle) {
         notFound();

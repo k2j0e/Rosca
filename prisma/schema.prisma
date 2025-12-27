@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  phoneNumber  String   @unique
+  name         String
+  avatar       String?
+  location     String?
+  bio          String?
+  trustScore   Int      @default(850)
+  memberSince  String   @default("2025") // Could be DateTime, but keeping string for MVP compat
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // JSON fields for complex unstructured data
+  badges       String[] // e.g. ['early-backer']
+  stats        Json?    // { circlesCompleted: number, ... }
+  history      Json?    // Array of history objects
+
+  // Relations
+  memberships  Member[]
+  createdCircles Circle[] @relation("CreatedCircles")
+}
+
+model Circle {
+  id           String   @id @default(uuid())
+  name         String
+  category     String   // 'Travel', 'Business', etc.
+  amount       Float
+  frequency    String   // 'weekly', 'monthly'
+  duration     Int      // Number of cycles
+  maxMembers   Int
+  payoutTotal  Float
+  startDate    DateTime
+  description  String?
+  rules        String[]
+  coverImage   String?
+  isPrivate    Boolean  @default(false)
+  status       String   // 'open', 'active', 'completed'
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  adminId      String
+  admin        User     @relation("CreatedCircles", fields: [adminId], references: [id])
+  members      Member[]
+  events       CircleEvent[]
+}
+
+model Member {
+  id               String   @id @default(uuid())
+  joinedAt         DateTime @default(now())
+  role             String   // 'admin' | 'member'
+  payoutMonth      Int?
+  payoutPreference String?  // 'early' | 'late' | 'any'
+  status           String   // 'paid' | 'pending' | 'late' | 'requested'
+  
+  // Relations
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  circleId         String
+  circle           Circle   @relation(fields: [circleId], references: [id])
+
+  @@unique([userId, circleId]) // Compound unique constraint
+}
+
+model CircleEvent {
+  id        String   @id @default(uuid())
+  type      String   // 'payment', 'join', etc.
+  message   String
+  timestamp DateTime @default(now())
+  meta      Json?    // Extra data like userId, amount
+
+  // Relations
+  circleId  String
+  circle    Circle   @relation(fields: [circleId], references: [id])
+}

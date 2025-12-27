@@ -5,7 +5,7 @@ import { updateMemberStatusAction } from "@/app/actions";
 
 export default async function ManageMembers(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
+    const circle = await getCircle(params.id);
 
     if (!circle) {
         notFound();

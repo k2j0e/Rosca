@@ -7,8 +7,8 @@ import InviteButton from "@/app/components/InviteButton";
 
 export default async function CircleDetail(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
-    const user = getCurrentUser() || MOCK_USER;
+    const circle = await getCircle(params.id);
+    const user = await getCurrentUser() || MOCK_USER;
 
     if (!circle) {
         notFound();
@@ -184,7 +184,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                             className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10"
                         />
                     </div>
-                    {circle.members.some(m => m.userId === user.id) ? (
+                    {user && circle.members.some(m => m.userId === user.id) ? (
                         <Link href={`/circles/${circle.id}/dashboard`} className="flex-[2]">
                             <button className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition shadow-lg shadow-primary/25">
                                 Go to Dashboard

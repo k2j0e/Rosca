@@ -6,7 +6,7 @@ import { getCircles } from "@/lib/data";
 export default async function ExploreCircles(props: { searchParams: Promise<{ joined?: string }> }) {
     const searchParams = await props.searchParams;
     const joined = searchParams?.joined === 'true';
-    const circles = getCircles();
+    const circles = await getCircles();
 
     return (
         <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl pb-20">

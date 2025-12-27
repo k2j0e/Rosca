@@ -5,7 +5,7 @@ import PayoutEditor from "./PayoutEditor";
 
 export default async function AdminPayouts(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
+    const circle = await getCircle(params.id);
 
     if (!circle) {
         redirect("/profile");

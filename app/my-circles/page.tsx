@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { getCircles, getCurrentUser } from "@/lib/data";
 
-export default function MyCirclesScreen() {
-    const currentUser = getCurrentUser();
-    const circles = getCircles();
+export default async function MyCirclesScreen() {
+    const currentUser = await getCurrentUser();
+    const circles = await getCircles();
     const myCircles = currentUser
         ? circles.filter(c => c.members.some(m => m.userId === currentUser.id))
         : [];

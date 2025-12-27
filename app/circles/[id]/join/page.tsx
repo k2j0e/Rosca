@@ -6,8 +6,8 @@ import { getCircle, getCurrentUser } from "@/lib/data";
 
 export default async function JoinCircleConfirm(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
-    const currentUser = getCurrentUser();
+    const circle = await getCircle(params.id);
+    const currentUser = await getCurrentUser();
 
     if (!circle) {
         notFound();

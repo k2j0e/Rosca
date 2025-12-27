@@ -8,8 +8,8 @@ export default async function DashboardLayout(props: {
 }) {
     const params = await props.params;
     const { children } = props;
-    const circle = getCircle(params.id);
-    const currentUser = getCurrentUser();
+    const circle = await getCircle(params.id);
+    const currentUser = await getCurrentUser();
 
     if (!circle) {
         notFound();

@@ -8,8 +8,8 @@ import { updateMemberStatusAction, verifyPaymentAction } from "@/app/actions";
 
 export default async function DashboardMembers(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
-    const circle = getCircle(params.id);
-    const currentUser = getCurrentUser();
+    const circle = await getCircle(params.id);
+    const currentUser = await getCurrentUser();
 
     if (!circle) {
         notFound();
@@ -25,7 +25,7 @@ export default async function DashboardMembers(props: { params: Promise<{ id: st
         // Fallback
         if (a.role === 'admin') return -1;
         if (b.role === 'admin') return 1;
-        return a.name.localeCompare(b.name);
+        return (a.name || '').localeCompare(b.name || '');
     });
 
     const currentUserMember = currentUser ? circle.members.find(m => m.userId === currentUser.id) : null;

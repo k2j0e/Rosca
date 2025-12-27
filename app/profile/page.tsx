@@ -10,13 +10,13 @@ const BADGE_CONFIG: Record<string, { label: string, icon: string, color: string 
     'supporter': { label: 'Supporter', icon: 'handshake', color: 'bg-blue-100 text-blue-700' },
 };
 
-export default function ProfileScreen() {
-    const user = getCurrentUser() || MOCK_USER;
+export default async function ProfileScreen() {
+    const user = await getCurrentUser() || MOCK_USER;
 
     // Ensure stats exist even if using old mock user
-    const stats = user.stats || { circlesCompleted: 3, onTimePercentage: 98, supportCount: 8 };
-    const history = user.history || [];
-    const badges = user.badges || ['early-backer', 'consistent'];
+    const stats = user?.stats || { circlesCompleted: 3, onTimePercentage: 98, supportCount: 8 };
+    const history = user?.history || [];
+    const badges = user?.badges || ['early-backer', 'consistent'];
 
     return (
         <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white">
@@ -38,7 +38,7 @@ export default function ProfileScreen() {
                         <div className="absolute -inset-1.5 bg-gradient-to-tr from-amber-300 to-orange-400 rounded-full blur-sm opacity-50 group-hover:opacity-75 transition duration-500"></div>
                         <div
                             className="relative w-28 h-28 rounded-full bg-cover bg-center border-4 border-white dark:border-surface-dark shadow-sm"
-                            style={{ backgroundImage: `url('${user.avatar}')` }}
+                            style={{ backgroundImage: `url('${user?.avatar || ''}')` }}
                         ></div>
                         <div className="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full border-[3px] border-white dark:border-surface-dark flex items-center justify-center shadow-sm">
                             <span className="material-symbols-outlined text-[14px]">verified</span>
@@ -46,11 +46,11 @@ export default function ProfileScreen() {
                     </div>
 
                     <h1 className="text-2xl font-bold text-center text-text-main dark:text-white mb-1">
-                        {user.name}
+                        {user?.name || 'User'}
                     </h1>
 
                     <div className="flex items-center gap-2 text-sm">
-                        <span className="text-text-sub dark:text-text-sub-dark font-medium">Member since {user.memberSince || '2023'}</span>
+                        <span className="text-text-sub dark:text-text-sub-dark font-medium">Member since {user?.memberSince || '2023'}</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/20"></span>
                         <span className="text-primary font-bold">Highly Trusted</span>
                     </div>

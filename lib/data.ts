@@ -1,20 +1,22 @@
 import 'server-only';
-import fs from 'fs';
-import path from 'path';
+import { prisma } from './db';
+import { Prisma } from '@prisma/client';
 
+// Re-export types for compatibility, though ideally we switch to Prisma types
 export type MemberStatus = 'paid' | 'pending' | 'late' | 'requested' | 'paid_pending';
 export type CircleCategory = 'Travel' | 'Business' | 'Emergency' | 'Other';
 
+// Define interfaces that match the Prisma schema but with strict typing for JSON fields
 export interface User {
     id: string;
-    phoneNumber: string; // Primary identity anchor
+    phoneNumber: string;
     name: string;
     avatar: string;
-    location?: string; // City / Region
+    location?: string;
     bio?: string;
     trustScore: number;
-    memberSince: string; // e.g. "2021"
-    badges: string[]; // e.g. ['early-backer', 'consistent', 'guide']
+    memberSince: string;
+    badges: string[];
     stats: {
         circlesCompleted: number;
         onTimePercentage: number;
@@ -32,12 +34,12 @@ export interface User {
 
 export interface Member {
     userId: string;
-    name: string;
-    avatar: string;
+    name?: string; // These are joined fields, often need flattening
+    avatar?: string;
     joinedAt: string;
     role: 'admin' | 'member';
-    payoutMonth?: number; // 1-indexed
-    payoutPreference?: 'early' | 'late' | 'any'; // Added preference
+    payoutMonth?: number;
+    payoutPreference?: 'early' | 'late' | 'any';
     status: MemberStatus;
 }
 
@@ -58,284 +60,292 @@ export interface Circle {
     id: string;
     name: string;
     category: CircleCategory;
-    amount: number; // Contribution amount
+    amount: number;
     frequency: 'weekly' | 'monthly' | 'bi-weekly';
-    duration: number; // Number of cycles
+    duration: number;
     payoutTotal: number;
     startDate: string;
     members: Member[];
-    maxMembers: number; // Added maxMembers
+    maxMembers: number;
     description?: string;
-    rules?: string[]; // Added rules
-    coverImage?: string; // Added coverImage
+    rules?: string[];
+    coverImage?: string;
     isPrivate: boolean;
     status: 'open' | 'active' | 'completed';
     adminId: string;
-    events: CircleEvent[]; // Added activity log
+    events: CircleEvent[];
 }
 
-const DB_PATH = path.join(process.cwd(), 'db.json');
-const USER_DB_PATH = path.join(process.cwd(), 'user.json');
-const USERS_REGISTRY_PATH = path.join(process.cwd(), 'users.json');
-
-// Initial Default User (for fallback)
-const DEFAULT_USER: User = {
-    id: 'u1',
-    phoneNumber: '+15550109999',
-    name: 'Amara Okafor',
-    location: 'Lagos, Nigeria',
-    avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAasS-Tm_0L0SFa0loHUoMYYrgYAhVY6aD55T5IzbsW5tY6QKzBpccqQxkDa2UQvXpDcmXhKqnTvip2i8-944CMV65YQqlQegt_yuCR8bgCDTiCWVnCtCBu2rprE8gkgl5O663fgkcJbtR-oANpt1bbRGfiLudMWnzj1y_lPeM5_SGN2ovBXOBH3qUS3wZuVLFW8iAORYRPdCNKsOwut1-soe4EkwaDS8qa-RpFXfI6qjV_Au7mt_0he_V1B-vdlJkVxiO3K_2sDfZO',
-    trustScore: 850,
-    memberSince: "2021",
-    badges: ['early-backer', 'consistent', 'guide'],
-    stats: {
-        circlesCompleted: 3,
-        onTimePercentage: 98,
-        supportCount: 8
-    },
-    history: [
-        {
-            id: 'h1',
-            type: 'contribution',
-            title: 'Contribution made',
-            subtitle: 'Family Vacation Circle · Week 4',
-            timestamp: new Date(Date.now() - 2 * 86400000).toISOString() // 2 days ago
-        },
-        {
-            id: 'h2',
-            type: 'endorsement',
-            title: 'Endorsed by Admin',
-            subtitle: 'Verified identity confirmation',
-            timestamp: new Date(Date.now() - 7 * 86400000).toISOString() // 1 week ago
-        },
-        {
-            id: 'h3',
-            type: 'badge',
-            title: "Unlocked 'Guide' Badge",
-            subtitle: 'Invited 3 trusted friends',
-            timestamp: new Date(Date.now() - 14 * 86400000).toISOString() // 2 weeks ago
-        }
-    ]
-};
-
-// --- User Session Management (Current Logged In User) ---
-
-export function getCurrentUser(): User | null {
-    try {
-        if (fs.existsSync(USER_DB_PATH)) {
-            const data = fs.readFileSync(USER_DB_PATH, 'utf-8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.error("Error reading User Session DB:", error);
-    }
-    return null; // Return null if not logged in
-}
-
-export function updateUser(user: User) {
-    try {
-        fs.writeFileSync(USER_DB_PATH, JSON.stringify(user, null, 2));
-    } catch (error) {
-        console.error("Error writing User Session DB:", error);
-    }
-}
-
-export function deleteUserSession() {
-    try {
-        if (fs.existsSync(USER_DB_PATH)) {
-            fs.unlinkSync(USER_DB_PATH);
-        }
-    } catch (error) {
-        console.error("Error deleting User session:", error);
-    }
-}
-
-// --- User Registry (All Users) ---
-
-function readUsersRegistry(): User[] {
-    try {
-        if (fs.existsSync(USERS_REGISTRY_PATH)) {
-            const data = fs.readFileSync(USERS_REGISTRY_PATH, 'utf-8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.error("Error reading Users Registry:", error);
-    }
-    return [];
-}
-
-function writeUsersRegistry(users: User[]) {
-    try {
-        fs.writeFileSync(USERS_REGISTRY_PATH, JSON.stringify(users, null, 2));
-    } catch (error) {
-        console.error("Error writing Users Registry:", error);
-    }
-}
-
-export function registerUser(user: User) {
-    const users = readUsersRegistry();
-    // Check if user already exists, update if so, else append
-    const existingIndex = users.findIndex(u => u.phoneNumber === user.phoneNumber);
-    if (existingIndex !== -1) {
-        users[existingIndex] = user;
-    } else {
-        users.push(user);
-    }
-    writeUsersRegistry(users);
-}
-
-export function findUserByPhone(phone: string): User | undefined {
-    const users = readUsersRegistry();
-    // Simple normalization check could go here
-    return users.find(u => u.phoneNumber.includes(phone) || phone.includes(u.phoneNumber));
-}
-
-// Backward compatibility helper (deprecated, check for null in app)
-export const MOCK_USER = getCurrentUser() || DEFAULT_USER;
-
-function readDb(): Circle[] {
-    try {
-        const data = fs.readFileSync(DB_PATH, 'utf-8');
-        return JSON.parse(data);
-    } catch (error) {
-        console.error("Error reading DB:", error);
-        return [];
-    }
-}
-
-function writeDb(circles: Circle[]) {
-    try {
-        fs.writeFileSync(DB_PATH, JSON.stringify(circles, null, 2));
-    } catch (error) {
-        console.error("Error writing DB:", error);
-    }
-}
-
-// Simple In-Memory Store Helpers
-export function getCircles() {
-    return readDb();
-}
-
-export function getCircle(id: string) {
-    const circles = readDb();
-    return circles.find(c => c.id === id);
-}
-
-export function createCircle(data: Partial<Circle>, creator: User) {
-    const circles = readDb();
-    const newCircle: Circle = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: data.name || 'New Circle',
-        category: data.category || 'Other',
-        amount: data.amount || 0,
-        frequency: data.frequency || 'monthly',
-        duration: data.duration || 10,
-        maxMembers: data.maxMembers || data.duration || 10, // Default to duration or 10
-        payoutTotal: (data.amount || 0) * (data.duration || 10),
-        startDate: new Date().toISOString().split('T')[0],
-        description: data.description || '',
-        rules: data.rules || [],
-        coverImage: data.coverImage || '',
-        isPrivate: data.isPrivate || false,
-        status: 'open',
-        adminId: creator.id,
-        members: [{
-            userId: creator.id,
-            name: creator.name,
-            avatar: creator.avatar,
-            joinedAt: new Date().toISOString(),
-            role: 'admin',
-            status: 'pending'
-        }],
-        events: [{
-            id: Math.random().toString(36).substr(2, 9),
-            type: 'info',
-            message: 'Circle created',
-            timestamp: new Date().toISOString()
-        }]
+// Helper to map Prisma User to our User type (handling JSON parsing)
+function mapUser(pUser: any): User {
+    return {
+        ...pUser,
+        badges: pUser.badges as string[],
+        stats: pUser.stats as any,
+        history: pUser.history as any
     };
-    circles.unshift(newCircle); // Add to top
-    writeDb(circles);
+}
+
+// --- User Session Management ---
+
+// For MVP, we simulated "current user" with a file. 
+// Now, we will default to the seeded user "Amara" for simplicity if no auth is present.
+// In a real app, this would check cookies/headers.
+export async function getCurrentUser(): Promise<User | null> {
+    try {
+        const user = await prisma.user.findFirst({
+            where: { phoneNumber: '+15550109999' } // Amara
+        });
+        return user ? mapUser(user) : null;
+    } catch (error) {
+        console.error("Error getting current user:", error);
+        return null;
+    }
+}
+
+// This is no longer writing to a file, but updating the User record in DB
+export async function updateUser(user: Partial<User> & { id: string }) {
+    try {
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                name: user.name,
+                location: user.location,
+                bio: user.bio,
+                // Add other fields as necessary
+            }
+        });
+    } catch (error) {
+        console.error("Error updating user:", error);
+    }
+}
+
+// Dropping this as it was session-file specific
+export async function deleteUserSession() {
+    // No-op for now
+}
+
+// --- User Registry ---
+
+export async function registerUser(user: Partial<User>) {
+    if (!user.phoneNumber || !user.name) return;
+
+    try {
+        await prisma.user.upsert({
+            where: { phoneNumber: user.phoneNumber },
+            update: { ...user },
+            create: {
+                ...user,
+                // provide defaults
+                trustScore: 850,
+                memberSince: new Date().getFullYear().toString(),
+            } as any
+        });
+    } catch (e) {
+        console.error("Error registering user", e);
+    }
+}
+
+export async function findUserByPhone(phone: string): Promise<User | null> {
+    const user = await prisma.user.findFirst({
+        where: { phoneNumber: { contains: phone } }
+    });
+    return user ? mapUser(user) : null;
+}
+
+// Helper: MOCK_USER logic is deprecated but let's keep a compat placeholder
+export const MOCK_USER = null;
+
+// --- Circle Operations ---
+
+export async function getCircles(): Promise<Circle[]> {
+    const circles = await prisma.circle.findMany({
+        include: {
+            members: { include: { user: true } },
+            events: true,
+            admin: true
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    return circles.map(c => ({
+        ...c,
+        category: c.category as CircleCategory,
+        frequency: c.frequency as any,
+        status: c.status as any,
+        startDate: c.startDate.toISOString(),
+        description: (c.description || undefined) as string | undefined,
+        coverImage: (c.coverImage || undefined) as string | undefined,
+        members: c.members.map(m => ({
+            userId: m.userId,
+            name: m.user.name,
+            avatar: m.user.avatar || '',
+            joinedAt: m.joinedAt.toISOString(),
+            role: m.role as any,
+            status: m.status as any,
+            payoutPreference: m.payoutPreference as any,
+            payoutMonth: m.payoutMonth ?? undefined
+        })),
+        events: c.events.map(e => ({
+            ...e,
+            type: e.type as any,
+            timestamp: e.timestamp.toISOString(),
+            meta: e.meta as any
+        }))
+    }));
+}
+
+export async function getCircle(id: string): Promise<Circle | undefined> {
+    const c = await prisma.circle.findUnique({
+        where: { id },
+        include: {
+            members: { include: { user: true }, orderBy: { joinedAt: 'asc' } },
+            events: { orderBy: { timestamp: 'desc' } },
+            admin: true
+        }
+    });
+
+    if (!c) return undefined;
+
+    return {
+        ...c,
+        category: c.category as CircleCategory,
+        frequency: c.frequency as any,
+        status: c.status as any,
+        startDate: c.startDate.toISOString(),
+        description: (c.description || undefined) as string | undefined,
+        coverImage: (c.coverImage || undefined) as string | undefined,
+        members: c.members.map(m => ({
+            userId: m.userId,
+            name: m.user.name,
+            avatar: m.user.avatar || '',
+            joinedAt: m.joinedAt.toISOString(),
+            role: m.role as any,
+            status: m.status as any,
+            payoutPreference: m.payoutPreference as any,
+            payoutMonth: m.payoutMonth ?? undefined
+        })),
+        events: c.events.map(e => ({
+            // ...e, 
+            id: e.id,
+            type: e.type as any,
+            message: e.message,
+            timestamp: e.timestamp.toISOString(),
+            meta: e.meta as any
+        }))
+    };
+}
+
+export async function createCircle(data: Partial<Circle>, creator: User) {
+    const newCircle = await prisma.circle.create({
+        data: {
+            name: data.name || 'New Circle',
+            category: data.category || 'Other',
+            amount: data.amount || 0,
+            frequency: data.frequency || 'monthly',
+            duration: data.duration || 10,
+            maxMembers: data.maxMembers || 10,
+            payoutTotal: (data.amount || 0) * (data.duration || 10),
+            startDate: new Date(),
+            description: (data.description || undefined) as string | undefined,
+            rules: data.rules || [],
+            coverImage: (data.coverImage || undefined) as string | undefined,
+            isPrivate: data.isPrivate || false,
+            status: 'open',
+            adminId: creator.id,
+            members: {
+                create: {
+                    userId: creator.id,
+                    role: 'admin',
+                    status: 'pending' // or paid?
+                }
+            },
+            events: {
+                create: {
+                    type: 'info',
+                    message: 'Circle created',
+                    timestamp: new Date()
+                }
+            }
+        },
+        include: { members: true }
+    });
     return newCircle;
 }
 
-export function joinCircle(circleId: string, user: User, preference: 'early' | 'late' | 'any' = 'any') {
-    const circles = readDb();
-    const circleIndex = circles.findIndex(c => c.id === circleId);
+export async function joinCircle(circleId: string, user: User, preference: 'early' | 'late' | 'any' = 'any') {
+    // Check if Member exists
+    const existing = await prisma.member.findUnique({
+        where: { userId_circleId: { userId: user.id, circleId } }
+    });
 
-    if (circleIndex !== -1) {
-        const circle = circles[circleIndex];
-        const exists = circle.members.find(m => m.userId === user.id);
-        if (!exists) {
-            circle.members.push({
+    if (!existing) {
+        await prisma.member.create({
+            data: {
+                circleId,
                 userId: user.id,
-                name: user.name,
-                avatar: user.avatar,
-                joinedAt: new Date().toISOString(),
                 role: 'member',
-                payoutPreference: preference,
-                status: 'requested'
-            });
-            writeDb(circles);
-        }
+                status: 'requested',
+                payoutPreference: preference
+            }
+        });
+
+        // Add Event
+        await prisma.circleEvent.create({
+            data: {
+                circleId,
+                type: 'join',
+                message: `${user.name} requested to join`,
+                meta: { userId: user.id, userName: user.name }
+            }
+        });
     }
 }
 
-export function updateCircleMembers(circleId: string, members: Member[]) {
-    const circles = readDb();
-    const circleIndex = circles.findIndex(c => c.id === circleId);
+export async function updateCircleMembers(circleId: string, members: Member[]) {
+    // This is tricky. In Prisma, we update individual members.
+    // The previous logic replaced the whole array in JSON.
+    // Here we likely just want to update the payoutMonth or Order.
 
-    if (circleIndex !== -1) {
-        circles[circleIndex].members = members;
-        writeDb(circles);
-    }
+    // We can loop through and update.
+    const updates = members.map((m, index) =>
+        prisma.member.update({
+            where: { userId_circleId: { userId: m.userId, circleId } },
+            data: {
+                payoutMonth: m.payoutMonth,
+                // status: m.status
+            }
+        })
+    );
+
+    await prisma.$transaction(updates);
 }
 
-export function updateMemberStatus(circleId: string, userId: string, newStatus: 'approved' | 'rejected' | MemberStatus) {
-    const circles = readDb();
-    const circleIndex = circles.findIndex(c => c.id === circleId);
+export async function updateMemberStatus(circleId: string, userId: string, newStatus: 'approved' | 'rejected' | MemberStatus) {
+    if (newStatus === 'rejected') {
+        await prisma.member.delete({
+            where: { userId_circleId: { userId, circleId } }
+        });
+    } else {
+        const status = newStatus === 'approved' ? 'pending' : newStatus; // Map 'approved' to 'pending' (waiting for payment)
 
-    if (circleIndex !== -1) {
-        let members = circles[circleIndex].members;
-        const memberIndex = members.findIndex(m => m.userId === userId);
+        await prisma.member.update({
+            where: { userId_circleId: { userId, circleId } },
+            data: { status }
+        });
 
-        if (memberIndex !== -1) {
-            if (newStatus === 'rejected') {
-                // Remove member
-                members = members.filter(m => m.userId !== userId);
-            } else {
-                // Update status
-                members[memberIndex].status = newStatus as MemberStatus;
-
-                if (newStatus === 'pending') { // Was approved (mapped from 'approved')
-                    // Check if we can log here. We need to call addCircleEvent.
-                    // But we are inside updateMemberStatus.
-                    // Let's just do it inline or call the helper after?
-                    // Helper reads DB again. Inefficient. 
-                    // But strictly speaking, for MVP it's fine.
-                    // Better: modify the circle object in memory here if we can.
-                    // Actually layout logic:
-                    // We writeDb at the end.
-                    // Let's just modify the events array here.
-
-                    if (!circles[circleIndex].events) circles[circleIndex].events = [];
-
-                    circles[circleIndex].events.unshift({
-                        id: Math.random().toString(36).substr(2, 9),
+        if (newStatus === 'approved' || newStatus === 'pending') {
+            const user = await prisma.user.findUnique({ where: { id: userId } });
+            if (user) {
+                await prisma.circleEvent.create({
+                    data: {
+                        circleId,
                         type: 'join',
-                        message: `${members[memberIndex].name} joined the circle`,
-                        timestamp: new Date().toISOString(),
-                        meta: {
-                            userId: members[memberIndex].userId,
-                            userName: members[memberIndex].name,
-                            userAvatar: members[memberIndex].avatar
-                        }
-                    });
-                }
+                        message: `${user.name} joined the circle`,
+                        meta: { userId: user.id, userName: user.name, userAvatar: user.avatar }
+                    }
+                });
             }
         }
-        circles[circleIndex].members = members;
-        writeDb(circles);
     }
 }
-
