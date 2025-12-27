@@ -184,8 +184,8 @@ function CreateDetailsContent() {
                     </div>
 
 
-                    {/* Action Button */}
-                    <div className="fixed bottom-6 left-4 right-4 z-40 max-w-md mx-auto">
+                    {/* Static Action Button */}
+                    <div className="mt-8 mb-4">
                         <button
                             type="submit"
                             className="w-full bg-primary text-white font-bold text-lg py-4 rounded-full shadow-xl shadow-primary/30 flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all"
