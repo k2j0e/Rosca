@@ -9,7 +9,7 @@ export default function BottomNav() {
     const pathname = usePathname();
 
     // Exclude BottomNav on specific full-screen flows
-    const hiddenPaths = ['/welcome', '/signin', '/signup'];
+    const hiddenPaths = ['/welcome', '/signin', '/signup', '/admin'];
     // Also hide if we are in the create flow? Maybe the user wants it everywhere. 
     // Let's stick to the obvious auth/welcome pages for now.
     // If exact match or starts with (for nested routes if needed, though exact check is safer for known routes)
