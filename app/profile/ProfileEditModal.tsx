@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { updateProfileAction } from './actions';
 
 interface UserData {
@@ -12,41 +11,37 @@ interface UserData {
     avatar: string | null;
 }
 
-export default function ProfileEditor({ user }: { user: UserData }) {
-    const [isEditing, setIsEditing] = useState(false);
+interface ProfileEditModalProps {
+    user: UserData;
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export default function ProfileEditModal({ user, isOpen, onClose }: ProfileEditModalProps) {
     const [state, formAction, isPending] = useActionState(updateProfileAction, { message: '' });
 
     // Close modal on success
-    if (state?.success && isEditing) {
-        setIsEditing(false);
-    }
+    useEffect(() => {
+        if (state?.success && isOpen) {
+            onClose();
+        }
+    }, [state?.success, isOpen, onClose]);
 
-    if (!isEditing) {
-        return (
-            <button
-                id="edit-profile"
-                onClick={() => setIsEditing(true)}
-                className="absolute top-3 right-4 p-2 bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-full text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10 transition-colors"
-                title="Edit Profile"
-            >
-                <span className="material-symbols-outlined">edit</span>
-            </button>
-        );
-    }
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto transition-opacity"
-                onClick={() => setIsEditing(false)}
+                className="absolute inset-0 bg-black/60 pointer-events-auto transition-opacity"
+                onClick={onClose}
             ></div>
 
             {/* Modal */}
-            <div className="bg-white dark:bg-slate-900 w-full max-w-md sm:rounded-t-2xl sm:rounded-b-2xl rounded-t-3xl p-6 shadow-2xl transform transition-transform pointer-events-auto max-h-[90vh] overflow-y-auto">
+            <div className="bg-white dark:bg-slate-900 w-full max-w-md sm:rounded-2xl rounded-t-3xl p-6 shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto relative z-10 mx-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="font-bold text-xl text-slate-900 dark:text-white">Edit Profile</h3>
-                    <button onClick={() => setIsEditing(false)} className="p-2 -mr-2 text-slate-400 hover:text-slate-600">
+                    <button onClick={onClose} className="p-2 -mr-2 text-slate-400 hover:text-slate-600">
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>

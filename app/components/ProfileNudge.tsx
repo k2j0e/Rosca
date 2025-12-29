@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 
 interface ProfileNudgeProps {
     missingFields: string[];
+    onEdit: () => void;
 }
 
-export default function ProfileNudge({ missingFields }: ProfileNudgeProps) {
+export default function ProfileNudge({ missingFields, onEdit }: ProfileNudgeProps) {
     const [isVisible, setIsVisible] = useState(true);
 
     if (!isVisible || missingFields.length === 0) return null;
@@ -22,9 +22,12 @@ export default function ProfileNudge({ missingFields }: ProfileNudgeProps) {
                 <p className="text-xs text-blue-700 dark:text-blue-300 mb-3 leading-relaxed">
                     Add your <span className="font-bold">{missingFields.join(' and ')}</span> to verify your identity and increase your Trust Score.
                 </p>
-                <Link href="#edit-profile" className="text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-lg inline-block hover:bg-blue-700 transition-colors">
+                <button
+                    onClick={onEdit}
+                    className="text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-lg inline-block hover:bg-blue-700 transition-colors"
+                >
                     Complete Profile
-                </Link>
+                </button>
             </div>
             <button
                 onClick={() => setIsVisible(false)}
