@@ -47,7 +47,7 @@ export async function adminLoginAction(prevState: any, formData: FormData) {
         cookieStore.set('admin_session_token', user.id, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            path: '/admin',
+            path: '/',
             maxAge: 60 * 60 * 24 // 1 day
         });
 
