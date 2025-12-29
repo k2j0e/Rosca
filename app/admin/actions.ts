@@ -61,7 +61,7 @@ export async function adminLoginAction(prevState: any, formData: FormData) {
 
     } catch (error) {
         console.error("Admin Login Error:", error);
-        return { message: "An unexpected error occurred." };
+        return { message: `Error: ${error.message || 'Unknown error'}` }; // DEBUG MODE
     }
 
     redirect('/admin');
