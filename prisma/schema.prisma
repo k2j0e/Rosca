@@ -13,6 +13,8 @@ datasource db {
 model User {
   id           String   @id @default(uuid())
   phoneNumber  String   @unique
+  email        String?  @unique // Optional for normal users, required for admin login
+  password     String?  // Hashed password for admin login
   name         String
   avatar       String?
   location     String?
