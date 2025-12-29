@@ -2,22 +2,26 @@ import { prisma } from "@/lib/db";
 import Link from "next/link";
 
 async function getStats() {
-    // In a real app, these would be cached or optimized queries
-    const [
-        totalUsers,
-        totalCircles,
-        activeCircles,
-        recruitingCircles,
-        recentSignups
-    ] = await Promise.all([
-        prisma.user.count(),
-        prisma.circle.count(),
-        prisma.circle.count({ where: { status: 'active' } }),
-        prisma.circle.count({ where: { status: 'recruiting' } }),
-        prisma.user.count({ where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } }) // Last 7 days
-    ]);
+    try {
+        const [
+            totalUsers,
+            totalCircles,
+            activeCircles,
+            recruitingCircles,
+            recentSignups
+        ] = await Promise.all([
+            prisma.user.count(),
+            prisma.circle.count(),
+            prisma.circle.count({ where: { status: 'active' } }),
+            prisma.circle.count({ where: { status: 'recruiting' } }),
+            prisma.user.count({ where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } })
+        ]);
 
-    return { totalUsers, totalCircles, activeCircles, recruitingCircles, recentSignups };
+        return { totalUsers, totalCircles, activeCircles, recruitingCircles, recentSignups };
+    } catch (error) {
+        console.error("Dashboard stats failed:", error);
+        return { totalUsers: 0, totalCircles: 0, activeCircles: 0, recruitingCircles: 0, recentSignups: 0 };
+    }
 }
 
 export default async function AdminDashboard() {
