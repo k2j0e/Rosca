@@ -16,6 +16,7 @@ const DEFAULT_USER_MOCK: User = {
     avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAasS-Tm_0L0SFa0loHUoMYYrgYAhVY6aD55T5IzbsW5tY6QKzBpccqQxkDa2UQvXpDcmXhKqnTvip2i8-944CMV65YQqlQegt_yuCR8bgCDTiCWVnCtCBu2rprE8gkgl5O663fgkcJbtR-oANpt1bbRGfiLudMWnzj1y_lPeM5_SGN2ovBXOBH3qUS3wZuVLFW8iAORYRPdCNKsOwut1-soe4EkwaDS8qa-RpFXfI6qjV_Au7mt_0he_V1B-vdlJkVxiO3K_2sDfZO',
     trustScore: 850,
     memberSince: "2023",
+    role: 'user',
     badges: [],
     stats: { circlesCompleted: 3, onTimePercentage: 98, supportCount: 8 },
     history: []
@@ -84,6 +85,7 @@ export async function createAccountAction(formData: FormData) {
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`, // Dynamic avatar
         trustScore: 100, // Starting score
         memberSince: new Date().getFullYear().toString(),
+        role: 'user',
         badges: [],
         stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
         history: []

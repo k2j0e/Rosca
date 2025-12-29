@@ -16,6 +16,7 @@ export interface User {
     bio?: string;
     trustScore: number;
     memberSince: string;
+    role: 'user' | 'platform_admin' | 'support_agent' | 'read_only_analyst';
     badges: string[];
     stats: {
         circlesCompleted: number;
@@ -92,6 +93,7 @@ function mapUser(pUser: any): User {
         bio: pUser.bio ? String(pUser.bio) : undefined,
         trustScore: Number(pUser.trustScore || 0),
         memberSince: String(pUser.memberSince || '2025'),
+        role: (pUser.role || 'user') as any,
         // Ensure arrays/objects, never null
         badges: Array.isArray(pUser.badges) ? pUser.badges : [],
         stats: pUser.stats && typeof pUser.stats === 'object' ? pUser.stats : { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },

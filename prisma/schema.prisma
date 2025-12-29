@@ -30,6 +30,59 @@ model User {
   // Relations
   memberships  Member[]
   createdCircles Circle[] @relation("CreatedCircles")
+  
+  // Admin Portal Roles
+  role         String   @default("user") // 'user', 'platform_admin', 'support_agent', 'read_only_analyst'
+  
+  // Relations for Admin Portal
+  supportCasesCreated SupportCase[] @relation("CreatedCases")
+  supportCasesAssigned SupportCase[] @relation("AssignedCases")
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  adminId      String
+  admin        User     @relation(fields: [adminId], references: [id])
+  action       String   // 'UPDATE_CIRCLE_STATUS', 'BAN_USER', etc.
+  targetType   String   // 'CIRCLE', 'USER', 'MEMBER'
+  targetId     String
+  changes      Json?    // { before: {...}, after: {...} }
+  reason       String?
+  timestamp    DateTime @default(now())
+}
+
+model SupportCase {
+  id           String   @id @default(uuid())
+  caseId       String   @unique @default(cuid()) // Human friendlyish ID
+  category     String   // 'dispute', 'bug', 'verification', 'other'
+  priority     String   // 'low', 'medium', 'high', 'critical'
+  status       String   // 'open', 'in_progress', 'resolved', 'closed'
+  subject      String
+  description  String?
+  messages     Json?    // Array of message objects
+  
+  // Relations
+  createdById  String
+  createdBy    User     @relation("CreatedCases", fields: [createdById], references: [id])
+  assignedToId String?
+  assignedTo   User?    @relation("AssignedCases", fields: [assignedToId], references: [id])
+  
+  relatedCircleId String?
+  relatedUserId   String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model NotificationLog {
+  id           String   @id @default(uuid())
+  type         String   // 'broadcast', 'segment', 'direct'
+  audience     Json     // { role: 'admin' } or { circleId: '...' }
+  title        String
+  body         String
+  sentAt       DateTime @default(now())
+  sentByUserId String
 }
 
 model Circle {
