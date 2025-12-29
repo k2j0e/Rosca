@@ -13,28 +13,34 @@ export async function adminLoginAction(prevState: any, formData: FormData) {
         return { message: "Email and password are required." };
     }
 
+    console.log("Attempting Admin Login:", email);
+
     try {
         const user = await prisma.user.findUnique({
             where: { email },
         });
 
         if (!user) {
-            return { message: "Invalid credentials." };
+            console.log("User not found via email");
+            return { message: "Invalid credentials (User not found)." };
         }
 
         if (!user.password) {
+            console.log("User has no password set");
             return { message: "This account is not set up for password login." };
         }
 
         const isValid = await verifyPassword(password, user.password);
 
         if (!isValid) {
-            return { message: "Invalid credentials." };
+            console.log("Invalid password");
+            return { message: "Invalid credentials (Password mismatch)." };
         }
 
         // Check Role
         const allowedRoles = ['platform_admin', 'support_agent', 'read_only_analyst'];
         if (!allowedRoles.includes(user.role)) {
+            console.log("Insufficient permissions", user.role);
             return { message: "Access denied. Insufficient permissions." };
         }
 
@@ -43,17 +49,15 @@ export async function adminLoginAction(prevState: any, formData: FormData) {
         }
 
         // Set Admin Session Cookie
-        // In a real app, this should be a signed JWT.
-        // For this MVP, we are setting a simple flag cookie that our middleware will check.
-        // Security NOTE: This is weak. Anyone can forge this cookie if they know the name.
-        // TODO: Switch to JWT or signed cookie in Phase 18.
         const cookieStore = await cookies();
         cookieStore.set('admin_session_token', user.id, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: false, // process.env.NODE_ENV === 'production' (Relaxed for localhost testing)
             path: '/',
             maxAge: 60 * 60 * 24 // 1 day
         });
+
+        console.log("Admin Login Successful for:", user.email);
 
     } catch (error) {
         console.error("Admin Login Error:", error);

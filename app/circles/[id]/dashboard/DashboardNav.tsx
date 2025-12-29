@@ -21,7 +21,8 @@ export default function DashboardNav({
     const tabs = [
         { name: "Overview", path: `/circles/${circleId}/dashboard`, exact: true },
         { name: "Members", path: `/circles/${circleId}/dashboard/members`, exact: false },
-        { name: isRecruiting ? "My Turn 🔒" : "My Turn", path: `/circles/${circleId}/dashboard/commitment`, exact: false, disabled: isRecruiting },
+        { name: "Ledger", path: `/circles/${circleId}/dashboard/transparency`, exact: false },
+        { name: isRecruiting ? "Commitment 🔒" : "Commitment", path: `/circles/${circleId}/dashboard/commitment`, exact: false, disabled: isRecruiting },
     ];
 
     const isActive = (path: string, exact: boolean) => {

@@ -33,15 +33,25 @@ export default async function AdminLayout({ children }: { children: ReactNode })
                 </div>
 
                 <div className="p-4 border-t border-slate-800 bg-slate-950">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold">
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
                             {user.name.charAt(0)}
                         </div>
                         <div className="flex flex-col overflow-hidden">
-                            <span className="text-sm font-bold truncate">{user.name}</span>
-                            <span className="text-[10px] text-slate-400 uppercase tracking-wider truncate">{user.role}</span>
+                            <span className="text-sm font-bold truncate text-slate-200">{user.name}</span>
+                            <span className="text-[10px] text-slate-500 uppercase tracking-wider truncate">{user.role}</span>
                         </div>
                     </div>
+                    <form action={async () => {
+                        "use server";
+                        const { adminLogoutAction } = await import("../../admin/actions");
+                        await adminLogoutAction();
+                    }}>
+                        <button type="submit" className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-900 hover:bg-red-950/30 text-slate-400 hover:text-red-400 transition-colors text-xs font-bold uppercase tracking-wider border border-slate-800 hover:border-red-900/50">
+                            <span className="material-symbols-outlined text-sm">logout</span>
+                            Sign Out
+                        </button>
+                    </form>
                 </div>
             </aside>
 
