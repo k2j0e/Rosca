@@ -45,7 +45,13 @@ export async function signInAction(formData: FormData) {
 
     if (user) {
         // Login successful
-        (await cookies()).set('session_user_id', user.id, { path: '/' });
+        (await cookies()).set('session_user_id', user.id, {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 30, // 30 days
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
 
         // Add delay to ensure persistence before redirect
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -98,7 +104,13 @@ export async function createAccountAction(formData: FormData) {
     await registerUser(newUser);
 
     // 2. Set as Current Session (Log them in)
-    (await cookies()).set('session_user_id', newUser.id, { path: '/' });
+    (await cookies()).set('session_user_id', newUser.id, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+    });
 
     // Small delay to ensure DB consistency
     await new Promise(resolve => setTimeout(resolve, 500));

@@ -225,7 +225,7 @@ export async function getCircles(): Promise<Circle[]> {
         }));
     } catch (error) {
         console.error("Error fetching circles:", error);
-        return [];
+        throw error; // Re-throw to make error visible in UI/Logs instead of showing empty list
     }
 }
 
