@@ -11,6 +11,7 @@ export interface User {
     id: string;
     phoneNumber: string;
     name: string;
+    email?: string; // Added for verification
     avatar: string;
     location?: string;
     bio?: string;
@@ -88,6 +89,7 @@ function mapUser(pUser: any): User {
         id: String(pUser.id),
         phoneNumber: String(pUser.phoneNumber),
         name: String(pUser.name || 'User'),
+        email: pUser.email ? String(pUser.email) : undefined,
         avatar: String(pUser.avatar || ''),
         location: pUser.location ? String(pUser.location) : undefined,
         bio: pUser.bio ? String(pUser.bio) : undefined,

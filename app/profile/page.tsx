@@ -2,6 +2,8 @@
 
 import { MOCK_USER, getCurrentUser } from "@/lib/data";
 import { signOutAction } from "../actions";
+import ProfileEditor from "./ProfileEditor";
+import ProfileNudge from "../components/ProfileNudge";
 
 const BADGE_CONFIG: Record<string, { label: string, icon: string, color: string }> = {
     'early-backer': { label: 'Early Backer', icon: 'rocket_launch', color: 'bg-amber-100 text-amber-700' },
@@ -32,15 +34,29 @@ export default async function ProfileScreen() {
             </div>
 
             <div className="flex flex-col px-5 pb-6 overflow-y-auto">
+                <ProfileNudge missingFields={[
+                    !user?.email && 'email',
+                    !user?.bio && 'bio',
+                    !user?.location && 'location'
+                ].filter(Boolean) as string[]} />
+
                 {/* Profile Header */}
-                <div className="flex flex-col items-center pt-2 pb-6">
+                <div className="flex flex-col items-center pt-2 pb-6 relative">
+                    <ProfileEditor user={{
+                        name: user?.name || '',
+                        email: user?.email || null,
+                        bio: user?.bio || null,
+                        location: user?.location || null,
+                        avatar: user?.avatar || null
+                    }} />
+
                     <div className="relative mb-3 group">
                         <div className="absolute -inset-1.5 bg-gradient-to-tr from-amber-300 to-orange-400 rounded-full blur-sm opacity-50 group-hover:opacity-75 transition duration-500"></div>
                         <div
                             className="relative w-28 h-28 rounded-full bg-cover bg-center border-4 border-white dark:border-surface-dark shadow-sm"
                             style={{ backgroundImage: `url('${user?.avatar || ''}')` }}
                         ></div>
-                        <div className="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full border-[3px] border-white dark:border-surface-dark flex items-center justify-center shadow-sm">
+                        <div className={`absolute bottom-1 right-1 ${user?.email ? 'bg-blue-500' : 'bg-gray-400'} text-white p-1 rounded-full border-[3px] border-white dark:border-surface-dark flex items-center justify-center shadow-sm`}>
                             <span className="material-symbols-outlined text-[14px]">verified</span>
                         </div>
                     </div>
@@ -52,8 +68,15 @@ export default async function ProfileScreen() {
                     <div className="flex items-center gap-2 text-sm">
                         <span className="text-text-sub dark:text-text-sub-dark font-medium">Member since {user?.memberSince || '2023'}</span>
                         <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/20"></span>
-                        <span className="text-primary font-bold">Highly Trusted</span>
+                        <span className={`font-bold ${user?.email ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>
+                            {user?.email ? 'Verified Profile' : 'Unverified'}
+                        </span>
                     </div>
+                    {user?.bio && (
+                        <p className="text-center text-sm text-text-sub dark:text-text-sub-dark mt-3 max-w-[280px] leading-relaxed">
+                            "{user.bio}"
+                        </p>
+                    )}
                 </div>
 
                 {/* Trust Statement */}

@@ -103,8 +103,8 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     <div className="px-4 pb-4 leading-relaxed text-sm text-text-sub dark:text-text-sub-dark">
                         <p className="mb-2">{circle.description}</p>
                         <ul className="list-disc pl-4 space-y-1">
-                            <li>{circle.members.length} members contribute ${circle.amount} {circle.frequency}.</li>
-                            <li>One member receives the total pot of ${circle.payoutTotal} each round.</li>
+                            <li>{circle.maxMembers} members contribute ${circle.amount.toLocaleString()} {circle.frequency}.</li>
+                            <li>One member receives the total pot of ${circle.payoutTotal.toLocaleString()} each round.</li>
                             <li>Order is determined by the Admin before starting.</li>
                         </ul>
                     </div>
@@ -123,6 +123,9 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     <div className="flex flex-col items-center gap-1 bg-background-light dark:bg-background-dark px-2">
                         <div className="w-3 h-3 rounded-full bg-primary ring-4 ring-background-light dark:ring-background-dark"></div>
                         <span className="text-[10px] font-bold text-primary uppercase">Start</span>
+                        <span className="text-[10px] text-text-sub dark:text-text-sub-dark">
+                            {new Date(circle.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </span>
                     </div>
                     {/* Mid Node */}
                     <div className="flex flex-col items-center gap-1 bg-background-light dark:bg-background-dark px-2">
@@ -132,6 +135,17 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     <div className="flex flex-col items-center gap-1 bg-background-light dark:bg-background-dark px-2">
                         <div className="w-3 h-3 rounded-full bg-gray-800 dark:bg-white ring-4 ring-background-light dark:ring-background-dark"></div>
                         <span className="text-[10px] font-bold text-text-main dark:text-white uppercase">End</span>
+                        <span className="text-[10px] text-text-sub dark:text-text-sub-dark">
+                            {(() => {
+                                const start = new Date(circle.startDate);
+                                const monthsToAdd = circle.frequency === 'monthly' ? circle.duration :
+                                    circle.frequency === 'weekly' ? circle.duration / 4 : circle.duration; // Approximate
+                                const end = new Date(start);
+                                if (circle.frequency === 'monthly') end.setMonth(start.getMonth() + circle.duration);
+                                else if (circle.frequency === 'weekly') end.setDate(start.getDate() + (circle.duration * 7));
+                                return end.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+                            })()}
+                        </span>
                     </div>
                 </div>
                 <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 flex gap-3 items-start">
