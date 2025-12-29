@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/auth-admin";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import AdminCircleControls from "./AdminCircleControls";
 
 export default async function AdminCircleDetailPage(props: { params: Promise<{ id: string }> }) {
     await requireAdmin('read_only_analyst');
@@ -39,9 +40,7 @@ export default async function AdminCircleDetailPage(props: { params: Promise<{ i
                 </div>
 
                 <div className="flex gap-2">
-                    <button disabled className="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 font-bold rounded-lg disabled:opacity-50 cursor-not-allowed" title="Coming in Safe Ops Phase">
-                        Pause Circle
-                    </button>
+                    <AdminCircleControls circleId={circle.id} isFrozen={circle.isFrozen} />
                     <Link href={`/circles/${circle.id}`} target="_blank" className="px-4 py-2 bg-slate-900 text-white font-bold rounded-lg flex items-center gap-2 hover:bg-slate-800">
                         View Public Page
                         <span className="material-symbols-outlined text-sm">open_in_new</span>
@@ -94,7 +93,7 @@ export default async function AdminCircleDetailPage(props: { params: Promise<{ i
                                         <td className="px-6 py-4 capitalize text-slate-500">{member.role}</td>
                                         <td className="px-6 py-4">
                                             <span className={`text-xs font-bold px-2 py-0.5 rounded-full capitalize ${member.status === 'paid' ? 'bg-green-100 text-green-700' :
-                                                    member.status === 'late' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'
+                                                member.status === 'late' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'
                                                 }`}>
                                                 {member.status}
                                             </span>
