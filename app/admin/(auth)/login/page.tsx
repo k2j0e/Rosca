@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState } from 'react';
-import { adminLoginAction } from '../actions';
+import { adminLoginAction } from '../../actions';
 import Image from 'next/image';
 
 const initialState = {
