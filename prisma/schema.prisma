@@ -10,6 +10,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enums for strict typing
+enum LedgerEntryType {
+  // Obligation Lifecycle
+  CONTRIBUTION_OBLIGATION_CREATED
+  CONTRIBUTION_MARKED_PAID
+  CONTRIBUTION_CONFIRMED
+  CONTRIBUTION_MARKED_UNPAID
+  CONTRIBUTION_OVERDUE_FLAGGED
+  
+  // Payout Lifecycle
+  PAYOUT_RECIPIENT_ASSIGNED
+  PAYOUT_MARKED_SENT
+  PAYOUT_ACKNOWLEDGED
+  
+  // Membership & Governance
+  MEMBER_JOINED
+  MEMBER_REMOVED
+  CIRCLE_PAUSED
+  CIRCLE_RESUMED
+  
+  // Corrections
+  CORRECTION_ENTRY_POSTED
+}
+
+enum LedgerEntryDirection {
+  DEBIT  // Increases obligation / money out
+  CREDIT // Decreases obligation / money in
+  NEUTRAL // Status change
+}
+
+enum LedgerEntryStatus {
+  POSTED
+  VOIDED // Only via compensating entry
+}
+
 model User {
   id           String   @id @default(uuid())
   phoneNumber  String   @unique
@@ -41,6 +76,10 @@ model User {
   supportCasesCreated SupportCase[] @relation("CreatedCases")
   supportCasesAssigned SupportCase[] @relation("AssignedCases")
   auditLogs    AuditLog[]
+
+  // Ledger Relations
+  ledgerEntries UserLedgerEntry[] @relation("UserLedger")
+  ledgerActions UserLedgerEntry[] @relation("AdminLedger")
 }
 
 model AuditLog {
@@ -117,6 +156,7 @@ model Circle {
   admin        User     @relation("CreatedCircles", fields: [adminId], references: [id])
   members      Member[]
   events       CircleEvent[]
+  ledgerEntries UserLedgerEntry[]
 }
 
 model Member {
@@ -146,4 +186,37 @@ model CircleEvent {
   // Relations
   circleId  String
   circle    Circle   @relation(fields: [circleId], references: [id])
+}
+
+// Renamed to avoid confusion with internal 'Ledger' terms if any
+model UserLedgerEntry {
+  id        String   @id @default(cuid())
+  
+  // Core Identifiers (Denormalized for queries)
+  circleId  String?  // Optional: Global platform events might not have circle
+  userId    String?  // Optional: System events might not have user
+  adminId   String?  // Creator if manual action
+  
+  // The Data
+  type      LedgerEntryType
+  direction LedgerEntryDirection
+  amount    Float?   // Null for non-financial events
+  currency  String   @default("USD")
+  
+  // Audit
+  description String?
+  metadata    Json?    // For proofs, references, snapshots
+  createdAt   DateTime @default(now())
+  
+  status    LedgerEntryStatus @default(POSTED)
+  
+  // Relations
+  circle    Circle? @relation(fields: [circleId], references: [id])
+  user      User?   @relation("UserLedger", fields: [userId], references: [id])
+  admin     User?   @relation("AdminLedger", fields: [adminId], references: [id])
+
+  @@index([circleId])
+  @@index([userId])
+  @@index([type])
+  @@map("LedgerEntry") // Map to actual table name
 }

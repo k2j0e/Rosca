@@ -25,6 +25,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
                         <AdminNavLink href="/admin/users" icon="group" label="Users" />
                         <AdminNavLink href="/admin/support" icon="support_agent" label="Support" badge={0} />
                         <AdminNavLink href="/admin/notifications" icon="campaign" label="Notifications" />
+                        <AdminNavLink href="/admin/ledger" icon="account_balance" label="Ledger" />
                         <div className="my-2 border-t border-slate-800 mx-2"></div>
                         <AdminNavLink href="/admin/audit" icon="history_edu" label="Audit Log" />
                         <AdminNavLink href="/admin/settings" icon="settings" label="Settings" />

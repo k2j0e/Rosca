@@ -15,16 +15,17 @@ const BADGE_CONFIG: Record<string, { label: string, icon: string, color: string 
 
 // Props
 interface ProfileViewProps {
-    user: any; // Using any for simplicity as User type is complex and shared via lib/data
+    user: any;
+    history?: any[]; // Ledger entries
 }
 
-export default function ProfileView({ user }: ProfileViewProps) {
+export default function ProfileView({ user, history = [] }: ProfileViewProps) {
     const [isEditing, setIsEditing] = useState(false);
 
-    // Fallback data logic (moved from page.tsx)
-    const stats = user?.stats || { circlesCompleted: 3, onTimePercentage: 98, supportCount: 8 };
-    const history = user?.history || [];
-    const badges = user?.badges || ['early-backer', 'consistent'];
+    // Fallback data logic 
+    const stats = user?.stats || { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 };
+    // const history = user?.history || []; // DEPRECATED
+    const badges = user?.badges || [];
 
     return (
         <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white">
@@ -107,7 +108,7 @@ export default function ProfileView({ user }: ProfileViewProps) {
                 {/* Trust Statement */}
                 <div className="mb-8 text-center px-2">
                     <h3 className="text-xl font-bold text-text-main dark:text-white mb-2 leading-tight">
-                        You are a reliable<br />community pillar.
+                        Trust Score: {user?.trustScore || 100}
                     </h3>
                     <p className="text-text-sub dark:text-text-sub-dark/80 text-[15px] leading-relaxed">
                         Your consistent support helps your circle thrive.
@@ -189,23 +190,27 @@ export default function ProfileView({ user }: ProfileViewProps) {
                     <div className="flex flex-col gap-5">
                         {history.length > 0 ? history.map((item: any) => (
                             <div key={item.id} className="flex items-start gap-4">
-                                <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${item.type === 'contribution' ? 'bg-orange-100 text-orange-600' :
-                                    item.type === 'endorsement' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
-                                    }`}>
+                                <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                                    item.type.includes('PAID') || item.type.includes('CONFIRMED') ? 'bg-green-100 text-green-600' :
+                                    item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' : 
+                                    'bg-blue-100 text-blue-600'
+                                }`}>
                                     <span className="material-symbols-outlined text-[20px]">
-                                        {item.type === 'contribution' ? 'check_circle' :
-                                            item.type === 'endorsement' ? 'thumb_up' : 'lock_open'}
+                                        {item.type.includes('PAID') ? 'check_circle' :
+                                         item.type.includes('CONFIRMED') ? 'verified' :
+                                         item.type.includes('OBLIGATION') ? 'receipt_long' : 'info'}
                                     </span>
                                 </div>
                                 <div className="flex flex-col flex-1 gap-0.5">
                                     <div className="flex items-center justify-between">
-                                        <span className="font-bold text-[15px] text-text-main dark:text-white">{item.title}</span>
+                                        <span className="font-bold text-[15px] text-text-main dark:text-white">{item.description}</span>
                                         <span className="text-[11px] font-medium text-text-sub dark:text-text-sub-dark">
-                                            {/* Simple relative time logic or just mock for design match */}
-                                            {new Date(item.timestamp).getDate() < 20 ? '2d ago' : '1w ago'}
+                                            {new Date(item.createdAt).toLocaleDateString()}
                                         </span>
                                     </div>
-                                    <span className="text-[13px] text-text-sub dark:text-text-sub-dark">{item.subtitle}</span>
+                                    <span className="text-[13px] text-text-sub dark:text-text-sub-dark">
+                                        {item.amount ? `${item.direction === 'DEBIT' ? '-' : '+'}$${item.amount}` : item.type.replace(/_/g, ' ')}
+                                    </span>
                                 </div>
                             </div>
                         )) : (

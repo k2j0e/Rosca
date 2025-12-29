@@ -21,11 +21,11 @@ export async function requireAdmin(minRole: 'platform_admin' | 'support_agent' |
     try {
         const user = await prisma.user.findUnique({
             where: { id: adminSessionId },
-            select: { id: true, role: true, name: true }
+            select: { id: true, role: true, name: true, isBanned: true }
         });
 
-        if (!user) {
-            redirect('/admin/login');
+        if (!user || user.isBanned) {
+            redirect('/admin/login'); // Redirect banned admins to login (or suspended)
         }
 
         // 2. Role Hierarchy Check

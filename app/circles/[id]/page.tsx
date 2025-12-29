@@ -1,14 +1,18 @@
 "use strict";
 
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getCircle, getCurrentUser, MOCK_USER } from "@/lib/data";
 import InviteButton from "@/app/components/InviteButton";
 
 export default async function CircleDetail(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const circle = await getCircle(params.id);
-    const user = await getCurrentUser() || MOCK_USER;
+    const user = await getCurrentUser();
+
+    if (user?.isBanned) {
+        redirect('/suspended');
+    }
 
     if (!circle) {
         notFound();

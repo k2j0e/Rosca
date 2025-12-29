@@ -1,6 +1,7 @@
 "use server";
 
 import { createCircle, Circle, joinCircle, MOCK_USER, deleteUserSession, updateUser, getCurrentUser, User, findUserByPhone, registerUser, updateCircleMembers, Member, updateMemberStatus, updateCircleStatus } from "@/lib/data";
+import { recordLedgerEntry, LedgerEntryType, LedgerEntryDirection } from "@/lib/ledger";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -17,6 +18,7 @@ const DEFAULT_USER_MOCK: User = {
     trustScore: 850,
     memberSince: "2023",
     role: 'user',
+    isBanned: false,
     badges: [],
     stats: { circlesCompleted: 3, onTimePercentage: 98, supportCount: 8 },
     history: []
@@ -86,6 +88,7 @@ export async function createAccountAction(formData: FormData) {
         trustScore: 100, // Starting score
         memberSince: new Date().getFullYear().toString(),
         role: 'user',
+        isBanned: false,
         badges: [],
         stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
         history: []
@@ -148,6 +151,20 @@ export async function createCircleAction(formData: FormData) {
         settings: {}, // Future use
     }, currentUser);
 
+    // Ledger: Log creator joining
+    try {
+        await recordLedgerEntry({
+            type: LedgerEntryType.MEMBER_JOINED,
+            direction: LedgerEntryDirection.NEUTRAL,
+            description: `Creator ${currentUser.name} joined as Admin`,
+            circleId: newCircle.id,
+            userId: currentUser.id,
+            metadata: { role: 'admin' }
+        });
+    } catch (e) {
+        console.error("Ledger Error (Create Circle)", e);
+    }
+
     console.log(`Created circle with ID: ${newCircle.id}. Redirecting to profile.`);
 
     // Small delay to ensure DB (mock) consistency if concurrent
@@ -173,6 +190,18 @@ export async function joinCircleAction(formData: FormData) {
 
     // In a real app we might presumably log the intent somewhere
     console.log(`User joining circle ${circleId} with preference: ${preference} and intent: ${intent}`);
+
+    // Ledger: Log Member Join
+    try {
+        await recordLedgerEntry({
+            type: LedgerEntryType.MEMBER_JOINED,
+            direction: LedgerEntryDirection.NEUTRAL,
+            description: `${currentUser.name} joined the circle`,
+            circleId: circleId,
+            userId: currentUser.id,
+            metadata: { preference, intent }
+        });
+    } catch (e) { console.error("Ledger join error", e); }
 
     redirect(`/explore?joined=true`);
 }
@@ -226,6 +255,18 @@ export async function markContributionPaidAction(circleId: string) {
     }
 
     await updateMemberStatus(circleId, currentUser.id, 'paid_pending');
+
+    // Ledger: Log Payment Attempt
+    await recordLedgerEntry({
+        type: LedgerEntryType.CONTRIBUTION_MARKED_PAID,
+        direction: LedgerEntryDirection.CREDIT, // "Money in" potentially
+        description: `${currentUser.name} marked contribution as paid`,
+        circleId: circleId,
+        userId: currentUser.id,
+        amount: circle.amount,
+        currency: 'USD'
+    });
+
     revalidatePath(`/circles/${circleId}`);
     revalidatePath(`/circles/${circleId}/dashboard/commitment`);
 }
@@ -236,7 +277,24 @@ export async function verifyPaymentAction(circleId: string, memberId: string) {
 
     // In real app, check if currentUser is Admin of circleId here
 
+    // Need amount for record
+    const { getCircle } = await import("@/lib/data");
+    const circle = await getCircle(circleId);
+    if (!circle) return;
+
     await updateMemberStatus(circleId, memberId, 'paid');
+
+    // Ledger: Log Confirmation
+    await recordLedgerEntry({
+        type: LedgerEntryType.CONTRIBUTION_CONFIRMED,
+        direction: LedgerEntryDirection.CREDIT,
+        description: `Admin confirmed payment for member`,
+        circleId: circleId,
+        userId: memberId,
+        adminId: currentUser.id,
+        amount: circle.amount
+    });
+
     revalidatePath(`/circles/${circleId}`);
     // revalidatePath(`/circles/${circleId}/admin/members`); // If we had a specific admin page for this
 }
@@ -249,6 +307,25 @@ export async function launchCircleAction(circleId: string) {
 
     // In a real app, this is where we'd lock in the startDate if it was floating,
     // and trigger the first round notifications.
+
+    // Ledger: Create Obligations for ALL members for Round 1
+    const { getCircle } = await import("@/lib/data");
+    const circle = await getCircle(circleId);
+    if (circle) {
+        for (const member of circle.members) {
+            await recordLedgerEntry({
+                type: LedgerEntryType.CONTRIBUTION_OBLIGATION_CREATED,
+                direction: LedgerEntryDirection.DEBIT, // Owed money
+                description: `Round 1 Contribution Due`,
+                circleId: circle.id,
+                userId: member.userId,
+                amount: circle.amount,
+                metadata: { round: 1 }
+            });
+        }
+    }
+
+    revalidatePath(`/circles/${circleId}`);
 
     revalidatePath(`/circles/${circleId}`);
     revalidatePath(`/circles/${circleId}/dashboard`);

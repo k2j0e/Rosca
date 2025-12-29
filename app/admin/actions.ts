@@ -38,6 +38,10 @@ export async function adminLoginAction(prevState: any, formData: FormData) {
             return { message: "Access denied. Insufficient permissions." };
         }
 
+        if (user.isBanned) {
+            return { message: "Account suspended. Contact support." };
+        }
+
         // Set Admin Session Cookie
         // In a real app, this should be a signed JWT.
         // For this MVP, we are setting a simple flag cookie that our middleware will check.

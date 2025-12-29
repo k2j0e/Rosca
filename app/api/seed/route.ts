@@ -8,23 +8,23 @@ export async function GET() {
     const users: User[] = [
         {
             id: 'u1', name: 'Alice Admin', phoneNumber: '+15550000001', avatar: 'https://ui-avatars.com/api/?name=Alice+Admin&background=0D8ABC&color=fff', location: 'New York, USA', trustScore: 900,
-            memberSince: '2023', role: 'platform_admin', badges: ['early-backer', 'guide'], stats: { circlesCompleted: 5, onTimePercentage: 100, supportCount: 12 }, history: []
+            memberSince: '2023', role: 'platform_admin', isBanned: false, badges: ['early-backer', 'guide'], stats: { circlesCompleted: 5, onTimePercentage: 100, supportCount: 12 }, history: []
         },
         {
             id: 'u2', name: 'Bob Builder', phoneNumber: '+15550000002', avatar: 'https://ui-avatars.com/api/?name=Bob+Builder&background=random', location: 'London, UK', trustScore: 850,
-            memberSince: '2024', role: 'user', badges: ['consistent'], stats: { circlesCompleted: 2, onTimePercentage: 95, supportCount: 3 }, history: []
+            memberSince: '2024', role: 'user', isBanned: false, badges: ['consistent'], stats: { circlesCompleted: 2, onTimePercentage: 95, supportCount: 3 }, history: []
         },
         {
             id: 'u3', name: 'Charlie Chef', phoneNumber: '+15550000003', avatar: 'https://ui-avatars.com/api/?name=Charlie+Chef&background=random', location: 'Paris, France', trustScore: 800,
-            memberSince: '2024', role: 'user', badges: [], stats: { circlesCompleted: 1, onTimePercentage: 90, supportCount: 1 }, history: []
+            memberSince: '2024', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 1, onTimePercentage: 90, supportCount: 1 }, history: []
         },
-        { id: 'u4', name: 'Diana Doc', phoneNumber: '+15550000004', avatar: 'https://ui-avatars.com/api/?name=Diana+Doc&background=random', location: 'Berlin, Germany', trustScore: 880, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
-        { id: 'u5', name: 'Evan Eng', phoneNumber: '+15550000005', avatar: 'https://ui-avatars.com/api/?name=Evan+Eng&background=random', location: 'Tokyo, Japan', trustScore: 920, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
-        { id: 'u6', name: 'Fiona Farmer', phoneNumber: '+15550000006', avatar: 'https://ui-avatars.com/api/?name=Fiona+Farmer&background=random', location: 'Sydney, Australia', trustScore: 750, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
-        { id: 'u7', name: 'George Gamer', phoneNumber: '+15550000007', avatar: 'https://ui-avatars.com/api/?name=George+Gamer&background=random', location: 'Toronto, Canada', trustScore: 810, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
-        { id: 'u8', name: 'Hannah Host', phoneNumber: '+15550000008', avatar: 'https://ui-avatars.com/api/?name=Hannah+Host&background=random', location: 'Dubai, UAE', trustScore: 860, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
-        { id: 'u9', name: 'Ian Intern', phoneNumber: '+15550000009', avatar: 'https://ui-avatars.com/api/?name=Ian+Intern&background=random', location: 'Singapore', trustScore: 700, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
-        { id: 'u10', name: 'Judy Judge', phoneNumber: '+15550000010', avatar: 'https://ui-avatars.com/api/?name=Judy+Judge&background=random', location: 'Rio, Brazil', trustScore: 950, memberSince: '2023', role: 'user', badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u4', name: 'Diana Doc', phoneNumber: '+15550000004', avatar: 'https://ui-avatars.com/api/?name=Diana+Doc&background=random', location: 'Berlin, Germany', trustScore: 880, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u5', name: 'Evan Eng', phoneNumber: '+15550000005', avatar: 'https://ui-avatars.com/api/?name=Evan+Eng&background=random', location: 'Tokyo, Japan', trustScore: 920, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u6', name: 'Fiona Farmer', phoneNumber: '+15550000006', avatar: 'https://ui-avatars.com/api/?name=Fiona+Farmer&background=random', location: 'Sydney, Australia', trustScore: 750, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u7', name: 'George Gamer', phoneNumber: '+15550000007', avatar: 'https://ui-avatars.com/api/?name=George+Gamer&background=random', location: 'Toronto, Canada', trustScore: 810, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u8', name: 'Hannah Host', phoneNumber: '+15550000008', avatar: 'https://ui-avatars.com/api/?name=Hannah+Host&background=random', location: 'Dubai, UAE', trustScore: 860, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u9', name: 'Ian Intern', phoneNumber: '+15550000009', avatar: 'https://ui-avatars.com/api/?name=Ian+Intern&background=random', location: 'Singapore', trustScore: 700, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
+        { id: 'u10', name: 'Judy Judge', phoneNumber: '+15550000010', avatar: 'https://ui-avatars.com/api/?name=Judy+Judge&background=random', location: 'Rio, Brazil', trustScore: 950, memberSince: '2023', role: 'user', isBanned: false, badges: [], stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 }, history: [] },
     ];
 
     // 2. Define Circle
