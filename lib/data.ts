@@ -176,8 +176,8 @@ export async function registerUser(user: Partial<User>) {
 }
 
 export async function findUserByPhone(phone: string): Promise<User | null> {
-    const user = await prisma.user.findFirst({
-        where: { phoneNumber: { contains: phone } }
+    const user = await prisma.user.findUnique({
+        where: { phoneNumber: phone }
     });
     return user ? mapUser(user) : null;
 }

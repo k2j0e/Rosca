@@ -123,7 +123,9 @@ export async function verifyOtpAction(formData: FormData) {
     redirect('/');
 }
 
-export async function checkUserExistsAction(phone: string) {
+export async function checkUserExistsAction(rawPhone: string) {
+    // Normalize: If no '+', assume US (+1)
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
     console.log(`[Action] Checking if user exists for phone: ${phone}`);
     const user = await findUserByPhone(phone);
     console.log(`[Action] User found: ${!!user} (ID: ${user?.id})`);
