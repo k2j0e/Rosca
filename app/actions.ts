@@ -434,5 +434,126 @@ export async function launchCircleAction(circleId: string) {
     revalidatePath(`/circles/${circleId}`);
     revalidatePath(`/circles/${circleId}/dashboard`);
 
+    // ... launchCircleAction content
+
     await new Promise(resolve => setTimeout(resolve, 500));
+}
+
+// --- NEW SIGNUP FLOW ACTIONS ---
+
+export async function beginSignupAction(formData: FormData) {
+    const rawPhone = formData.get('phone') as string;
+    // Normalize: If no '+', assume US (+1)
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+
+    const { sendSms, generateOtp } = await import("@/lib/sms");
+    const { prisma } = await import("@/lib/db");
+    const { registerUser, findUserByPhone } = await import("@/lib/data");
+
+    // Check if user exists fully
+    const existing = await findUserByPhone(phone);
+    if (existing && existing.name !== "Guest") {
+        return { error: 'User already exists. Please Sign In.' };
+    }
+
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    if (existing) {
+        // Update Stub
+        await prisma.user.update({
+            where: { id: existing.id },
+            data: { otpCode: otp, otpExpiresAt: expiresAt }
+        });
+    } else {
+        // Create Stub
+        const stubId = Math.random().toString(36).substr(2, 9);
+        await registerUser({
+            id: stubId,
+            phoneNumber: phone,
+            name: "Guest",
+            role: 'user',
+            location: '',
+            isBanned: false,
+            trustScore: 100,
+            badges: [],
+            avatar: '',
+            memberSince: new Date().getFullYear().toString(),
+            stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
+            history: []
+        });
+
+        await prisma.user.update({
+            where: { id: stubId },
+            data: { otpCode: otp, otpExpiresAt: expiresAt }
+        });
+    }
+
+    // Send SMS
+    await sendSms(phone, `Your ROSCA signup code is: ${otp}`);
+    return { success: true };
+}
+
+export async function verifySignupOtpAction(formData: FormData) {
+    const { verifyOtpSchema } = await import("@/lib/schemas");
+    const { prisma } = await import("@/lib/db");
+
+    const rawData = {
+        phone: formData.get('phone') as string,
+        code: formData.get('code') as string
+    };
+
+    const validated = verifyOtpSchema.safeParse(rawData);
+    if (!validated.success) return { error: 'Invalid code format' };
+
+    const { phone, code } = validated.data;
+    const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
+
+    if (!user || user.otpCode !== code || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
+        return { error: 'Invalid or expired code' };
+    }
+
+    // Success: Clear OTP
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { otpCode: null, otpExpiresAt: null }
+    });
+
+    // Set Session (User is now "logged in" as Guest)
+    (await cookies()).set('session_user_id', user.id, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+    });
+
+    return { success: true };
+}
+
+export async function completeSignupAction(formData: FormData) {
+    const rawPhone = formData.get('phone') as string;
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+    const name = formData.get('name') as string;
+    const location = formData.get('location') as string;
+
+    const { prisma } = await import("@/lib/db");
+    const { findUserByPhone } = await import("@/lib/data");
+    const user = await findUserByPhone(phone);
+
+    if (!user) {
+        // Redirect to start if user lost
+        redirect('/signup?error=session_expired');
+    }
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            name,
+            location,
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
+        }
+    });
+
+    redirect('/welcome');
 }
