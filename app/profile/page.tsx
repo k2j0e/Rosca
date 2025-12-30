@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/data";
 import { getLedgerHistory } from "@/lib/ledger";
 import ProfileView from "./ProfileView";
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfileScreen() {
     const user = await getCurrentUser();
 

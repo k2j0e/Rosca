@@ -39,14 +39,20 @@ export async function sendOtpAction(formData: FormData) {
     const { sendSms, generateOtp } = await import("@/lib/sms");
     const { prisma } = await import("@/lib/db");
 
-    const rawData = { phone: formData.get('phone') as string };
+    const rawPhone = formData.get('phone') as string;
+    // Normalize: If no '+', assume US (+1) because UI shows +1 prefix hardcoded
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+
+    const rawData = { phone };
     const validated = signInSchema.safeParse(rawData);
 
     if (!validated.success) {
         redirect('/signin?error=invalid_phone');
     }
 
-    const { phone } = validated.data;
+
+    // const { phone } = validated.data; // Removed to avoid shadowing 'phone' variable defined above
+    // valid 'phone' variable is already available and normalized
     const otp = generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
@@ -125,9 +131,12 @@ export async function checkUserExistsAction(phone: string) {
 }
 
 export async function createAccountAction(formData: FormData) {
+    const rawPhone = formData.get('phone') as string;
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+
     const rawData = {
         name: formData.get('name') as string,
-        phone: formData.get('phone') as string,
+        phone,
         location: formData.get('location') as string
     };
 
@@ -138,7 +147,8 @@ export async function createAccountAction(formData: FormData) {
         redirect('/signup?error=validation_failed');
     }
 
-    const { name, phone, location } = validated.data;
+    const { name, location } = validated.data;
+    // phone is already available from upper scope
 
     // Check if user already exists
     const existingUser = await findUserByPhone(phone);

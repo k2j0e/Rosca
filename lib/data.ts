@@ -19,6 +19,9 @@ export interface User {
     memberSince: string;
     role: 'user' | 'platform_admin' | 'support_agent' | 'read_only_analyst';
     isBanned: boolean; // Added for security
+    // Auth Fields (Optional as they are not always needed in frontend)
+    otpCode?: string | null;
+    otpExpiresAt?: Date | string | null;
     badges: string[];
     stats: {
         circlesCompleted: number;
