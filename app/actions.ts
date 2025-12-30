@@ -34,40 +34,87 @@ export async function signOutAction() {
     redirect('/welcome');
 }
 
-export async function signInAction(formData: FormData) {
-    const rawData = {
-        phone: formData.get('phone') as string
-    };
+export async function sendOtpAction(formData: FormData) {
+    const { signInSchema } = await import("@/lib/schemas");
+    const { sendSms, generateOtp } = await import("@/lib/sms");
+    const { prisma } = await import("@/lib/db");
 
+    const rawData = { phone: formData.get('phone') as string };
     const validated = signInSchema.safeParse(rawData);
 
     if (!validated.success) {
-        console.error("Validation Error (SignIn):", validated.error.flatten());
         redirect('/signin?error=invalid_phone');
     }
 
     const { phone } = validated.data;
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    const user = await findUserByPhone(phone);
+    // Upsert user (create placeholder if new, update if exists)
+    // Actually, for "Sign In", we usually expect them to exist? 
+    // But for "Magic Link" style, we can just upsert.
+    // Let's assume we find them first to decide if it's "Sign In" or "Sign Up" flow?
+    // For now, simple auth: Update if exists. 
 
-    if (user) {
-        // Login successful
-        (await cookies()).set('session_user_id', user.id, {
-            path: '/',
-            maxAge: 60 * 60 * 24 * 30, // 30 days
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
-        });
+    const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
 
-        // Add delay to ensure persistence before redirect
-        await new Promise(resolve => setTimeout(resolve, 500));
-        redirect('/');
-    } else {
-        // User not found
-        console.log(`User not found for phone: ${phone}`);
+    if (!user) {
         redirect('/signup?error=user_not_found');
     }
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            otpCode: otp,
+            otpExpiresAt: expiresAt
+        }
+    });
+
+    await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
+
+    // Redirect to verify page (we need to pass phone via query param or hidden state)
+    // Ideally we shouldn't expose phone in URL but for MVP it's fine.
+    redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
+}
+
+export async function verifyOtpAction(formData: FormData) {
+    const { verifyOtpSchema } = await import("@/lib/schemas");
+    const { prisma } = await import("@/lib/db");
+
+    const rawData = {
+        phone: formData.get('phone') as string,
+        code: formData.get('code') as string
+    };
+
+    const validated = verifyOtpSchema.safeParse(rawData);
+
+    if (!validated.success) {
+        redirect(`/signin/verify?phone=${rawData.phone}&error=invalid_code_format`);
+    }
+
+    const { phone, code } = validated.data;
+
+    const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
+
+    if (!user || user.otpCode !== code || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
+        redirect(`/signin/verify?phone=${phone}&error=invalid_code`);
+    }
+
+    // Success: Clear OTP and Set Session
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { otpCode: null, otpExpiresAt: null }
+    });
+
+    (await cookies()).set('session_user_id', user.id, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+    });
+
+    redirect('/');
 }
 
 export async function checkUserExistsAction(phone: string) {

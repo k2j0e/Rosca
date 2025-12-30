@@ -17,6 +17,11 @@ export const signUpSchema = z.object({
     location: z.string().optional()
 });
 
+export const verifyOtpSchema = z.object({
+    phone: phoneSchema,
+    code: z.string().length(6, "Code must be 6 digits")
+});
+
 // --- Circle Schemas ---
 
 export const createCircleSchema = z.object({

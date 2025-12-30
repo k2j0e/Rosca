@@ -59,6 +59,10 @@ model User {
   memberSince  String   @default("2025") // Could be DateTime, but keeping string for MVP compat
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  
+  // Auth Fields
+  otpCode      String?
+  otpExpiresAt DateTime?
 
   // JSON fields for complex unstructured data
   badges       String[] // e.g. ['early-backer']
