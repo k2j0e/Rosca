@@ -1,23 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
 import { createAccountAction, checkUserExistsAction } from "@/app/actions";
 
 type Step = 'phone' | 'otp' | 'profile';
 
-export default function SignUpScreen() {
+function SignUpForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+
     const [step, setStep] = useState<Step>('phone');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState(searchParams.get('error') === 'user_not_found' ? 'Account not found. Please sign up.' : '');
 
     // Form Data
-    const [phone, setPhone] = useState('');
+    const [phone, setPhone] = useState(searchParams.get('phone') || '');
     const [otp, setOtp] = useState('');
     const [name, setName] = useState('');
     const [location, setLocation] = useState('');
+
+    useEffect(() => {
+        if (searchParams.get('error')) {
+            // Clear error from URL to prevent persistence logic issues if needed, 
+            // but for now just setting initial state is fine.
+        }
+    }, [searchParams]);
 
     const handlePhoneSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -217,5 +226,13 @@ export default function SignUpScreen() {
 
             </div>
         </div>
+    );
+}
+
+export default function SignUpScreen() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SignUpForm />
+        </Suspense>
     );
 }
