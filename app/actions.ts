@@ -490,7 +490,15 @@ export async function beginSignupAction(formData: FormData) {
     }
 
     // Send SMS
-    await sendSms(phone, `Your ROSCA signup code is: ${otp}`);
+    const smsResult = await sendSms(phone, `Your ROSCA signup code is: ${otp}`);
+
+    if (!smsResult.success) {
+        console.error("SMS Send Failed:", smsResult.error);
+        // Return a safe error message, or specific one for debugging
+        const errorMessage = (smsResult.error as any)?.message || 'Failed to send SMS.';
+        return { error: `SMS Error: ${errorMessage}` };
+    }
+
     return { success: true };
 }
 

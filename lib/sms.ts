@@ -7,6 +7,8 @@ const apiKeySecret = process.env.TWILIO_API_KEY_SECRET;
 const fromPhone = process.env.TWILIO_PHONE_NUMBER || '+15005550006'; // Magic number for success
 
 // Initialize Client only if we have credentials
+console.log(`[SMS Init] Account: ${!!accountSid}, Key: ${!!apiKeySid}, Secret: ${!!apiKeySecret}, From: ${fromPhone}`);
+
 const client = (accountSid && apiKeySid && apiKeySecret)
     ? twilio(apiKeySid, apiKeySecret, { accountSid })
     : null;
