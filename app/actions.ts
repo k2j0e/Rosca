@@ -2,6 +2,7 @@
 
 import { createCircle, Circle, joinCircle, MOCK_USER, deleteUserSession, updateUser, getCurrentUser, User, findUserByPhone, registerUser, updateCircleMembers, Member, updateMemberStatus, updateCircleStatus } from "@/lib/data";
 import { recordLedgerEntry, LedgerEntryType, LedgerEntryDirection } from "@/lib/ledger";
+import { signInSchema, signUpSchema, createCircleSchema, joinCircleSchema } from "@/lib/schemas";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
@@ -34,12 +35,18 @@ export async function signOutAction() {
 }
 
 export async function signInAction(formData: FormData) {
-    const phone = formData.get('phone') as string;
-    // const otp = formData.get('otp') as string; // Verify OTP in real app
+    const rawData = {
+        phone: formData.get('phone') as string
+    };
 
-    if (!phone) {
-        redirect('/signin?error=missing_phone');
+    const validated = signInSchema.safeParse(rawData);
+
+    if (!validated.success) {
+        console.error("Validation Error (SignIn):", validated.error.flatten());
+        redirect('/signin?error=invalid_phone');
     }
+
+    const { phone } = validated.data;
 
     const user = await findUserByPhone(phone);
 
@@ -71,11 +78,20 @@ export async function checkUserExistsAction(phone: string) {
 }
 
 export async function createAccountAction(formData: FormData) {
-    const name = formData.get('name') as string;
-    const phone = formData.get('phone') as string;
-    const location = formData.get('location') as string;
+    const rawData = {
+        name: formData.get('name') as string,
+        phone: formData.get('phone') as string,
+        location: formData.get('location') as string
+    };
 
-    if (!name || !phone) return;
+    const validated = signUpSchema.safeParse(rawData);
+
+    if (!validated.success) {
+        console.error("Validation Error (SignUp):", validated.error.flatten());
+        redirect('/signup?error=validation_failed');
+    }
+
+    const { name, phone, location } = validated.data;
 
     // Check if user already exists
     const existingUser = await findUserByPhone(phone);
@@ -120,28 +136,27 @@ export async function createAccountAction(formData: FormData) {
 }
 
 export async function createCircleAction(formData: FormData) {
-    const name = formData.get("name") as string;
-    const category = formData.get("category") as CircleCategory;
-    const amount = Number(formData.get("amount"));
-    const membersCount = Number(formData.get("membersCount"));
+    const rawData = {
+        name: formData.get("name") as string,
+        category: formData.get("category"),
+        amount: Number(formData.get("amount")),
+        membersCount: Number(formData.get("membersCount")),
+        frequency: (formData.get("frequency") as string || "monthly").toLowerCase(),
+        privacy: formData.get("privacy"),
+        description: formData.get("description") as string,
+        rules: JSON.parse(formData.get("rules") as string || "[]"),
+        coverImage: formData.get("coverImage") as string,
+        payoutSchedule: JSON.parse(formData.get("payoutSchedule") as string || "[]")
+    };
 
-    // Convert "Weekly" -> "weekly" to match type
-    const rawFreq = (formData.get("frequency") as string || "Monthly").toLowerCase();
-    const frequency = rawFreq as 'weekly' | 'monthly' | 'bi-weekly';
+    const validated = createCircleSchema.safeParse(rawData);
 
-    const privacy = formData.get("privacy") as "public" | "private";
+    if (!validated.success) {
+        console.error("Validation Error (CreateCircle):", validated.error.flatten());
+        throw new Error("Invalid circle data: " + JSON.stringify(validated.error.flatten().fieldErrors));
+    }
 
-
-    console.log("Creating circle with:", { name, category, amount, membersCount, frequency });
-
-    if (!name) throw new Error("Name is required");
-    if (!amount || isNaN(amount)) throw new Error("Valid amount is required");
-    if (!membersCount || isNaN(membersCount)) throw new Error("Valid members count is required");
-
-
-    const description = formData.get("description") as string;
-    const rules = JSON.parse(formData.get("rules") as string || "[]");
-    const coverImage = formData.get("coverImage") as string;
+    const { name, category, amount, membersCount, frequency, description, rules, coverImage, payoutSchedule } = validated.data;
 
     const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Must be logged in to create a circle");
@@ -186,13 +201,19 @@ export async function createCircleAction(formData: FormData) {
 }
 
 export async function joinCircleAction(formData: FormData) {
-    const circleId = formData.get("circleId") as string;
-    const intent = formData.get("intent") as string;
-    const preference = (formData.get("preference") as 'early' | 'late' | 'any') || 'any';
+    const rawData = {
+        circleId: formData.get("circleId") as string,
+        intent: formData.get("intent") as string,
+        preference: formData.get("preference") || 'any'
+    };
 
-    if (!circleId) {
-        throw new Error("Circle ID is required");
+    const validated = joinCircleSchema.safeParse(rawData);
+
+    if (!validated.success) {
+        throw new Error("Invalid join data");
     }
+
+    const { circleId, intent, preference } = validated.data;
 
     const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Must be logged in to join");
