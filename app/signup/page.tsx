@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
-import { createAccountAction, checkUserExistsAction } from "@/app/actions";
+import { checkUserExistsAction, beginSignupAction, verifySignupOtpAction, completeSignupAction } from "@/app/actions";
 
 type Step = 'phone' | 'otp' | 'profile';
 
@@ -23,47 +23,59 @@ function SignUpForm() {
 
     useEffect(() => {
         if (searchParams.get('error')) {
-            // Clear error from URL to prevent persistence logic issues if needed, 
-            // but for now just setting initial state is fine.
+            // Keep error visible
         }
     }, [searchParams]);
 
     const handlePhoneSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Submitting phone:", phone);
-        setError('');
         setIsLoading(true);
+        setError('');
 
         try {
-            // Check if user exists
-            console.log("Calling checkUserExistsAction...");
             const exists = await checkUserExistsAction(phone);
-            console.log("Exists result:", exists);
-
             if (exists) {
-                setError("Account already exists. Please log in.");
+                setError('Account already exists. Please sign in.');
                 setIsLoading(false);
                 return;
             }
 
-            // Simulate sending SMS
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setIsLoading(false);
-            setStep('otp');
+            const data = new FormData();
+            data.set('phone', phone);
+
+            const result = await beginSignupAction(data);
+            if (result?.error) {
+                setError(result.error);
+            } else {
+                setStep('otp');
+            }
         } catch (err) {
-            console.error(err);
-            setError("Something went wrong. Please try again.");
-            setIsLoading(false);
+            setError('Failed to connect. Please try again.');
         }
+        setIsLoading(false);
     };
 
     const handleOtpSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate verify OTP
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        setError('');
+
+        try {
+            const data = new FormData();
+            data.set('phone', phone);
+            data.set('code', otp);
+
+            const result = await verifySignupOtpAction(data);
+
+            if (result?.error) {
+                setError(result.error);
+            } else {
+                setStep('profile');
+            }
+        } catch (err) {
+            setError('Verification failed.');
+        }
         setIsLoading(false);
-        setStep('profile');
     };
 
     return (
@@ -148,14 +160,20 @@ function SignUpForm() {
                                     maxLength={6}
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
-                                    placeholder="0000"
+                                    placeholder="000000"
                                     className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300"
                                 />
+                                {error && (
+                                    <p className="text-sm font-bold text-red-500 flex items-center gap-1 mt-1">
+                                        <span className="material-symbols-outlined text-sm">error</span>
+                                        {error}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-gray-400">Didn't receive it?</span>
-                                <button type="button" className="text-primary font-bold hover:underline">Resend Code</button>
+                                <button type="button" onClick={() => setStep('phone')} className="text-primary font-bold hover:underline">Change Number</button>
                             </div>
 
                             <button
@@ -175,7 +193,7 @@ function SignUpForm() {
                         <h1 className="text-3xl font-extrabold tracking-tight mb-2">Profile Setup</h1>
                         <p className="text-text-sub dark:text-text-sub-dark mb-8">How you'll appear to your circle.</p>
 
-                        <form action={createAccountAction} className="flex flex-col gap-6">
+                        <form action={completeSignupAction} className="flex flex-col gap-6">
                             {/* Hidden inputs to carry over data from previous steps */}
                             <input type="hidden" name="phone" value={phone} />
 
