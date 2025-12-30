@@ -8,14 +8,27 @@ import { Suspense } from "react";
 
 function VerifyForm() {
     const searchParams = useSearchParams();
-    const phone = searchParams.get("phone") || "your phone";
+    const phone = searchParams.get("phone") || "";
+    const error = searchParams.get("error");
+
+    // Explicitly handle visual feedback for errors
+    const errorMap: Record<string, string> = {
+        'invalid_code': 'Invalid or expired code.',
+        'invalid_code_format': 'Code must be 6 digits.',
+    };
 
     return (
-        <div className="animate-in fade-in slide-in-from-right-8 duration-300">
+        <div>
             <h1 className="text-3xl font-extrabold tracking-tight mb-2">Verify number</h1>
             <p className="text-text-sub dark:text-text-sub-dark mb-10">
                 Enter the code sent to <span className="font-bold text-text-main dark:text-white">{phone}</span>.
             </p>
+
+            {error && (
+                <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl mb-6 text-sm font-bold border border-red-100 dark:border-red-900">
+                    {errorMap[error] || 'Verification failed. Please try again.'}
+                </div>
+            )}
 
             <form action={verifyOtpAction} className="flex flex-col gap-6">
                 <input type="hidden" name="phone" value={phone} />
@@ -24,9 +37,11 @@ function VerifyForm() {
                     <input
                         type="text"
                         name="code"
+                        id="otp-input"
                         required
                         maxLength={6}
                         placeholder="123456"
+                        autoComplete="one-time-code"
                         className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300"
                     />
                 </div>
