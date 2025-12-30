@@ -166,14 +166,26 @@ export async function createAccountAction(formData: FormData) {
     // 1. Save to Registry (Permanent storage)
     await registerUser(newUser);
 
-    // 2. Set as Current Session (Log them in)
-    (await cookies()).set('session_user_id', newUser.id, {
-        path: '/',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-    });
+    // 1. Save to Registry (Permanent storage)
+    await registerUser(newUser);
+
+    // --- UPDATED: Send OTP instead of auto-login ---
+    const { sendSms, generateOtp } = await import("@/lib/sms");
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await import("@/lib/db").then(m => m.prisma.user.update({
+        where: { id: newUser.id },
+        data: {
+            otpCode: otp,
+            otpExpiresAt: expiresAt
+        }
+    }));
+
+    await sendSms(phone, `Welcome to ROSCA! Your verification code is: ${otp}`);
+
+    // Redirect to Verify Page
+    redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
 
     // Small delay to ensure DB consistency
     await new Promise(resolve => setTimeout(resolve, 500));
