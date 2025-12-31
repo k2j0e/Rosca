@@ -76,7 +76,17 @@ export async function sendOtpAction(formData: FormData) {
         }
     });
 
-    await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
+    // Send SMS
+    const smsResult = await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
+
+    if (!smsResult.success) {
+        // Safe error for UI
+        const errorMessage = (smsResult.error as any)?.message || 'Failed to send SMS.';
+        // We need to redirect back with error because this action redirects on success
+        // But invalidating the redirect is tricky if we want to show the error.
+        // We can redirect to signin with error param.
+        redirect(`/signin?error=${encodeURIComponent(errorMessage)}`);
+    }
 
     // Redirect to verify page (we need to pass phone via query param or hidden state)
     // Ideally we shouldn't expose phone in URL but for MVP it's fine.
