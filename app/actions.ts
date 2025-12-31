@@ -1,4 +1,5 @@
 "use server";
+export const runtime = 'nodejs'; // Force Node.js runtime to ensure process.env access
 
 import { createCircle, Circle, joinCircle, MOCK_USER, deleteUserSession, updateUser, getCurrentUser, User, findUserByPhone, registerUser, updateCircleMembers, Member, updateMemberStatus, updateCircleStatus } from "@/lib/data";
 import { recordLedgerEntry, LedgerEntryType, LedgerEntryDirection } from "@/lib/ledger";
