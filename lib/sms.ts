@@ -11,6 +11,7 @@ export async function sendSms(to: string, body: string) {
     const fromPhone = process.env.TWILIO_PHONE_NUMBER;
 
     console.log(`[SMS Runtime] From: ${fromPhone}, SID: ${accountSid?.slice(0, 4)}...`);
+    console.log(`[Debug Env] Available Keys: ${Object.keys(process.env).filter(k => !k.includes('SECRET') && !k.includes('KEY')).join(', ')}`);
 
     if (!accountSid || !apiKeySid || !apiKeySecret || !fromPhone) {
         const missing = [];
