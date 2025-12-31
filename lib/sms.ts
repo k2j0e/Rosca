@@ -15,8 +15,14 @@ const client = (accountSid && apiKeySid && apiKeySecret && fromPhone)
 
 export async function sendSms(to: string, body: string) {
     if (!client) {
-        console.error("Twilio Client not initialized. Missing credentials or phone number.");
-        return { success: false, error: { message: "Server SMS configuration is missing." } };
+        const missing = [];
+        if (!accountSid) missing.push("TWILIO_ACCOUNT_SID");
+        if (!apiKeySid) missing.push("TWILIO_API_KEY_SID");
+        if (!apiKeySecret) missing.push("TWILIO_API_KEY_SECRET");
+        if (!fromPhone) missing.push("TWILIO_PHONE_NUMBER");
+
+        console.error("Twilio Client not initialized. Missing:", missing.join(", "));
+        return { success: false, error: { message: `Missing Config: ${missing.join(", ")}` } };
     }
 
     try {
