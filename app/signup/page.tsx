@@ -42,6 +42,7 @@ function SignUpForm() {
 
             const data = new FormData();
             data.set('phone', phone);
+            data.set('name', name);
 
             const result = await beginSignupAction(data);
             if (result?.error) {
@@ -119,6 +120,19 @@ function SignUpForm() {
                                         className={`flex-1 bg-gray-50 dark:bg-gray-900 border-2 ${error ? 'border-red-500' : 'border-gray-100 dark:border-gray-800'} rounded-xl p-4 font-bold text-lg focus:outline-none focus:border-primary transition-colors placeholder:font-normal`}
                                     />
                                 </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Full Name <span className="text-primary">*</span></label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="e.g. Amara Okafor"
+                                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-bold text-lg focus:outline-none focus:border-primary transition-colors placeholder:font-normal"
+                                />
+                                <p className="text-[11px] text-gray-400">Real names build trust in financial circles.</p>
                                 {error && (
                                     <p className="text-sm font-bold text-red-500 flex items-center gap-1 mt-1">
                                         <span className="material-symbols-outlined text-sm">error</span>
@@ -134,7 +148,7 @@ function SignUpForm() {
 
                             <button
                                 type="submit"
-                                disabled={isLoading || phone.length < 10}
+                                disabled={isLoading || phone.length < 10 || name.length < 2}
                                 className="mt-4 w-full h-14 bg-primary text-white font-bold text-lg rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : "Continue"}
@@ -205,19 +219,7 @@ function SignUpForm() {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Full Name <span className="text-primary">*</span></label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="e.g. Amara Okafor"
-                                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-bold text-lg focus:outline-none focus:border-primary transition-colors placeholder:font-normal"
-                                />
-                                <p className="text-[11px] text-gray-400">Real names build trust in financial circles.</p>
-                            </div>
+                            {/* Name input removed as it is collected in Step 1 */}
 
                             <div className="flex flex-col gap-2">
                                 <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Location <span className="text-gray-400 font-normal normal-case">(Optional)</span></label>
@@ -233,7 +235,7 @@ function SignUpForm() {
 
                             <button
                                 type="submit"
-                                disabled={isLoading || name.length < 2}
+                                disabled={isLoading}
                                 className="mt-4 w-full h-14 bg-primary text-white font-bold text-lg rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : "Complete Signup"}

@@ -453,6 +453,7 @@ export async function launchCircleAction(circleId: string) {
 
 export async function beginSignupAction(formData: FormData) {
     const rawPhone = formData.get('phone') as string;
+    const name = formData.get('name') as string || 'Guest'; // Capture name or default
     // Normalize: If no '+', assume US (+1)
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
 
@@ -481,13 +482,13 @@ export async function beginSignupAction(formData: FormData) {
         await registerUser({
             id: stubId,
             phoneNumber: phone,
-            name: "Guest",
+            name: name,
             role: 'user',
             location: '',
             isBanned: false,
             trustScore: 100,
             badges: [],
-            avatar: '',
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
             memberSince: new Date().getFullYear().toString(),
             stats: { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },
             history: []
@@ -552,7 +553,6 @@ export async function verifySignupOtpAction(formData: FormData) {
 export async function completeSignupAction(formData: FormData) {
     const rawPhone = formData.get('phone') as string;
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
-    const name = formData.get('name') as string;
     const location = formData.get('location') as string;
 
     const { prisma } = await import("@/lib/db");
@@ -567,9 +567,7 @@ export async function completeSignupAction(formData: FormData) {
     await prisma.user.update({
         where: { id: user.id },
         data: {
-            name,
             location,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`
         }
     });
 
