@@ -1,5 +1,5 @@
 
-import { signOutAction } from "../actions";
+import { signOutAction } from "@/app/actions";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/data";
 import { getLedgerHistory } from "@/lib/ledger";
@@ -11,7 +11,7 @@ export default async function ProfileScreen() {
     const user = await getCurrentUser();
 
     if (!user) {
-        redirect('/welcome');
+        redirect('/signin');
     }
 
     if (user.isBanned) {

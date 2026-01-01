@@ -8,22 +8,19 @@ import { usePathname } from "next/navigation";
 export default function BottomNav() {
     const pathname = usePathname();
 
-    // Exclude BottomNav on specific full-screen flows
-    const hiddenPaths = ['/welcome', '/signin', '/signup', '/admin'];
-    // Also hide if we are in the create flow? Maybe the user wants it everywhere. 
-    // Let's stick to the obvious auth/welcome pages for now.
-    // If exact match or starts with (for nested routes if needed, though exact check is safer for known routes)
-    // Actually, simple includes check for root paths is fine.
-    if (hiddenPaths.some(path => pathname === path || pathname.startsWith(path + '/'))) return null;
+    // BottomNav is now only rendered inside (app) layout, so simpler check.
+    // Still hide on admin and onboarding.
+    const hiddenPathPrefixes = ['/onboarding', '/admin'];
+    if (hiddenPathPrefixes.some(prefix => pathname.startsWith(prefix))) return null;
 
     const isActive = (path: string) => {
-        if (path === "/" && pathname === "/") return true;
-        if (path !== "/" && pathname.startsWith(path)) return true; // Keep active state logic
-        return false; // For other pages, no tab is active, but nav is visible
+        if (path === "/explore" && (pathname === "/explore" || pathname.startsWith("/explore/"))) return true;
+        if (path !== "/explore" && pathname.startsWith(path)) return true;
+        return false;
     };
 
     const navItems = [
-        { name: "Home", path: "/", icon: "home" },
+        { name: "Home", path: "/explore", icon: "home" }, // Home now points to explore
         { name: "Explore", path: "/explore", icon: "explore" },
         { name: "My Circles", path: "/my-circles", icon: "groups" },
         { name: "Profile", path: "/profile", icon: "person" },

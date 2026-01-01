@@ -7,7 +7,7 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
     const params = await props.params;
 
     const user = await getCurrentUser();
-    if (!user) redirect('/welcome');
+    if (!user) redirect('/signin');
 
     const grid = await getCircleLedgerGrid(params.id);
     if (!grid) notFound();

@@ -31,7 +31,7 @@ import { cookies } from "next/headers";
 
 export async function signOutAction() {
     (await cookies()).delete('session_user_id');
-    redirect('/welcome');
+    redirect('/signin');
 }
 
 export async function sendOtpAction(formData: FormData) {
@@ -130,7 +130,12 @@ export async function verifyOtpAction(formData: FormData) {
         sameSite: 'lax'
     });
 
-    redirect('/');
+    // Redirect based on onboarding status
+    if (user.hasCompletedOnboarding) {
+        redirect('/explore');
+    } else {
+        redirect('/onboarding');
+    }
 }
 
 export async function checkUserExistsAction(rawPhone: string) {
@@ -610,7 +615,7 @@ export async function completeSignupAction(formData: FormData) {
         }
     });
 
-    redirect('/welcome');
+    redirect('/onboarding');
 }
 
 export async function completeOnboardingAction() {
@@ -628,5 +633,5 @@ export async function completeOnboardingAction() {
         data: { hasCompletedOnboarding: true }
     });
 
-    redirect('/');
+    redirect('/explore');
 }

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { signOutAction } from "../actions";
+import { signOutAction } from "@/app/actions";
 import ProfileEditModal from "./ProfileEditModal";
-import ProfileNudge from "../components/ProfileNudge";
-import { ExplainRoscaTrigger } from "../components/ExplainRosca";
+import ProfileNudge from "@/app/components/ProfileNudge";
+import { ExplainRoscaTrigger } from "@/app/components/ExplainRosca";
 
 // Badge Config
 const BADGE_CONFIG: Record<string, { label: string, icon: string, color: string }> = {
@@ -196,8 +196,8 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
                             >
                                 <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${item.type.includes('PAID') || item.type.includes('CONFIRMED') ? 'bg-green-100 text-green-600' :
-                                        item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' :
-                                            'bg-blue-100 text-blue-600'
+                                    item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' :
+                                        'bg-blue-100 text-blue-600'
                                     }`}>
                                     <span className="material-symbols-outlined text-[20px]">
                                         {item.type.includes('PAID') ? 'check_circle' :
