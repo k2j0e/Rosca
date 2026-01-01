@@ -8,14 +8,9 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Explore Circles",
+  title: "Orbit - Save Together",
   description: "Join a circle and start saving together.",
 };
-
-// ... imports
-import BottomNav from "./components/BottomNav";
-
-// ... metadata
 
 export default function RootLayout({
   children,
@@ -34,8 +29,8 @@ export default function RootLayout({
         <main className="min-h-screen">
           {children}
         </main>
-        <BottomNav />
       </body>
     </html>
   );
 }
+

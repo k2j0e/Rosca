@@ -31,7 +31,7 @@ import { cookies } from "next/headers";
 
 export async function signOutAction() {
     (await cookies()).delete('session_user_id');
-    redirect('/signin');
+    redirect('/');
 }
 
 export async function sendOtpAction(formData: FormData) {
