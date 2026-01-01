@@ -14,13 +14,14 @@ export default function BottomNav() {
     if (hiddenPathPrefixes.some(prefix => pathname.startsWith(prefix))) return null;
 
     const isActive = (path: string) => {
-        if (path === "/explore" && (pathname === "/explore" || pathname.startsWith("/explore/"))) return true;
-        if (path !== "/explore" && pathname.startsWith(path)) return true;
+        // Exact match for paths
+        if (pathname === path) return true;
+        // For nested routes like /circles/*, check if it starts with the path
+        if (path !== "/explore" && path !== "/my-circles" && path !== "/profile" && pathname.startsWith(path)) return true;
         return false;
     };
 
     const navItems = [
-        { name: "Home", path: "/explore", icon: "home" }, // Home now points to explore
         { name: "Explore", path: "/explore", icon: "explore" },
         { name: "My Circles", path: "/my-circles", icon: "groups" },
         { name: "Profile", path: "/profile", icon: "person" },

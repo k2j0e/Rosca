@@ -30,23 +30,18 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
 
             {/* Top App Bar */}
             <div className="flex flex-col gap-2 bg-background-light dark:bg-background-dark p-4 pb-0 sticky top-0 z-20">
-                <div className="flex items-center h-12 justify-between">
-                    <div className="flex items-center gap-2">
-                        {/* Brand/Logo Placeholder could go here */}
-                    </div>
-                    <div className="flex gap-4">
-                        <button className="text-text-main dark:text-text-main-dark transition-colors hover:text-primary">
-                            <span className="material-symbols-outlined text-3xl">
-                                notifications
-                            </span>
-                        </button>
-                    </div>
-                </div>
-                <div className="flex justify-between items-center w-full">
+                <div className="flex items-center justify-between">
                     <p className="text-text-main dark:text-text-main-dark tracking-tight text-[28px] font-bold leading-tight">
                         Explore Circles
                     </p>
-                    <ExplainRoscaTrigger variant="icon" />
+                    <div className="flex items-center gap-2">
+                        <button className="text-text-main dark:text-text-main-dark transition-colors hover:text-primary p-1">
+                            <span className="material-symbols-outlined text-2xl">
+                                notifications
+                            </span>
+                        </button>
+                        <ExplainRoscaTrigger variant="icon" />
+                    </div>
                 </div>
             </div>
 

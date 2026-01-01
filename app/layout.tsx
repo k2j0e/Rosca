@@ -20,6 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${workSans.variable}`}>
       <head>
+        <meta name="color-scheme" content="light dark" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8f6f6" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#221610" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
