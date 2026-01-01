@@ -618,7 +618,10 @@ export async function completeOnboardingAction() {
     const { getCurrentUser } = await import("@/lib/data");
 
     const user = await getCurrentUser();
-    if (!user) return;
+
+    if (!user) {
+        redirect('/signup');
+    }
 
     await prisma.user.update({
         where: { id: user.id },
