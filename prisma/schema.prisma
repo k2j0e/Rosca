@@ -18,6 +18,7 @@ enum LedgerEntryType {
   CONTRIBUTION_CONFIRMED
   CONTRIBUTION_MARKED_UNPAID
   CONTRIBUTION_OVERDUE_FLAGGED
+  CONTRIBUTION_REJECTED
   
   // Payout Lifecycle
   PAYOUT_RECIPIENT_ASSIGNED
@@ -30,6 +31,14 @@ enum LedgerEntryType {
   MEMBER_REMOVED
   CIRCLE_PAUSED
   CIRCLE_RESUMED
+  CIRCLE_STARTED
+  
+  // Admin Actions
+  GRACE_APPLIED
+  DUE_DATE_EXTENDED
+  ADMIN_ANNOUNCEMENT_SENT
+  ADMIN_REMINDER_SENT
+  SUPPORT_CASE_OPENED
   
   // Corrections
   CORRECTION_ENTRY_POSTED
@@ -150,7 +159,14 @@ model Circle {
   coverImage   String?
   isPrivate    Boolean  @default(false)
   isFrozen     Boolean  @default(false)
-  status       String   // 'recruiting', 'active', 'completed'
+  status       String   // 'recruiting', 'active', 'completed', 'paused'
+  
+  // Round Tracking
+  currentRound Int      @default(1)
+  
+  // Pause State
+  pausedAt     DateTime?
+  pauseReason  String?
   
   // Advanced Settings
   payoutSchedule Json?  // Array of dates for rounds
@@ -165,6 +181,7 @@ model Circle {
   members      Member[]
   events       CircleEvent[]
   ledgerEntries UserLedgerEntry[]
+  announcements CircleAnnouncement[]
 }
 
 model Member {
@@ -173,7 +190,12 @@ model Member {
   role             String   // 'admin' | 'member'
   payoutMonth      Int?
   payoutPreference String?  // 'early' | 'late' | 'any'
-  status           String   // 'paid' | 'pending' | 'late' | 'requested'
+  status           String   // 'paid' | 'pending' | 'late' | 'requested' | 'paid_pending'
+  
+  // Exception Handling
+  graceApplied     Boolean  @default(false)
+  graceReason      String?
+  dueDateExtension DateTime?
   
   // Relations
   userId           String
@@ -194,6 +216,19 @@ model CircleEvent {
   // Relations
   circleId  String
   circle    Circle   @relation(fields: [circleId], references: [id])
+}
+
+model CircleAnnouncement {
+  id        String   @id @default(uuid())
+  title     String
+  body      String
+  isPinned  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  // Relations
+  circleId  String
+  circle    Circle   @relation(fields: [circleId], references: [id])
+  createdById String // Admin userId who created
 }
 
 // Renamed to avoid confusion with internal 'Ledger' terms if any

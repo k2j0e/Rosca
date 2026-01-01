@@ -635,3 +635,309 @@ export async function completeOnboardingAction() {
 
     redirect('/explore');
 }
+
+// --- CIRCLE ADMIN ACTIONS ---
+
+/**
+ * Apply one-time grace period for a member's contribution.
+ */
+export async function applyGraceAction(circleId: string, memberId: string, reason: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!reason || reason.trim().length < 5) {
+        throw new Error("Reason is required (minimum 5 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    const member = await prisma.member.findUnique({
+        where: { id: memberId },
+        include: { user: true }
+    });
+
+    if (!member || member.circleId !== circleId) {
+        throw new Error("Member not found in circle");
+    }
+
+    if (member.graceApplied) {
+        throw new Error("Grace has already been applied for this member");
+    }
+
+    await prisma.member.update({
+        where: { id: memberId },
+        data: {
+            graceApplied: true,
+            graceReason: reason.trim(),
+            status: 'pending' // Reset from 'late' if applicable
+        }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.GRACE_APPLIED,
+        description: `Grace period applied for ${member.user.name}`,
+        reason: reason.trim(),
+        targetUserId: member.userId
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true, memberName: member.user.name };
+}
+
+/**
+ * Extend the due date for a member's contribution.
+ */
+export async function extendDueDateAction(circleId: string, memberId: string, newDueDate: Date, reason: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!reason || reason.trim().length < 5) {
+        throw new Error("Reason is required (minimum 5 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    const member = await prisma.member.findUnique({
+        where: { id: memberId },
+        include: { user: true }
+    });
+
+    if (!member || member.circleId !== circleId) {
+        throw new Error("Member not found in circle");
+    }
+
+    await prisma.member.update({
+        where: { id: memberId },
+        data: {
+            dueDateExtension: newDueDate,
+            status: 'pending' // Reset from 'late' if applicable
+        }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.DUE_DATE_EXTENDED,
+        description: `Due date extended for ${member.user.name} to ${newDueDate.toLocaleDateString()}`,
+        reason: reason.trim(),
+        targetUserId: member.userId,
+        metadata: { newDueDate: newDueDate.toISOString() }
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true, memberName: member.user.name, newDueDate };
+}
+
+/**
+ * Mark a member's contribution as unpaid/late.
+ */
+export async function markUnpaidAction(circleId: string, memberId: string, reason: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!reason || reason.trim().length < 5) {
+        throw new Error("Reason is required (minimum 5 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    const member = await prisma.member.findUnique({
+        where: { id: memberId },
+        include: { user: true }
+    });
+
+    if (!member || member.circleId !== circleId) {
+        throw new Error("Member not found in circle");
+    }
+
+    await prisma.member.update({
+        where: { id: memberId },
+        data: { status: 'late' }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.CONTRIBUTION_MARKED_UNPAID,
+        description: `${member.user.name} marked as unpaid`,
+        reason: reason.trim(),
+        targetUserId: member.userId
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true, memberName: member.user.name };
+}
+
+/**
+ * Reject a member's claimed payment.
+ */
+export async function rejectPaymentAction(circleId: string, memberId: string, reason: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!reason || reason.trim().length < 5) {
+        throw new Error("Reason is required (minimum 5 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    const member = await prisma.member.findUnique({
+        where: { id: memberId },
+        include: { user: true }
+    });
+
+    if (!member || member.circleId !== circleId) {
+        throw new Error("Member not found in circle");
+    }
+
+    // Reset status back to pending (from paid_pending or paid)
+    await prisma.member.update({
+        where: { id: memberId },
+        data: { status: 'pending' }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.CONTRIBUTION_REJECTED,
+        description: `Payment rejected for ${member.user.name}`,
+        reason: reason.trim(),
+        targetUserId: member.userId
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true, memberName: member.user.name };
+}
+
+/**
+ * Pause a circle (admin only, pre-start or during).
+ */
+export async function pauseCircleAction(circleId: string, reason: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!reason || reason.trim().length < 5) {
+        throw new Error("Reason is required (minimum 5 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    const circle = await prisma.circle.findUnique({ where: { id: circleId } });
+    if (!circle) throw new Error("Circle not found");
+    if (circle.status === 'paused') throw new Error("Circle is already paused");
+
+    await prisma.circle.update({
+        where: { id: circleId },
+        data: {
+            status: 'paused',
+            pausedAt: new Date(),
+            pauseReason: reason.trim()
+        }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.CIRCLE_PAUSED,
+        description: `Circle paused`,
+        reason: reason.trim()
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true };
+}
+
+/**
+ * Resume a paused circle.
+ */
+export async function resumeCircleAction(circleId: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    const circle = await prisma.circle.findUnique({ where: { id: circleId } });
+    if (!circle) throw new Error("Circle not found");
+    if (circle.status !== 'paused') throw new Error("Circle is not paused");
+
+    await prisma.circle.update({
+        where: { id: circleId },
+        data: {
+            status: 'active',
+            pausedAt: null,
+            pauseReason: null
+        }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.CIRCLE_RESUMED,
+        description: `Circle resumed`
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true };
+}
+
+/**
+ * Post an announcement to circle members.
+ */
+export async function postAnnouncementAction(circleId: string, title: string, body: string, isPinned: boolean = false) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!title || title.trim().length < 3) {
+        throw new Error("Title is required (minimum 3 characters)");
+    }
+    if (!body || body.trim().length < 10) {
+        throw new Error("Body is required (minimum 10 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    // Rate limit: Max 3 announcements per day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const announcementsToday = await prisma.circleAnnouncement.count({
+        where: {
+            circleId,
+            createdAt: { gte: today }
+        }
+    });
+
+    if (announcementsToday >= 3) {
+        throw new Error("Rate limit: Maximum 3 announcements per day");
+    }
+
+    const announcement = await prisma.circleAnnouncement.create({
+        data: {
+            circleId,
+            title: title.trim(),
+            body: body.trim(),
+            isPinned,
+            createdById: adminId
+        }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.ADMIN_ANNOUNCEMENT_SENT,
+        description: `Announcement posted: "${title.trim()}"`,
+        metadata: { announcementId: announcement.id, isPinned }
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    revalidatePath(`/circles/${circleId}/dashboard`);
+    return { success: true, announcementId: announcement.id };
+}
