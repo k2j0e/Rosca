@@ -85,6 +85,20 @@ export default async function JoinCircleIntent(props: { params: Promise<{ id: st
                         </p>
                     </div>
 
+                    {/* Liability Acknowledgement - Mandatory */}
+                    <div className="mb-6 bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+                        <label className="flex gap-3 items-start cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                required
+                                className="mt-1 w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <p className="text-sm text-text-main dark:text-white leading-snug">
+                                I understand that members who receive funds earlier are supported by the group, and members who receive funds later are supporting the group.
+                            </p>
+                        </label>
+                    </div>
+
                     {/* Footer Actions */}
                     <div className="mt-auto pt-6 flex flex-col gap-3 pb-6">
                         <button

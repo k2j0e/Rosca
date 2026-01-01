@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { signOutAction } from "../actions";
 import ProfileEditModal from "./ProfileEditModal";
 import ProfileNudge from "../components/ProfileNudge";
+import { ExplainRoscaTrigger } from "../components/ExplainRosca";
 
 // Badge Config
 const BADGE_CONFIG: Record<string, { label: string, icon: string, color: string }> = {
@@ -50,7 +51,7 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                     Trust Passport
                 </h2>
                 <div className="p-2 -mr-2 text-text-sub dark:text-text-sub-dark">
-                    <span className="material-symbols-outlined">help</span>
+                    <ExplainRoscaTrigger variant="icon" />
                 </div>
             </div>
 
@@ -190,15 +191,14 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                     <div className="flex flex-col gap-5">
                         {history.length > 0 ? history.map((item: any) => (
                             <div key={item.id} className="flex items-start gap-4">
-                                <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                                    item.type.includes('PAID') || item.type.includes('CONFIRMED') ? 'bg-green-100 text-green-600' :
-                                    item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' : 
-                                    'bg-blue-100 text-blue-600'
-                                }`}>
+                                <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${item.type.includes('PAID') || item.type.includes('CONFIRMED') ? 'bg-green-100 text-green-600' :
+                                        item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' :
+                                            'bg-blue-100 text-blue-600'
+                                    }`}>
                                     <span className="material-symbols-outlined text-[20px]">
                                         {item.type.includes('PAID') ? 'check_circle' :
-                                         item.type.includes('CONFIRMED') ? 'verified' :
-                                         item.type.includes('OBLIGATION') ? 'receipt_long' : 'info'}
+                                            item.type.includes('CONFIRMED') ? 'verified' :
+                                                item.type.includes('OBLIGATION') ? 'receipt_long' : 'info'}
                                     </span>
                                 </div>
                                 <div className="flex flex-col flex-1 gap-0.5">

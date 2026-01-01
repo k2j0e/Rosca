@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from "next/link";
 import { getCircles } from "@/lib/data";
+import { ExplainRoscaTrigger } from "@/app/components/ExplainRosca";
 
 export default async function ExploreCircles(props: { searchParams: Promise<{ joined?: string }> }) {
     const searchParams = await props.searchParams;
@@ -40,9 +41,12 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
                         </button>
                     </div>
                 </div>
-                <p className="text-text-main dark:text-text-main-dark tracking-tight text-[28px] font-bold leading-tight">
-                    Explore Circles
-                </p>
+                <div className="flex justify-between items-center w-full">
+                    <p className="text-text-main dark:text-text-main-dark tracking-tight text-[28px] font-bold leading-tight">
+                        Explore Circles
+                    </p>
+                    <ExplainRoscaTrigger variant="icon" />
+                </div>
             </div>
 
             {/* Search Bar */}

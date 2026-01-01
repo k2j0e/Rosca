@@ -22,6 +22,7 @@ export interface User {
     // Auth Fields (Optional as they are not always needed in frontend)
     otpCode?: string | null;
     otpExpiresAt?: Date | string | null;
+    hasCompletedOnboarding?: boolean;
     badges: string[];
     stats: {
         circlesCompleted: number;
@@ -101,6 +102,7 @@ function mapUser(pUser: any): User {
         memberSince: String(pUser.memberSince || '2025'),
         role: (pUser.role || 'user') as any,
         isBanned: Boolean(pUser.isBanned || false), // Ensure boolean
+        hasCompletedOnboarding: Boolean(pUser.hasCompletedOnboarding || false),
         // Ensure arrays/objects, never null
         badges: Array.isArray(pUser.badges) ? pUser.badges : [],
         stats: pUser.stats && typeof pUser.stats === 'object' ? pUser.stats : { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 },

@@ -573,3 +573,18 @@ export async function completeSignupAction(formData: FormData) {
 
     redirect('/welcome');
 }
+
+export async function completeOnboardingAction() {
+    const { prisma } = await import("@/lib/db");
+    const { getCurrentUser } = await import("@/lib/data");
+
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: { hasCompletedOnboarding: true }
+    });
+
+    redirect('/');
+}
