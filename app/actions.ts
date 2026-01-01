@@ -320,6 +320,45 @@ export async function joinCircleAction(formData: FormData) {
     redirect(`/explore?joined=true`);
 }
 
+export async function joinCircleJsonAction(formData: FormData) {
+    const rawData = {
+        circleId: formData.get("circleId") as string,
+        intent: formData.get("intent") as string,
+        preference: formData.get("preference") || 'any'
+    };
+
+    const validated = joinCircleSchema.safeParse(rawData);
+
+    if (!validated.success) {
+        return { error: "Invalid join data" };
+    }
+
+    const { circleId, intent, preference } = validated.data;
+
+    const currentUser = await getCurrentUser();
+    if (!currentUser) return { error: "Must be logged in to join" };
+
+    // Add real user to circle
+    await joinCircle(circleId, currentUser, preference);
+
+    // Ledger: Log Member Join
+    try {
+        await recordLedgerEntry({
+            type: LedgerEntryType.MEMBER_JOINED,
+            direction: LedgerEntryDirection.NEUTRAL,
+            description: `${currentUser.name} joined the circle`,
+            circleId: circleId,
+            userId: currentUser.id,
+            metadata: { preference, intent }
+        });
+    } catch (e) { console.error("Ledger join error", e); }
+
+    revalidatePath(`/explore`);
+    revalidatePath(`/circles/${circleId}`);
+
+    return { success: true };
+}
+
 export async function updatePayoutOrderAction(circleId: string, members: Member[]) {
     // In a real app, verify admin status here
     await updateCircleMembers(circleId, members);

@@ -189,8 +189,12 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                 <div className="mb-8">
                     <h3 className="font-bold text-lg text-text-main dark:text-white mb-4 px-1">Recent Activity</h3>
                     <div className="flex flex-col gap-5">
-                        {history.length > 0 ? history.map((item: any) => (
-                            <div key={item.id} className="flex items-start gap-4">
+                        {history.length > 0 ? history.map((item: any, index: number) => (
+                            <div
+                                key={item.id}
+                                className="flex items-start gap-4 animate-in slide-in-from-bottom-2 fade-in duration-500 fill-mode-forwards opacity-0"
+                                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
+                            >
                                 <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${item.type.includes('PAID') || item.type.includes('CONFIRMED') ? 'bg-green-100 text-green-600' :
                                         item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' :
                                             'bg-blue-100 text-blue-600'
