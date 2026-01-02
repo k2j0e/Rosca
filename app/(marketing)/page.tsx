@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { MarketingAnimation } from "../components/MarketingAnimation";
 
 export default async function LandingPage() {
     const cookieStore = await cookies();
@@ -192,31 +193,9 @@ export default async function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Right: Timeline */}
-                        <div className="relative pl-8 pt-4">
-                            {/* Vertical Line */}
-                            <div className="absolute left-[27px] top-4 bottom-4 w-px bg-gray-200 dark:bg-gray-800"></div>
-
-                            <div className="space-y-12">
-                                {[
-                                    { num: 1, label: 'Month 1', desc: 'Person A receives $1,000' },
-                                    { num: 2, label: 'Month 2', desc: 'Person B receives $1,000' },
-                                    { num: 3, label: 'Month 3', desc: 'Person C receives $1,000' },
-                                    { num: 4, label: 'Month 10', desc: 'Final person receives $1,000 — circle complete!' }
-                                ].map((step, i) => (
-                                    <div key={i} className="relative flex items-center gap-12">
-                                        <div className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 border-2 border-[#F25F15] text-[#F25F15] text-2xl font-bold flex items-center justify-center shrink-0 z-10">
-                                            {step.num}
-                                            {/* Dashed Connector */}
-                                            <div className="absolute left-full top-1/2 w-8 border-t-2 border-[#F25F15] -z-10"></div>
-                                        </div>
-                                        <div>
-                                            <h4 className="text-2xl font-medium text-gray-500 dark:text-gray-400 mb-1">{step.label}</h4>
-                                            <p className="text-lg font-medium text-text-main dark:text-white">{step.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        {/* Right: Interactive Animation */}
+                        <div className="relative pl-0 lg:pl-8 pt-4">
+                            <MarketingAnimation />
                         </div>
                     </div>
                 </div>
