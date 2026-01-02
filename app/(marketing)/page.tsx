@@ -10,28 +10,28 @@ export default async function LandingPage() {
         <div className="flex min-h-screen flex-col font-display bg-white dark:bg-gray-950 text-text-main dark:text-white overflow-x-hidden">
 
             {/* 1. Navigation */}
-            <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
-                <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4">
+            <header className="sticky top-0 z-50 w-full bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
+                <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 rounded-full border-[3px] border-primary flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
-                            <div className="w-2 h-2 rounded-full bg-primary"></div>
+                        <div className="w-8 h-8 rounded-full border-[3px] border-[#F25F15] flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
+                            <div className="w-2 h-2 rounded-full bg-[#F25F15]"></div>
                         </div>
                         <span className="text-xl font-black tracking-tight text-text-main dark:text-white">Orbit</span>
                     </Link>
 
-                    <nav className="flex items-center gap-6">
-                        <Link href="#how-it-works" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary transition-colors hidden sm:block">
+                    <nav className="flex items-center gap-8">
+                        <Link href="#how-it-works" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-[#F25F15] transition-colors hidden sm:block">
                             How it Works
                         </Link>
                         {isLoggedIn ? (
                             <Link href="/home">
-                                <button className="px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                <button className="px-6 py-2.5 bg-[#F25F15] text-white font-bold text-sm rounded-full hover:bg-[#F25F15]/90 transition-all shadow-lg shadow-[#F25F15]/20">
                                     Go to Dashboard
                                 </button>
                             </Link>
                         ) : (
                             <Link href="/signup">
-                                <button className="px-6 py-2.5 bg-primary text-white font-bold text-sm rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                <button className="px-6 py-2.5 bg-[#F25F15] text-white font-bold text-sm rounded-full hover:bg-[#F25F15]/90 transition-all shadow-lg shadow-[#F25F15]/20">
                                     Get Started
                                 </button>
                             </Link>
@@ -42,49 +42,212 @@ export default async function LandingPage() {
 
             <main className="flex-1">
 
-                {/* 2. Hero Section */}
-                <section className="pt-20 pb-24 px-6 text-center">
-                    <div className="max-w-4xl mx-auto flex flex-col items-center">
-                        <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight mb-8 leading-[1.1]">
-                            Save Together.<br />
-                            <span className="text-primary">Access Cash.</span><br />
-                            No Interest.
-                        </h1>
-                        <p className="text-xl text-gray-500 dark:text-gray-400 mb-10 max-w-xl mx-auto leading-relaxed">
-                            Join a savings circle. Reach your goals faster without banks or debt. The modern way to save with your community.
-                        </p>
+                {/* 2. Hero Section (Split Layout) */}
+                <section className="py-16 md:py-24 px-6 overflow-hidden">
+                    <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                        <div className="flex flex-col items-start text-left">
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-[1.1] text-text-main dark:text-white">
+                                Save Together.<br />
+                                Access Cash.<br />
+                                No Interest.
+                            </h1>
+                            <p className="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-xl leading-relaxed">
+                                A trusted group helps each other reach goals — without banks or debt. Join a savings circle where friends, family, or community members pool resources and take turns accessing funds. It's an ancient practice reimagined for modern life.
+                            </p>
 
-                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                            <Link href={isLoggedIn ? "/home" : "/signup"} className="w-full sm:w-auto">
-                                <button className="w-full sm:w-auto px-8 py-4 bg-primary text-white font-bold text-lg rounded-2xl hover:translate-y-[-2px] hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98]">
-                                    Start Saving Now
-                                </button>
-                            </Link>
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 px-4 py-2">
-                                <span className="material-symbols-outlined text-green-500 fill-1">check_circle</span>
-                                No fees to join
+                            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                                <Link href={isLoggedIn ? "/home" : "/signup"} className="w-full sm:w-auto">
+                                    <button className="w-full sm:w-auto px-8 py-4 bg-[#F25F15] text-white font-bold text-lg rounded-full hover:bg-[#d8500c] transition-all shadow-xl shadow-[#F25F15]/20">
+                                        Get Started
+                                    </button>
+                                </Link>
+                                <Link href="#how-it-works" className="w-full sm:w-auto">
+                                    <button className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-transparent border-2 border-[#F25F15] text-[#F25F15] font-bold text-lg rounded-full hover:bg-[#F25F15]/5 transition-all">
+                                        See How It Works
+                                    </button>
+                                </Link>
                             </div>
                         </div>
 
-                        {/* Hero Visual / Cycle Graphic Stub */}
-                        <div className="mt-20 relative w-full max-w-2xl aspect-[4/3] sm:aspect-[16/9] bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 rounded-3xl border border-gray-100 dark:border-white/5 p-8 flex items-center justify-center overflow-hidden">
-                            {/* Abstract Orbit Visual */}
-                            <div className="absolute inset-0 flex items-center justify-center opacity-30">
-                                <div className="w-[500px] h-[500px] border border-primary/20 rounded-full animate-spin-slow-reverse" style={{ animationDuration: '30s' }}></div>
-                                <div className="absolute w-[350px] h-[350px] border border-primary/40 rounded-full animate-spin-slow" style={{ animationDuration: '20s' }}></div>
-                                <div className="absolute w-[200px] h-[200px] border border-primary/60 rounded-full"></div>
+                        {/* Hero Image / Composition */}
+                        <div className="relative w-full aspect-square md:aspect-[4/3] rounded-3xl overflow-hidden bg-gray-100 dark:bg-white/5">
+                            <img
+                                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
+                                alt="Friends laughing and saving together"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* 3. Why People Choose (6 Grid) */}
+                <section className="py-24 px-6 bg-white dark:bg-gray-950">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-4xl md:text-5xl font-black mb-6 text-text-main dark:text-white">Why People Choose Savings Circles</h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-400 mb-16 max-w-4xl">
+                            From avoiding predatory interest rates to building stronger community bonds, savings circles offer something traditional finance can't: human connection paired with financial flexibility.
+                        </p>
+
+                        <div className="grid md:grid-cols-2 gap-x-12 gap-y-16">
+                            {[
+                                {
+                                    icon: 'percent',
+                                    title: 'Avoid Interest & Debt',
+                                    desc: 'No credit checks, no loan applications, no interest charges. Access funds without getting trapped in debt cycles.'
+                                },
+                                {
+                                    icon: 'fast_forward',
+                                    title: 'Access Money Sooner',
+                                    desc: 'Need funds for an emergency or opportunity? Get your full amount early in the cycle instead of waiting to save it all yourself.'
+                                },
+                                {
+                                    icon: 'handshake',
+                                    title: 'Save with Accountability',
+                                    desc: 'When your community is counting on you, you\'re more likely to stick to your savings commitment. Social pressure becomes positive motivation.'
+                                },
+                                {
+                                    icon: 'diversity_3',
+                                    title: 'Support Friends & Community',
+                                    desc: 'Help each other reach goals. When someone in your circle gets their payout, you\'re part of making that happen.'
+                                },
+                                {
+                                    icon: 'public',
+                                    title: 'Culturally Inclusive',
+                                    desc: 'This practice exists in cultures worldwide — from tandas to chit funds to susus. Now it\'s accessible to everyone, digitally.'
+                                },
+                                {
+                                    icon: 'description',
+                                    title: 'Transparent & Fair',
+                                    desc: 'Everyone sees the same information. No hidden fees, no fine print, no surprises. Just clear terms everyone agrees to.'
+                                }
+                            ].map((item, i) => (
+                                <div key={i} className="flex flex-col items-start">
+                                    <div className="mb-4">
+                                        <span className="material-symbols-outlined text-4xl text-[#F25F15]">{item.icon}</span>
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-3 text-text-main dark:text-white">{item.title}</h3>
+                                    <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">{item.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* 4. Built on Trust (Split + Banner) */}
+                <section className="py-24 px-6 bg-gray-50 dark:bg-white/5">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-4xl md:text-5xl font-black mb-8">Built on Trust, Not Banks</h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-400 mb-16 max-w-4xl">
+                            We're not a bank, investment platform, or loan company. We're a coordination tool that helps communities organize what they've been doing for centuries — but with transparency, tracking, and digital convenience.
+                        </p>
+
+                        <div className="grid md:grid-cols-2 gap-12 mb-12">
+                            {/* What This Is */}
+                            <div>
+                                <h3 className="flex items-center gap-3 text-2xl font-bold mb-8 text-text-main dark:text-white">
+                                    <span className="text-green-600 material-symbols-outlined font-bold">check</span>
+                                    What This Is
+                                </h3>
+                                <ul className="space-y-4">
+                                    {['A coordination and tracking tool', 'For trusted groups only', 'Transparent to all members', 'Zero-interest arrangement', 'Admin-controlled membership', 'Community-based savings'].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-lg text-gray-700 dark:text-gray-300">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
 
-                            <div className="relative z-10 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl shadow-gray-200/50 dark:shadow-black/50 p-6 flex items-center gap-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                                <div className="text-center">
-                                    <p className="text-xs uppercase font-bold text-gray-400 mb-1">Pot Value</p>
-                                    <p className="text-4xl font-black text-text-main dark:text-white">$1,000</p>
+                            {/* What This Is Not */}
+                            <div>
+                                <h3 className="flex items-center gap-3 text-2xl font-bold mb-8 text-text-main dark:text-white">
+                                    <span className="text-gray-500 material-symbols-outlined font-bold">close</span>
+                                    What This Is Not
+                                </h3>
+                                <ul className="space-y-4">
+                                    {['A bank or financial institution', 'An investment or yield platform', 'A loan or credit product', 'A cryptocurrency scheme', 'Open to strangers', 'A get-rich-quick opportunity'].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-lg text-gray-700 dark:text-gray-300">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Important Banner */}
+                        <div className="bg-[#FFDAC6] dark:bg-orange-900/30 rounded-2xl p-8 flex gap-6 items-start">
+                            <span className="material-symbols-outlined text-3xl text-text-main dark:text-white shrink-0 mt-1">warning</span>
+                            <div>
+                                <h3 className="text-xl font-bold mb-2 text-text-main dark:text-white">Important: We Don't Hold Your Money</h3>
+                                <p className="text-text-main/80 dark:text-white/80 leading-relaxed">
+                                    Members pay each other directly. The app simply tracks contributions, schedules, and whose turn it is. Your circle admin controls who joins and verifies payments. We provide the software, you provide the trust.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* 5. Real Example (Timeline) */}
+                <section className="py-24 px-6 bg-white dark:bg-gray-950">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-4xl md:text-5xl font-black mb-16">A Real Example: See the Numbers</h2>
+
+                        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+                            {/* Left: Circle Details */}
+                            <div className="space-y-8">
+                                <div className="bg-[#FFDAC6] dark:bg-orange-900/30 rounded-3xl p-10">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <span className="material-symbols-outlined text-3xl">pie_chart</span>
+                                        <h3 className="text-2xl font-bold">Circle Details</h3>
+                                    </div>
+                                    <ul className="space-y-4">
+                                        <li className="flex items-start gap-3 text-lg font-medium">
+                                            <span className="text-2xl leading-none">•</span>
+                                            <span><span className="font-bold">10 people</span> in the circle</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-lg font-medium">
+                                            <span className="text-2xl leading-none">•</span>
+                                            <span><span className="font-bold">$100 per month</span> from each person</span>
+                                        </li>
+                                        <li className="flex items-start gap-3 text-lg font-medium">
+                                            <span className="text-2xl leading-none">•</span>
+                                            <span><span className="font-bold">10 months</span> total duration</span>
+                                        </li>
+                                    </ul>
                                 </div>
-                                <div className="h-10 w-px bg-gray-100 dark:bg-gray-800"></div>
-                                <div className="flex -space-x-3">
-                                    {[1, 2, 3, 4].map(i => (
-                                        <div key={i} className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-gray-900 flex items-center justify-center text-xs font-bold">
-                                            {i === 4 ? '+' : ''}
+
+                                <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                                    Each month, one person receives <span className="font-bold text-text-main dark:text-white">$1,000</span>. By the end, everyone has received exactly <span className="font-bold text-text-main dark:text-white">$1,000</span>.
+                                </p>
+
+                                <div className="inline-block bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 font-medium px-4 py-2 rounded-lg">
+                                    No interest. No bank. Just coordination.
+                                </div>
+                            </div>
+
+                            {/* Right: Timeline */}
+                            <div className="relative pl-8 pt-4">
+                                {/* Vertical Line */}
+                                <div className="absolute left-[27px] top-4 bottom-4 w-px bg-gray-200 dark:bg-gray-800"></div>
+
+                                <div className="space-y-12">
+                                    {[
+                                        { num: 1, label: 'Month 1', desc: 'Person A receives $1,000' },
+                                        { num: 2, label: 'Month 2', desc: 'Person B receives $1,000' },
+                                        { num: 3, label: 'Month 3', desc: 'Person C receives $1,000' },
+                                        { num: 4, label: 'Month 10', desc: 'Final person receives $1,000 — circle complete!' }
+                                    ].map((step, i) => (
+                                        <div key={i} className="relative flex items-center gap-12">
+                                            <div className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 border-2 border-[#F25F15] text-[#F25F15] text-2xl font-bold flex items-center justify-center shrink-0 z-10">
+                                                {step.num}
+                                                {/* Dashed Connector */}
+                                                <div className="absolute left-full top-1/2 w-8 border-t-2 border-[#F25F15] -z-10"></div>
+                                            </div>
+                                            <div>
+                                                <h4 className="text-2xl font-medium text-gray-500 dark:text-gray-400 mb-1">{step.label}</h4>
+                                                <p className="text-lg font-medium text-text-main dark:text-white">{step.desc}</p>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -93,168 +256,81 @@ export default async function LandingPage() {
                     </div>
                 </section>
 
-                {/* 3. Benefits Section */}
-                <section className="py-20 px-6 bg-gray-50 dark:bg-white/5">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="text-center mb-16">
-                            <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 inline-block">Benefits</span>
-                            <h2 className="text-3xl md:text-4xl font-extrabold">Why Choose Orbit?</h2>
-                            <p className="text-gray-500 mt-4">Built on trust, powered by community.</p>
-                        </div>
+                {/* 6. How it Works (3 Step Horizontal) */}
+                <section id="how-it-works" className="py-24 px-6 bg-white dark:bg-gray-950">
+                    <div className="max-w-7xl mx-auto">
+                        <h2 className="text-4xl md:text-5xl font-black mb-8">How Community Savings Circles Work</h2>
+                        <p className="text-xl text-gray-600 dark:text-gray-400 mb-20 max-w-4xl">
+                            Forget complicated financial products. This is simple, transparent, and built on trust. Every member contributes the same amount on a regular schedule, and each round, one person receives the full pooled amount. Everyone takes a turn until the circle completes.
+                        </p>
 
-                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid md:grid-cols-3 gap-12 border-t-2 border-[#F25F15] pt-12">
                             {[
-                                { icon: 'verified_user', title: 'Transparent & Secure', desc: 'Your funds are protected with bank-grade security. No hidden fees.' },
-                                { icon: 'groups', title: 'Community-Driven', desc: 'Connect with verified members. Save together and support each other.' },
-                                { icon: 'percent', title: 'Interest-Free', desc: 'Forget high interest rates. Pay a small flat membership fee and keep your cash.' },
-                                { icon: 'bolt', title: 'Fast Access', desc: 'Get verified in minutes. Receive your payout instantly when it’s your turn.' }
-                            ].map((item, i) => (
-                                <div key={i} className="bg-white dark:bg-gray-900 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow">
-                                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center text-primary mb-6">
-                                        <span className="material-symbols-outlined text-2xl">{item.icon}</span>
+                                {
+                                    icon: 'groups',
+                                    title: 'Join a Circle',
+                                    desc: 'Everyone commits the same amount on a regular schedule — weekly, monthly, or whatever works for your group.'
+                                },
+                                {
+                                    icon: 'volunteer_activism',
+                                    title: 'One Person Receives the Pool',
+                                    desc: 'Each round, a different member gets the full sum. The order is agreed upon by the group from the start.'
+                                },
+                                {
+                                    icon: 'currency_exchange',
+                                    title: 'Everyone Takes a Turn',
+                                    desc: 'Some access cash sooner for urgent needs, others save steadily. It\'s fair, transparent, and works for everyone.'
+                                }
+                            ].map((step, i) => (
+                                <div key={i}>
+                                    <div className="mb-6">
+                                        <span className="material-symbols-outlined text-4xl text-gray-400 font-light">{step.icon}</span>
                                     </div>
-                                    <h3 className="font-bold text-lg mb-3">{item.title}</h3>
-                                    <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                                    <h3 className="text-2xl font-bold mb-4 text-[#F25F15]">{step.title}</h3>
+                                    <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">{step.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                {/* 4. Trust / Dark Stats Section */}
-                <section className="py-20 px-6 bg-gray-900 text-white rounded-[2.5rem] my-10 max-w-[95%] mx-auto relative overflow-hidden">
-                    {/* Background Pattern */}
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
-
-                    <div className="max-w-6xl mx-auto relative z-10">
-                        <div className="flex flex-col md:flex-row items-start justify-between gap-12">
-                            <div className="max-w-md">
-                                <h2 className="text-4xl font-black mb-6">Built on Trust</h2>
-                                <div className="space-y-8">
-                                    <div>
-                                        <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">200k+</p>
-                                        <p className="text-gray-400 font-medium mt-1">Active Members</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">$350M+</p>
-                                        <p className="text-gray-400 font-medium mt-1">Total Saved</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/10">
-                                <div className="flex gap-1 text-yellow-400 mb-4">
-                                    {[1, 2, 3, 4, 5].map(i => <span key={i} className="material-symbols-outlined fill-1 text-lg">star</span>)}
-                                </div>
-                                <p className="text-xl font-medium leading-relaxed mb-6">"Orbit helped me start a small business. I used my payout to buy inventory without paying interest to a bank. It felt like family helping family."</p>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500"></div>
-                                    <div>
-                                        <p className="font-bold">Adira K.</p>
-                                        <p className="text-sm text-gray-400">Ghana</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 5. How It Works */}
-                <section id="how-it-works" className="py-20 px-6">
-                    <div className="max-w-4xl mx-auto">
-                        <h2 className="text-3xl font-extrabold text-center mb-16">How Orbit Works</h2>
-
-                        <div className="relative">
-                            {/* Vertical Line for Desktop/Mobile */}
-                            <div className="absolute left-8 lg:left-1/2 top-0 bottom-0 w-0.5 bg-gray-100 dark:bg-gray-800 -translate-x-1/2 hidden md:block"></div>
-
-                            <div className="space-y-12 relative">
-                                {[
-                                    { step: 1, title: 'Join a Circle', desc: 'Find a circle that matches your savings goal and monthly budget.' },
-                                    { step: 2, title: 'Contribute Monthly', desc: 'Pay your fixed monthly contribution easily via the app.' },
-                                    { step: 3, title: 'Receive Cash', desc: 'When it’s your turn, receive the total lump sum. No interest, no debt.' }
-                                ].map((step, i) => (
-                                    <div key={i} className={`flex flex-col md:flex-row items-center gap-8 ${i % 2 === 0 ? '' : 'md:flex-row-reverse'}`}>
-
-                                        {/* Step Number Circle */}
-                                        <div className="w-16 h-16 rounded-full bg-white dark:bg-gray-900 border-4 border-gray-50 dark:border-gray-800 flex items-center justify-center z-10 shrink-0 shadow-lg">
-                                            <span className="font-black text-2xl text-primary">{step.step}</span>
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className={`bg-gray-50 dark:bg-gray-900 p-8 rounded-3xl flex-1 text-center ${i % 2 === 0 ? 'md:text-left' : 'md:text-right'}`}>
-                                            <h3 className="font-bold text-xl mb-2">{step.title}</h3>
-                                            <p className="text-gray-500">{step.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 6. Social Proof / Cards */}
-                <section className="py-20 px-6 bg-gradient-to-b from-transparent to-gray-50 dark:to-white/5">
-                    <div className="max-w-5xl mx-auto">
-                        <div className="grid md:grid-cols-2 gap-8 items-center">
-                            <div className="bg-red-50 dark:bg-red-900/10 p-8 rounded-3xl border border-red-100 dark:border-red-900/20">
-                                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center text-red-600 mb-6">
-                                    <span className="material-symbols-outlined">money_off</span>
-                                </div>
-                                <h3 className="text-xl font-bold mb-2 text-red-900 dark:text-red-200">Traditional Loans</h3>
-                                <p className="text-sm text-red-800/70 dark:text-red-300">Hidden fees, high interest rates, and impersonal service. Often leaves you with more debt than you started with.</p>
-                            </div>
-
-                            <div className="bg-green-50 dark:bg-green-900/10 p-8 rounded-3xl border border-green-100 dark:border-green-900/20 relative">
-                                <div className="absolute -top-4 -right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-lg">Rated 4.9/5.0</div>
-                                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 mb-6">
-                                    <span className="material-symbols-outlined">thumb_up</span>
-                                </div>
-                                <h3 className="text-xl font-bold mb-2 text-green-900 dark:text-green-200">Member Ratings</h3>
-                                <p className="text-sm text-green-800/70 dark:text-green-300">Transparent profiles help you save with people you can trust. Our community vetting process ensures safety.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
                 {/* 7. Bottom CTA */}
-                <section className="py-24 px-6 text-center">
-                    <div className="max-w-2xl mx-auto">
-                        <h2 className="text-4xl font-extrabold mb-8">Ready to start saving?</h2>
-                        <p className="text-gray-500 mb-10 text-lg">Create your account in minutes and join your first circle today.</p>
+                <section className="py-24 px-6 text-center bg-gray-50 dark:bg-white/5">
+                    <div className="max-w-3xl mx-auto">
+                        <h2 className="text-4xl sm:text-5xl font-black mb-8">Ready to start saving?</h2>
                         <Link href="/signup">
-                            <button className="px-10 py-5 bg-primary text-white font-bold text-xl rounded-full hover:bg-primary/90 hover:scale-105 transition-all shadow-xl shadow-primary/30">
+                            <button className="px-12 py-5 bg-[#F25F15] text-white font-bold text-xl rounded-full hover:bg-[#d8500c] hover:scale-105 transition-all shadow-xl shadow-[#F25F15]/30">
                                 Create Free Account
                             </button>
                         </Link>
-                        <div className="mt-8 text-sm text-gray-400">
+                        <p className="mt-8 text-gray-500">
                             No credit card required • Cancel anytime
-                        </div>
+                        </p>
                     </div>
                 </section>
 
                 {/* Footer */}
-                <footer className="py-12 px-6 border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-gray-950">
-                    <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+                <footer className="py-12 px-6 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-gray-950">
+                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
                         <div className="flex flex-col items-center md:items-start gap-4">
                             <div className="flex items-center gap-2">
-                                <span className="text-xl font-black text-primary">Orbit</span>
+                                <span className="text-xl font-black text-text-main dark:text-white">Orbit</span>
                             </div>
-                            <p className="text-sm text-gray-400">© {new Date().getFullYear()} Orbit Financial Technologies.<br />All rights reserved.</p>
+                            <p className="text-sm text-gray-500">© {new Date().getFullYear()} Orbit Financial Technologies.<br />All rights reserved.</p>
                         </div>
 
-                        <div className="flex gap-8 text-sm font-medium text-gray-500">
-                            <Link href="#" className="hover:text-primary transition-colors">About</Link>
-                            <Link href="#" className="hover:text-primary transition-colors">Safety</Link>
-                            <Link href="#" className="hover:text-primary transition-colors">Support</Link>
-                            <Link href="#" className="hover:text-primary transition-colors">Terms</Link>
+                        <div className="flex gap-8 text-sm font-medium text-gray-600 dark:text-gray-400">
+                            <Link href="#" className="hover:text-[#F25F15] transition-colors">About</Link>
+                            <Link href="#" className="hover:text-[#F25F15] transition-colors">Safety</Link>
+                            <Link href="#" className="hover:text-[#F25F15] transition-colors">Support</Link>
+                            <Link href="#" className="hover:text-[#F25F15] transition-colors">Terms</Link>
                         </div>
 
                         <div className="flex gap-4">
-                            <button className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 hover:text-primary transition-colors shadow-sm">
+                            <button className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-gray-500 hover:text-[#F25F15] transition-colors shadow-sm">
                                 <span className="material-symbols-outlined text-lg">public</span>
                             </button>
-                            <button className="w-10 h-10 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center text-gray-400 hover:text-primary transition-colors shadow-sm">
+                            <button className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-900 flex items-center justify-center text-gray-500 hover:text-[#F25F15] transition-colors shadow-sm">
                                 <span className="material-symbols-outlined text-lg">mail</span>
                             </button>
                         </div>
