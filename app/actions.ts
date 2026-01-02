@@ -132,7 +132,7 @@ export async function verifyOtpAction(formData: FormData) {
 
     // Redirect based on onboarding status
     if (user.hasCompletedOnboarding) {
-        redirect('/explore');
+        redirect('/home');
     } else {
         redirect('/onboarding');
     }
@@ -633,7 +633,7 @@ export async function completeOnboardingAction() {
         data: { hasCompletedOnboarding: true }
     });
 
-    redirect('/explore');
+    redirect('/home');
 }
 
 // --- CIRCLE ADMIN ACTIONS ---
