@@ -13,8 +13,8 @@ const TRADITIONS = [
 
 export function TraditionsAnimation() {
     const [rotation, setRotation] = useState(0);
-    const requestRef = useRef<number>();
-    const startTimeRef = useRef<number>();
+    const requestRef = useRef<number | null>(null);
+    const startTimeRef = useRef<number | null>(null);
 
     // Animation Loop
     const animate = (time: number) => {
