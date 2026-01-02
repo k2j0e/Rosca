@@ -17,14 +17,15 @@ export default function BottomNav() {
         // Exact match for paths
         if (pathname === path) return true;
         // For nested routes like /circles/*, check if it starts with the path
-        if (path !== "/explore" && path !== "/my-circles" && path !== "/profile" && pathname.startsWith(path)) return true;
+        if (path !== "/explore" && path !== "/my-circles" && path !== "/profile" && path !== "/create/schedule" && pathname.startsWith(path)) return true;
         return false;
     };
 
     const navItems = [
-        { name: "Explore", path: "/explore", icon: "explore" },
-        { name: "My Circles", path: "/my-circles", icon: "groups" },
-        { name: "Profile", path: "/profile", icon: "person" },
+        { name: "Explore", path: "/explore", icon: "explore", isCreate: false },
+        { name: "My Circles", path: "/my-circles", icon: "groups", isCreate: false },
+        { name: "Create", path: "/create/schedule", icon: "add_circle", isCreate: true },
+        { name: "Profile", path: "/profile", icon: "person", isCreate: false },
     ];
 
     return (
@@ -36,6 +37,23 @@ export default function BottomNav() {
                 <div className="max-w-md mx-auto flex items-center justify-around h-16 px-2">
                     {navItems.map((item) => {
                         const active = isActive(item.path);
+
+                        // Special Create button styling
+                        if (item.isCreate) {
+                            return (
+                                <Link key={item.path} href={item.path} className="w-full h-full">
+                                    <button
+                                        className="flex flex-col items-center justify-center w-full h-full gap-1 transition-colors text-primary"
+                                    >
+                                        <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                            {item.icon}
+                                        </span>
+                                        <span className="text-[10px] font-bold">{item.name}</span>
+                                    </button>
+                                </Link>
+                            );
+                        }
+
                         return (
                             <Link key={item.path} href={item.path} className="w-full h-full">
                                 <button
