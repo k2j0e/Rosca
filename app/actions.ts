@@ -941,3 +941,109 @@ export async function postAnnouncementAction(circleId: string, title: string, bo
     revalidatePath(`/circles/${circleId}/dashboard`);
     return { success: true, announcementId: announcement.id };
 }
+
+/**
+ * Send a group reminder to all circle members.
+ */
+export async function sendReminderAction(circleId: string, message: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!message || message.trim().length < 10) {
+        throw new Error("Message is required (minimum 10 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    // Rate limit: Max 2 reminders per day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const remindersToday = await prisma.userLedgerEntry.count({
+        where: {
+            circleId,
+            type: 'ADMIN_REMINDER_SENT',
+            createdAt: { gte: today }
+        }
+    });
+
+    if (remindersToday >= 2) {
+        throw new Error("Rate limit: Maximum 2 reminders per day");
+    }
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.ADMIN_REMINDER_SENT,
+        description: `Group reminder sent`,
+        metadata: { message: message.trim() }
+    });
+
+    // In production, this would trigger push/SMS notifications
+    console.log(`[Reminder] Circle ${circleId}: ${message.trim()}`);
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true };
+}
+
+/**
+ * Escalate a circle issue to platform support.
+ */
+export async function escalateToSupportAction(circleId: string, subject: string, description: string) {
+    const { prisma } = await import("@/lib/db");
+    const { requireCircleAdmin, logCircleAdminAction } = await import("@/lib/admin-circle");
+    const { LedgerEntryType } = await import("@/lib/ledger");
+
+    if (!subject || subject.trim().length < 5) {
+        throw new Error("Subject is required (minimum 5 characters)");
+    }
+    if (!description || description.trim().length < 20) {
+        throw new Error("Description is required (minimum 20 characters)");
+    }
+
+    const adminId = await requireCircleAdmin(circleId);
+
+    // Get circle context
+    const circle = await prisma.circle.findUnique({
+        where: { id: circleId },
+        include: {
+            members: { include: { user: true } }
+        }
+    });
+
+    if (!circle) throw new Error("Circle not found");
+
+    // Create support case
+    const supportCase = await prisma.supportCase.create({
+        data: {
+            category: 'dispute',
+            priority: 'medium',
+            status: 'open',
+            subject: subject.trim(),
+            description: description.trim(),
+            createdById: adminId,
+            relatedCircleId: circleId,
+            messages: [{
+                from: 'admin',
+                userId: adminId,
+                message: description.trim(),
+                timestamp: new Date().toISOString()
+            }]
+        }
+    });
+
+    await logCircleAdminAction({
+        circleId,
+        adminId,
+        type: LedgerEntryType.SUPPORT_CASE_OPENED,
+        description: `Support case opened: "${subject.trim()}"`,
+        metadata: {
+            supportCaseId: supportCase.id,
+            caseId: supportCase.caseId
+        }
+    });
+
+    revalidatePath(`/circles/${circleId}/admin`);
+    return { success: true, caseId: supportCase.caseId };
+}
+

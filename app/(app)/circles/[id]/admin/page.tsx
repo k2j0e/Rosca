@@ -63,9 +63,9 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                         </p>
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${circle.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                            circle.status === 'paused' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                circle.status === 'recruiting' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                                    'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                        circle.status === 'paused' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                            circle.status === 'recruiting' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
                         }`}>
                         {circle.status}
                     </div>
@@ -158,6 +158,32 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                         <div className="flex-1">
                             <h4 className="font-bold text-sm">Payout Schedule</h4>
                             <p className="text-xs text-text-sub dark:text-text-sub-dark">Assign slots, reorder</p>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-400 text-sm">arrow_forward_ios</span>
+                    </div>
+                </Link>
+
+                <Link href={`/circles/${params.id}/admin/announcements`}>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors group cursor-pointer">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
+                            <span className="material-symbols-outlined text-xl">campaign</span>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-sm">Announcements</h4>
+                            <p className="text-xs text-text-sub dark:text-text-sub-dark">Post updates to members</p>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-400 text-sm">arrow_forward_ios</span>
+                    </div>
+                </Link>
+
+                <Link href={`/circles/${params.id}/admin/support`}>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-red-200 dark:hover:border-red-800 transition-colors group cursor-pointer">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+                            <span className="material-symbols-outlined text-xl">support_agent</span>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-sm">Escalate to Support</h4>
+                            <p className="text-xs text-text-sub dark:text-text-sub-dark">Get help with disputes</p>
                         </div>
                         <span className="material-symbols-outlined text-gray-400 text-sm">arrow_forward_ios</span>
                     </div>
