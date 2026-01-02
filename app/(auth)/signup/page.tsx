@@ -162,7 +162,7 @@ function SignUpForm() {
                     <div className="animate-in fade-in slide-in-from-right-8 duration-300">
                         <h1 className="text-3xl font-extrabold tracking-tight mb-2">Verify number</h1>
                         <p className="text-text-sub dark:text-text-sub-dark mb-10">
-                            We send a code to <span className="font-bold text-text-main dark:text-white">+1 {phone}</span>.
+                            We sent a code to <span className="font-bold text-text-main dark:text-white">+1 {phone}</span>.
                         </p>
 
                         <form onSubmit={handleOtpSubmit} className="flex flex-col gap-6">
@@ -173,26 +173,54 @@ function SignUpForm() {
                                     required
                                     maxLength={6}
                                     value={otp}
-                                    onChange={(e) => setOtp(e.target.value)}
+                                    onChange={(e) => { setOtp(e.target.value.replace(/\D/g, '')); setError(''); }}
                                     placeholder="000000"
-                                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300"
+                                    className={`w-full bg-gray-50 dark:bg-gray-900 border-2 ${error ? 'border-red-400' : 'border-gray-100 dark:border-gray-800'} rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300`}
                                 />
                                 {error && (
-                                    <p className="text-sm font-bold text-red-500 flex items-center gap-1 mt-1">
-                                        <span className="material-symbols-outlined text-sm">error</span>
-                                        {error}
-                                    </p>
+                                    <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mt-2">
+                                        <p className="text-sm font-medium text-red-600 dark:text-red-400 flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-lg">error</span>
+                                            {error}
+                                        </p>
+                                    </div>
                                 )}
                             </div>
 
                             <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-400">Didn't receive it?</span>
-                                <button type="button" onClick={() => setStep('phone')} className="text-primary font-bold hover:underline">Change Number</button>
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        setIsLoading(true);
+                                        setError('');
+                                        const data = new FormData();
+                                        data.set('phone', phone);
+                                        data.set('name', name);
+                                        const result = await beginSignupAction(data);
+                                        if (result?.error) {
+                                            setError(result.error);
+                                        } else {
+                                            setError('');
+                                            setOtp('');
+                                            // Show success briefly
+                                            setError('New code sent!');
+                                            setTimeout(() => setError(''), 3000);
+                                        }
+                                        setIsLoading(false);
+                                    }}
+                                    disabled={isLoading}
+                                    className="text-primary font-bold hover:underline disabled:opacity-50"
+                                >
+                                    Resend Code
+                                </button>
+                                <button type="button" onClick={() => { setStep('phone'); setOtp(''); setError(''); }} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                                    Change Number
+                                </button>
                             </div>
 
                             <button
                                 type="submit"
-                                disabled={isLoading || otp.length < 4}
+                                disabled={isLoading || otp.length < 6}
                                 className="mt-4 w-full h-14 bg-primary text-white font-bold text-lg rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : "Verify Identity"}

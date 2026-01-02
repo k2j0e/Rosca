@@ -497,7 +497,7 @@ export async function launchCircleAction(circleId: string) {
 
 export async function beginSignupAction(formData: FormData) {
     const rawPhone = formData.get('phone') as string;
-    const name = formData.get('name') as string || 'Guest'; // Capture name or default
+    const name = formData.get('name') as string || 'Guest';
     // Normalize: If no '+', assume US (+1)
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
 
@@ -505,23 +505,29 @@ export async function beginSignupAction(formData: FormData) {
     const { prisma } = await import("@/lib/db");
     const { registerUser, findUserByPhone } = await import("@/lib/data");
 
-    // Check if user exists fully
+    // Check if user exists
     const existing = await findUserByPhone(phone);
-    if (existing && existing.name !== "Guest") {
-        return { error: 'User already exists. Please Sign In.' };
+
+    // If user exists and has completed onboarding, they should sign in instead
+    if (existing && existing.hasCompletedOnboarding) {
+        return { error: 'Account already exists. Please sign in instead.', shouldSignIn: true };
     }
 
     const otp = generateOtp();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     if (existing) {
-        // Update Stub
+        // User exists but hasn't completed onboarding - update their OTP and name
         await prisma.user.update({
             where: { id: existing.id },
-            data: { otpCode: otp, otpExpiresAt: expiresAt }
+            data: {
+                otpCode: otp,
+                otpExpiresAt: expiresAt,
+                name: name || existing.name // Update name if provided
+            }
         });
     } else {
-        // Create Stub
+        // Create new user stub
         const stubId = Math.random().toString(36).substr(2, 9);
         await registerUser({
             id: stubId,
@@ -545,11 +551,10 @@ export async function beginSignupAction(formData: FormData) {
     }
 
     // Send SMS
-    const smsResult = await sendSms(phone, `Your ROSCA signup code is: ${otp}`);
+    const smsResult = await sendSms(phone, `Your Orbit code is: ${otp}`);
 
     if (!smsResult.success) {
         console.error("SMS Send Failed:", smsResult.error);
-        // Return a safe error message, or specific one for debugging
         const errorMessage = (smsResult.error as any)?.message || 'Failed to send SMS.';
         return { error: `SMS Error: ${errorMessage}` };
     }
@@ -561,28 +566,37 @@ export async function verifySignupOtpAction(formData: FormData) {
     const { verifyOtpSchema } = await import("@/lib/schemas");
     const { prisma } = await import("@/lib/db");
 
-    const rawData = {
-        phone: formData.get('phone') as string,
-        code: formData.get('code') as string
-    };
+    const rawPhone = formData.get('phone') as string;
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+    const code = formData.get('code') as string;
 
-    const validated = verifyOtpSchema.safeParse(rawData);
-    if (!validated.success) return { error: 'Invalid code format' };
+    const validated = verifyOtpSchema.safeParse({ phone, code });
+    if (!validated.success) return { error: 'Please enter a valid 6-digit code.' };
 
-    const { phone, code } = validated.data;
     const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
 
-    if (!user || user.otpCode !== code || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
-        return { error: 'Invalid or expired code' };
+    if (!user) {
+        return { error: 'No account found. Please start over.', shouldRestart: true };
     }
 
-    // Success: Clear OTP
+    if (!user.otpCode || !user.otpExpiresAt) {
+        return { error: 'No verification code pending. Please request a new code.', canResend: true };
+    }
+
+    if (user.otpExpiresAt < new Date()) {
+        return { error: 'Code expired. Please request a new one.', canResend: true };
+    }
+
+    if (user.otpCode !== code) {
+        return { error: 'Incorrect code. Please check and try again.' };
+    }
+
+    // Success: Clear OTP and set session
     await prisma.user.update({
         where: { id: user.id },
         data: { otpCode: null, otpExpiresAt: null }
     });
 
-    // Set Session (User is now "logged in" as Guest)
     (await cookies()).set('session_user_id', user.id, {
         path: '/',
         maxAge: 60 * 60 * 24 * 30, // 30 days
