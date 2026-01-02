@@ -1,119 +1,154 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const TRADITIONS = [
-    { name: 'Tandas', region: 'Latin America', icon: 'location_on', color: 'bg-green-100 dark:bg-green-900/30 text-green-700' },
-    { name: 'Chit Funds', region: 'India', icon: 'temp_preferences_custom', color: 'bg-orange-100 dark:bg-orange-900/30 text-[#F25F15]' },
-    { name: 'Ayuuto', region: 'Africa', icon: 'public', color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700' },
-    { name: 'Susus', region: 'Caribbean', icon: 'wb_sunny', color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700' },
-    { name: 'Stokvels', region: 'South Africa', icon: 'diversity_3', color: 'bg-red-100 dark:bg-red-900/30 text-red-700' },
-    { name: 'Hui', region: 'Asia', icon: 'temple_buddhist', color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700' },
+    { name: 'Tandas', region: 'Latin America', icon: 'location_on', color: 'text-green-600' },
+    { name: 'Chit Funds', region: 'India', icon: 'temp_preferences_custom', color: 'text-[#F25F15]' },
+    { name: 'Ayuuto', region: 'Africa', icon: 'public', color: 'text-blue-600' },
+    { name: 'Susus', region: 'Caribbean', icon: 'wb_sunny', color: 'text-yellow-600' },
+    { name: 'Stokvels', region: 'South Africa', icon: 'diversity_3', color: 'text-red-600' },
+    { name: 'Hui', region: 'Asia', icon: 'temple_buddhist', color: 'text-purple-600' },
 ];
 
 export function TraditionsAnimation() {
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [rotation, setRotation] = useState(0);
+    const requestRef = useRef<number>();
+    const startTimeRef = useRef<number>();
+
+    // Animation Loop
+    const animate = (time: number) => {
+        if (!startTimeRef.current) startTimeRef.current = time;
+        // const delta = time - startTimeRef.current;
+
+        // Slow rotation: 1 degree every ~50ms? 
+        // Let's just increment based on frames for smoothness, 
+        // or easier: just use CSS animation for the rotation value if possible?
+        // React state for 60fps might be heavy, but for 6 items it's fine.
+
+        setRotation(prev => (prev + 0.2) % 360); // Speed of rotation
+        requestRef.current = requestAnimationFrame(animate);
+    };
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setActiveIndex((prev) => (prev + 1) % TRADITIONS.length);
-        }, 3000);
-        return () => clearInterval(interval);
+        requestRef.current = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(requestRef.current!);
     }, []);
 
+    // Calculate Active Item (The one closest to "front" - 90 degrees in our circle math?)
+    // Our positioning logic: 
+    // angle = (index * 60) + rotation
+    // "Front" is usually 90deg (bottom) or 270deg (top) depending on visual.
+    // Let's say front is 90deg (bottom of ellipse).
+    const getActiveIndex = () => {
+        // Normalize rotation to 0-360
+        // We want the item whose angle is closest to 90.
+        // It's a bit complex with moving targets. 
+        // Actually, let's just highlight the one visually at the front.
+
+        // Simplified: The active item is the one with the highest 'y' value (scale).
+        // Let's compute that during render.
+        return -1; // computed in render
+    };
+
     return (
-        <div className="relative w-full max-w-4xl mx-auto h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden">
+        <div className="relative w-full max-w-4xl mx-auto h-[500px] flex items-center justify-center overflow-visible perspective-[1000px]">
 
-            {/* Center Hub */}
-            <div className="absolute z-10 text-center bg-white dark:bg-gray-900 rounded-full p-8 shadow-2xl border-4 border-[#F25F15] w-64 h-64 flex flex-col items-center justify-center transition-all duration-500">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors duration-500 ${TRADITIONS[activeIndex].color}`}>
-                    <span className="material-symbols-outlined text-3xl">
-                        {TRADITIONS[activeIndex].icon}
-                    </span>
-                </div>
-                <h3 className="text-2xl font-black mb-1 transition-all duration-500 scale-100 key={activeIndex}">
-                    {TRADITIONS[activeIndex].name}
-                </h3>
-                <p className="text-sm font-bold text-gray-500 uppercase tracking-widest transition-all duration-500">
-                    {TRADITIONS[activeIndex].region}
-                </p>
+            {/* Center Hub (Fixed) */}
+            {(() => {
+                // Find the "front-most" item to display its details in center
+                // We map to find max 'y' / scale.
+                // Or just hardcode the "active" based on rotation buckets if needed.
+                // Better: find the item closest to angle 90 (front).
 
-                {/* Connecting Lines to Active (Visual only, fading in/out) */}
-                <div className="absolute inset-0 rounded-full border border-dashed border-[#F25F15]/30 animate-spin-slow pointer-events-none"></div>
-            </div>
+                let activeItem = TRADITIONS[0];
+                let minDist = 360;
+
+                TRADITIONS.forEach((item, i) => {
+                    const offsetAngle = (360 / TRADITIONS.length) * i;
+                    const currentAngle = (rotation + offsetAngle) % 360;
+                    // Distance to 90 (front)
+                    let dist = Math.abs(currentAngle - 90);
+                    if (dist > 180) dist = 360 - dist;
+
+                    if (dist < minDist) {
+                        minDist = dist;
+                        activeItem = item;
+                    }
+                });
+
+                return (
+                    <div className="absolute z-0 text-center bg-white dark:bg-gray-900 rounded-full p-8 shadow-[0_0_40px_-10px_rgba(242,95,21,0.15)] border-4 border-[#F25F15]/10 w-56 h-56 flex flex-col items-center justify-center transition-all duration-300">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-colors duration-300 bg-gray-50 dark:bg-white/5`}>
+                            <span className={`material-symbols-outlined text-3xl ${activeItem.color}`}>
+                                {activeItem.icon}
+                            </span>
+                        </div>
+                        <h3 className="text-xl font-black mb-1 text-gray-900 dark:text-white">
+                            {activeItem.name}
+                        </h3>
+                        <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                            {activeItem.region}
+                        </p>
+                    </div>
+                );
+            })()}
+
+            {/* Orbit Path (Visual) */}
+            {/* 3D Tilted Ring */}
+            <div className="absolute w-[300px] h-[300px] md:w-[450px] md:h-[450px] border border-dashed border-[#F25F15]/30 rounded-full pointer-events-none transform-style-3d rotate-x-[60deg]"></div>
 
             {/* Satellites */}
-            <div className="relative w-full h-full animate-spin-slow-custom">
-                {TRADITIONS.map((item, i) => {
-                    // Position items in a circle
-                    const angle = (i * 360) / TRADITIONS.length; // degrees
-                    const radius = 180; // Distance from center (px) - might need adjustment for mobile
+            {TRADITIONS.map((item, i) => {
+                const offsetAngle = (360 / TRADITIONS.length) * i;
+                const currentAngleDeg = (rotation + offsetAngle) % 360;
+                const currentAngleRad = currentAngleDeg * (Math.PI / 180);
 
-                    // Convert polar to cartesian
-                    // Note: We'll use CSS transforms for simpler rotation management in the future, 
-                    // but for static positioning let's use style.
-                    // Actually, to make them Orbit, we can just rotate the CONTAINER and counter-rotate the ITEMS.
+                // Ellipse parameters
+                const radiusX = 225; // 450px width / 2
+                const radiusY = 60;  // Compressed height for 3D effect
 
-                    return (
-                        <div
-                            key={i}
-                            className={`
-                                absolute top-1/2 left-1/2 w-24 h-24 -ml-12 -mt-12
-                                bg-white dark:bg-gray-800 rounded-full shadow-xl border-2 
-                                flex flex-col items-center justify-center text-center p-2
-                                transition-all duration-500
-                                ${i === activeIndex ? 'scale-125 border-[#F25F15] z-20 ring-4 ring-[#F25F15]/20' : 'scale-90 border-gray-100 dark:border-gray-700 opacity-60 grayscale'}
-                            `}
-                            style={{
-                                transform: `rotate(${angle}deg) translate(140px) rotate(-${angle}deg)` // Mobile radius
-                            }}
-                        >
-                            <div className={`md:hidden flex flex-col items-center`}>
-                                <span className="material-symbols-outlined text-xl mb-1">{item.icon}</span>
-                                <span className="text-[10px] font-bold">{item.name}</span>
-                            </div>
+                // Calculate position
+                const x = radiusX * Math.cos(currentAngleRad);
+                const y = radiusY * Math.sin(currentAngleRad);
 
-                            {/* Desktop only larger view override via media query styles effectively */}
-                            <div className="hidden md:flex flex-col items-center">
-                                <span className="material-symbols-outlined text-2xl mb-1">{item.icon}</span>
-                                <span className="text-xs font-bold">{item.name}</span>
-                            </div>
-                        </div>
-                    );
-                })}
+                // Calculate Scale/Z-index
+                // y goes from -60 (back) to +60 (front). 
+                // Scale range: 0.7 (max back) to 1.1 (max front)
+                const scale = 0.7 + ((y + radiusY) / (2 * radiusY)) * 0.4;
 
+                // Z-index: Front items higher
+                const zIndex = Math.floor(y + 100);
 
-                {/* Larger Radius for Desktop - rendered separately to avoid complex media query math in inline styles */}
-                <div className="hidden md:block absolute inset-0">
-                    {TRADITIONS.map((item, i) => {
-                        const angle = (i * 360) / TRADITIONS.length;
-                        return (
-                            <div
-                                key={i}
-                                className={`
-                                    absolute top-1/2 left-1/2 w-32 h-32 -ml-16 -mt-16
-                                    bg-white dark:bg-gray-800 rounded-full shadow-xl border-2 
-                                    flex flex-col items-center justify-center text-center p-4
-                                    transition-all duration-500
-                                    ${i === activeIndex ? 'scale-110 border-[#F25F15] z-20 ring-4 ring-[#F25F15]/20 shadow-[#F25F15]/20' : 'scale-100 border-gray-100 dark:border-gray-700 opacity-70'}
-                                `}
-                                style={{
-                                    transform: `rotate(${angle - 90}deg) translate(240px) rotate(-${angle - 90}deg)` // Desktop radius
-                                }}
-                            >
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 bg-gray-50 dark:bg-white/5`}>
-                                    <span className="material-symbols-outlined text-2xl text-gray-600 dark:text-gray-300">{item.icon}</span>
-                                </div>
-                                <span className="text-sm font-bold text-gray-900 dark:text-white">{item.name}</span>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+                // Opacity: Fade back items slightly
+                const opacity = 0.5 + ((y + radiusY) / (2 * radiusY)) * 0.5;
 
-            {/* Connecting Orbit Ring */}
-            <div className="absolute w-[280px] h-[280px] md:w-[480px] md:h-[480px] rounded-full border-2 border-dashed border-[#F25F15]/20 pointer-events-none"></div>
+                // Check if "Active" (closest to front/90deg) for highlighting
+                let dist = Math.abs(currentAngleDeg - 90);
+                if (dist > 180) dist = 360 - dist;
+                const isActive = dist < 20; // 20 degree threshold
 
+                return (
+                    <div
+                        key={i}
+                        className={`
+                            absolute top-1/2 left-1/2 w-20 h-20 -ml-10 -mt-10
+                            bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 
+                            flex flex-col items-center justify-center text-center
+                            transition-shadow duration-300
+                            ${isActive ? 'border-[#F25F15] shadow-[#F25F15]/30' : 'border-gray-100 dark:border-gray-700'}
+                        `}
+                        style={{
+                            transform: `translate(${x}px, ${y}px) scale(${scale})`,
+                            zIndex: zIndex,
+                            opacity: opacity,
+                        }}
+                    >
+                        <span className={`material-symbols-outlined text-2xl mb-0.5 ${item.color}`}>{item.icon}</span>
+                        <span className={`text-[10px] font-bold ${isActive ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`}>{item.name}</span>
+                    </div>
+                );
+            })}
         </div>
     );
 }
