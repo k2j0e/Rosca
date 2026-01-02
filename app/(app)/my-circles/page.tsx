@@ -13,7 +13,7 @@ export default async function MyCirclesScreen() {
         : [];
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-[#F8F9FA] dark:bg-background-dark pb-6 font-display">
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-[#F8F9FA] dark:bg-background-dark pb-6 lg:pb-8 font-display">
 
             {/* Header */}
             <div className="flex flex-col gap-1 p-6 pb-2 sticky top-0 z-20 bg-[#F8F9FA]/95 dark:bg-background-dark/95 backdrop-blur-sm">
@@ -22,7 +22,7 @@ export default async function MyCirclesScreen() {
             </div>
 
             {/* List */}
-            <div className="flex flex-col gap-4 p-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-5">
                 {myCircles.length > 0 ? (
                     myCircles.map((circle) => {
                         const isAdmin = currentUser && circle.adminId === currentUser.id;

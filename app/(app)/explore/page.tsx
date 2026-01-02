@@ -12,7 +12,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
     const circles = await getCircles();
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark shadow-2xl pb-20">
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark shadow-2xl pb-20 lg:pb-8">
             {/* Success Toast */}
             {joined && (
                 <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-500 w-[90%] max-w-sm">
@@ -97,7 +97,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
             </div>
 
             {/* Main Content: Circles List */}
-            <div className="flex flex-col gap-5 p-4 pb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-4 pb-6">
                 {circles.map((circle) => (
                     <CircleCard key={circle.id} circle={circle} />
                 ))}

@@ -33,7 +33,7 @@ export default async function HomePage() {
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark pb-24">
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark pb-24 lg:pb-8">
             {/* Header */}
             <div className="flex items-center justify-between p-4 sticky top-0 z-20 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
                 <div>
@@ -56,7 +56,7 @@ export default async function HomePage() {
 
             {/* Quick Stats */}
             <div className="px-4 pb-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <div className="bg-gradient-to-br from-primary to-orange-500 p-4 rounded-2xl text-white">
                         <p className="text-xs font-medium opacity-80">Total Contributed</p>
                         <p className="text-2xl font-black">${stats.totalContributed.toLocaleString()}</p>
@@ -128,8 +128,8 @@ export default async function HomePage() {
                         </h2>
                         <Link href="/my-circles" className="text-primary text-xs font-bold">View All</Link>
                     </div>
-                    <div className="space-y-3">
-                        {activeCircles.slice(0, 3).map(circle => (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+                        {activeCircles.slice(0, 6).map(circle => (
                             <Link key={circle.id} href={`/circles/${circle.id}/dashboard`}>
                                 <div className="flex items-center gap-3 bg-white dark:bg-surface-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-primary/30 transition-colors">
                                     <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden">
@@ -153,8 +153,8 @@ export default async function HomePage() {
                                         </p>
                                     </div>
                                     <div className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${circle.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                            circle.status === 'recruiting' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                                                'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                                        circle.status === 'recruiting' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                            'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                                         }`}>
                                         {circle.status}
                                     </div>
