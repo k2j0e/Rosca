@@ -48,7 +48,7 @@ export default async function LandingPage() {
                         <div className="flex flex-col items-start text-left">
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight mb-6 leading-[1.1] text-text-main dark:text-white">
                                 Save Together.<br />
-                                Access Cash.<br />
+                                <span className="text-[#F25F15]">Access Cash.</span><br />
                                 No Interest.
                             </h1>
                             <p className="text-xl text-gray-600 dark:text-gray-300 mb-10 max-w-xl leading-relaxed">
@@ -81,7 +81,7 @@ export default async function LandingPage() {
                 </section>
 
                 {/* 3. Why People Choose (6 Grid) */}
-                <section className="py-24 px-6 bg-white dark:bg-gray-950">
+                <section className="pb-24 pt-0 px-6 bg-white dark:bg-gray-950">
                     <div className="max-w-7xl mx-auto">
                         <h2 className="text-4xl md:text-5xl font-black mb-6 text-text-main dark:text-white">Why People Choose Savings Circles</h2>
                         <p className="text-xl text-gray-600 dark:text-gray-400 mb-16 max-w-4xl">
