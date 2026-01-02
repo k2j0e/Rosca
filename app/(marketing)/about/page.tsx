@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TraditionsAnimation } from "../../components/TraditionsAnimation";
 
 export default function AboutPage() {
     return (
@@ -37,26 +38,8 @@ export default function AboutPage() {
                         Savings circles aren't new — they're ancient. Communities worldwide have used rotating savings groups for generations, under many different names. We're simply bringing this proven model into the digital age.
                     </p>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 relative">
-                        {/* Center Circle (Visual Only - could be an icon or logo) */}
-                        <div className="hidden md:flex absolute inset-0 items-center justify-center z-0 opacity-10">
-                            <div className="w-64 h-64 rounded-full border-4 border-current"></div>
-                        </div>
-
-                        {[
-                            { name: 'Tandas', region: 'Mexico and Latin America' },
-                            { name: 'Chit Funds', region: 'India and South Asia' },
-                            { name: 'Ayuuto', region: 'Somalia and Horn of Africa' },
-                            { name: 'Susus', region: 'West Africa and Caribbean' },
-                            { name: 'Stokvels', region: 'South Africa' },
-                            { name: 'Hui', region: 'China and East Asia' },
-                        ].map((item, i) => (
-                            <div key={i} className="flex flex-col items-center justify-center p-8 bg-white/50 dark:bg-white/5 rounded-3xl backdrop-blur-sm hover:scale-105 transition-transform">
-                                <span className="material-symbols-outlined text-4xl mb-4 text-gray-400">public</span>
-                                <h3 className="text-2xl font-bold mb-2 text-text-main dark:text-white">{item.name}</h3>
-                                <p className="text-sm text-gray-500 uppercase tracking-wider">{item.region}</p>
-                            </div>
-                        ))}
+                    <div className="relative mb-20">
+                        <TraditionsAnimation />
                     </div>
 
                     <div className="mt-20 flex gap-4 max-w-3xl mx-auto text-left border-l-4 border-[#F25F15] pl-6">
