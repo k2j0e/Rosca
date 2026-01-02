@@ -40,7 +40,7 @@ export async function MarketingHeader() {
                         </Link>
                     ) : (
                         <div className="flex items-center gap-4">
-                            <Link href="/signin" className="hidden sm:block text-sm font-bold text-gray-600 hover:text-[#F25F15] transition-colors">
+                            <Link href="/signin" className="text-sm font-bold text-gray-600 hover:text-[#F25F15] transition-colors">
                                 Sign In
                             </Link>
                             <Link href="/signup">
