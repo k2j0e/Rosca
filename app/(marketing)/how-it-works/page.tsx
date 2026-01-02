@@ -9,9 +9,9 @@ export default function HowItWorksPage() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                     {/* Access Sooner */}
-                    <div className="rounded-3xl overflow-hidden border-2 border-[#F6C6B6] bg-[#EAF4EB] dark:bg-green-900/10">
-                        <div className="h-32 bg-[#E3F0E5] dark:bg-white/5 flex items-center justify-center border-b border-[#F6C6B6]/30">
-                            <span className="material-symbols-outlined text-5xl text-gray-700">rocket_launch</span>
+                    <div className="rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 bg-white dark:bg-gray-900 shadow-sm">
+                        <div className="h-32 bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center border-b border-orange-100 dark:border-transparent">
+                            <span className="material-symbols-outlined text-5xl text-[#F25F15]">rocket_launch</span>
                         </div>
                         <div className="p-8 md:p-12">
                             <h2 className="text-3xl font-bold mb-6">Access Funds Sooner</h2>
@@ -34,9 +34,9 @@ export default function HowItWorksPage() {
                     </div>
 
                     {/* Save Steadily */}
-                    <div className="rounded-3xl overflow-hidden border-2 border-[#F6C6B6] bg-[#EAF4EB] dark:bg-green-900/10">
-                        <div className="h-32 bg-[#E3F0E5] dark:bg-white/5 flex items-center justify-center border-b border-[#F6C6B6]/30">
-                            <span className="material-symbols-outlined text-5xl text-gray-700">account_balance</span>
+                    <div className="rounded-3xl overflow-hidden border border-gray-100 dark:border-white/5 bg-white dark:bg-gray-900 shadow-sm">
+                        <div className="h-32 bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center border-b border-orange-100 dark:border-transparent">
+                            <span className="material-symbols-outlined text-5xl text-[#F25F15]">account_balance</span>
                         </div>
                         <div className="p-8 md:p-12">
                             <h2 className="text-3xl font-bold mb-6">Save Steadily</h2>

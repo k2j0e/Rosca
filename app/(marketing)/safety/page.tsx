@@ -14,8 +14,8 @@ export default function SafetyPage() {
                         { icon: 'assignment', title: 'Clear Agreements', desc: 'Payment schedule, amounts, and payout order are set before the circle starts. Everyone agrees to the same terms.' },
                         { icon: 'groups', title: 'Social Accountability', desc: 'Your reputation in the community is on the line. Most people honor commitments when others are counting on them.' }
                     ].map((item, i) => (
-                        <div key={i} className="border border-green-600/30 rounded-2xl p-8 hover:bg-green-50 dark:hover:bg-green-900/10 transition-colors">
-                            <div className="w-12 h-12 rounded-full bg-green-700 flex items-center justify-center text-white mb-6">
+                        <div key={i} className="border border-gray-100 dark:border-white/10 rounded-2xl p-8 hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors group">
+                            <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-[#F25F15] mb-6 group-hover:scale-110 transition-transform">
                                 <span className="material-symbols-outlined">{item.icon}</span>
                             </div>
                             <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
