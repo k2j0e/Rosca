@@ -48,7 +48,13 @@ export default function CloudinaryUpload({
 
         try {
             // 1. Get Signature from Server
-            const { timestamp, folder, signature, cloudName, apiKey } = await getCloudinarySignature();
+            const signatureResult = await getCloudinarySignature();
+
+            if ('error' in signatureResult && signatureResult.error) {
+                throw new Error(signatureResult.error as string);
+            }
+
+            const { timestamp, folder, signature, cloudName, apiKey } = signatureResult as any;
 
             // 2. Prepare FormData for Direct Upload
             const formData = new FormData();
