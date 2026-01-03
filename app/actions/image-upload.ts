@@ -1,50 +1,31 @@
-// CACHE BUST 2024-01-03-v2 - Force fresh build
+// CACHE BUST 2024-01-03-v3 - Read env vars at RUNTIME not module load
 'use server';
 
 import { v2 as cloudinary } from 'cloudinary';
-
-// Read env vars at module level to ensure they are captured
-const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
-const ROSCA_CLOUD_NAME = process.env.ROSCA_CLOUDINARY_CLOUD_NAME;
-const ROSCA_API_KEY = process.env.ROSCA_CLOUDINARY_API_KEY;
-const ROSCA_API_SECRET = process.env.ROSCA_CLOUDINARY_API_SECRET;
-
-// Helper to parse CLOUDINARY_URL if present
-const getEnvVar = (key: string, roscaVal: string | undefined): string | undefined => {
-    // 1. Try Rosca-specific var
-    if (roscaVal) return roscaVal;
-
-    // 2. Try Standard var
-    const stdVal = process.env[key];
-    if (stdVal) return stdVal;
-
-    // 3. Fallback: Parse CLOUDINARY_URL (captured at module level)
-    if (CLOUDINARY_URL) {
-        try {
-            const url = new URL(CLOUDINARY_URL.startsWith('cloudinary://') ? CLOUDINARY_URL.replace('cloudinary://', 'http://') : CLOUDINARY_URL);
-            if (key === 'CLOUDINARY_API_KEY') return url.username;
-            if (key === 'CLOUDINARY_API_SECRET') return url.password;
-            if (key === 'CLOUDINARY_CLOUD_NAME') return url.hostname;
-        } catch (e) {
-            console.error('Failed to parse CLOUDINARY_URL', e);
-        }
-    }
-    return undefined;
-};
 
 export async function getCloudinarySignature() {
     try {
         console.log('[Server Action] Generating Cloudinary Signature');
 
-        const cloudName = getEnvVar('CLOUDINARY_CLOUD_NAME', ROSCA_CLOUD_NAME);
-        const apiKey = getEnvVar('CLOUDINARY_API_KEY', ROSCA_API_KEY);
-        const apiSecret = getEnvVar('CLOUDINARY_API_SECRET', ROSCA_API_SECRET);
+        // Read environment variables INSIDE the function (at request time)
+        // NOT at module level (which might execute before Vercel injects them)
+        const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+        const cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME ||
+            process.env.CLOUDINARY_CLOUD_NAME ||
+            parseCloudinaryUrl(CLOUDINARY_URL, 'cloudName');
+        const apiKey = process.env.ROSCA_CLOUDINARY_API_KEY ||
+            process.env.CLOUDINARY_API_KEY ||
+            parseCloudinaryUrl(CLOUDINARY_URL, 'apiKey');
+        const apiSecret = process.env.ROSCA_CLOUDINARY_API_SECRET ||
+            process.env.CLOUDINARY_API_SECRET ||
+            parseCloudinaryUrl(CLOUDINARY_URL, 'apiSecret');
 
         console.log('[Server Action] Config Check:', {
             hasCloudName: !!cloudName,
             hasApiKey: !!apiKey,
             hasApiSecret: !!apiSecret,
-            hasUrl: !!CLOUDINARY_URL
+            hasUrl: !!CLOUDINARY_URL,
+            urlStart: CLOUDINARY_URL ? CLOUDINARY_URL.substring(0, 20) : 'N/A'
         });
 
         if (!cloudName || !apiKey || !apiSecret) {
@@ -54,13 +35,11 @@ export async function getCloudinarySignature() {
             if (!apiSecret) missing.push('API_SECRET');
 
             const envName = process.env.VERCEL_ENV || 'unknown';
-            const region = process.env.VERCEL_REGION || 'unknown';
-            const host = process.env.VERCEL_URL || 'unknown project';
             const projectName = process.env.VERCEL_PROJECT_NAME || 'UNKNOWN';
             const hasDbUrl = !!process.env.DATABASE_URL;
 
             console.error(`[Server Action] Missing Credentials. Env: ${envName}. Project: ${projectName}. Missing: ${missing.join(', ')}`);
-            return { error: `Server Config Error. Project: ${projectName}. Missing: ${missing.join(', ')}. CLOUDINARY_URL: ${!!CLOUDINARY_URL ? 'YES' : 'NO'}. DB_URL: ${hasDbUrl ? 'YES' : 'NO'}` };
+            return { error: `Config Error. Project: ${projectName}. Missing: ${missing.join(', ')}. CLOUDINARY_URL: ${!!CLOUDINARY_URL ? 'YES' : 'NO'}. DB_URL: ${hasDbUrl ? 'YES' : 'NO'}` };
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
@@ -86,4 +65,19 @@ export async function getCloudinarySignature() {
         console.error('[Server Action] Signature Generation Failed:', error);
         return { error: error.message || 'Failed to generate signature' };
     }
+}
+
+// Helper function to parse CLOUDINARY_URL
+function parseCloudinaryUrl(url: string | undefined, field: 'cloudName' | 'apiKey' | 'apiSecret'): string | undefined {
+    if (!url) return undefined;
+    try {
+        // cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+        const parsed = new URL(url.replace('cloudinary://', 'http://'));
+        if (field === 'apiKey') return parsed.username;
+        if (field === 'apiSecret') return parsed.password;
+        if (field === 'cloudName') return parsed.hostname;
+    } catch (e) {
+        console.error('Failed to parse CLOUDINARY_URL', e);
+    }
+    return undefined;
 }
