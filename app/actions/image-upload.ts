@@ -30,8 +30,11 @@ export async function getCloudinarySignature() {
             if (!apiKey) missing.push('CLOUDINARY_API_KEY');
             if (!apiSecret) missing.push('CLOUDINARY_API_SECRET');
 
-            console.error('[Server Action] Missing Credentials:', missing);
-            return { error: `Server Config Error. Missing: ${missing.join(', ')}` };
+            const envName = process.env.VERCEL_ENV || 'unknown';
+            const region = process.env.VERCEL_REGION || 'unknown';
+
+            console.error(`[Server Action] Missing Credentials in ${envName} (${region}):`, missing);
+            return { error: `Server Config Error (${envName}/${region}). Missing: ${missing.join(', ')}` };
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
