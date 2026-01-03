@@ -10,6 +10,7 @@ const profileSchema = z.object({
     email: z.string().email("Invalid email address").optional().or(z.literal('')),
     bio: z.string().max(160, "Bio must be less than 160 characters").optional(),
     location: z.string().max(50, "Location must be short").optional(),
+    avatar: z.string().url().optional().or(z.literal('')),
 });
 
 export async function updateProfileAction(prevState: any, formData: FormData) {
@@ -21,6 +22,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
         email: formData.get('email'),
         bio: formData.get('bio'),
         location: formData.get('location'),
+        avatar: formData.get('avatar'),
     };
 
     const validated = profileSchema.safeParse(rawData);
@@ -38,6 +40,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
                 email: validated.data.email || null, // Convert empty string to null
                 bio: validated.data.bio,
                 location: validated.data.location,
+                image: validated.data.avatar || null, // Save avatar to 'image' field
             }
         });
 
