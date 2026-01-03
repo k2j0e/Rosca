@@ -34,6 +34,13 @@ export default function CloudinaryUpload({
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Client-side validation: Max 9MB (leaving buffer for encoding overhead)
+        if (file.size > 9 * 1024 * 1024) {
+            alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max size is 9MB.`);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+        }
+
         // Show local preview immediately
         const objectUrl = URL.createObjectURL(file);
         setPreview(objectUrl);
