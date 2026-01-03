@@ -5,18 +5,18 @@
 import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+    cloud_name: process.env.ROSCA_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.ROSCA_CLOUDINARY_API_KEY,
+    api_secret: process.env.ROSCA_CLOUDINARY_API_SECRET,
 });
 
 export async function getCloudinarySignature() {
     try {
         console.log('[Server Action] Generating Cloudinary Signature');
 
-        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-        const apiKey = process.env.CLOUDINARY_API_KEY;
-        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+        const cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME;
+        const apiKey = process.env.ROSCA_CLOUDINARY_API_KEY;
+        const apiSecret = process.env.ROSCA_CLOUDINARY_API_SECRET;
 
         console.log('[Server Action] Debug Env Vars:', {
             hasCloudName: !!cloudName,
@@ -26,9 +26,9 @@ export async function getCloudinarySignature() {
 
         if (!cloudName || !apiKey || !apiSecret) {
             const missing = [];
-            if (!cloudName) missing.push('CLOUDINARY_CLOUD_NAME');
-            if (!apiKey) missing.push('CLOUDINARY_API_KEY');
-            if (!apiSecret) missing.push('CLOUDINARY_API_SECRET');
+            if (!cloudName) missing.push('ROSCA_CLOUDINARY_CLOUD_NAME');
+            if (!apiKey) missing.push('ROSCA_CLOUDINARY_API_KEY');
+            if (!apiSecret) missing.push('ROSCA_CLOUDINARY_API_SECRET');
 
             const envName = process.env.VERCEL_ENV || 'unknown';
             const region = process.env.VERCEL_REGION || 'unknown';
@@ -54,8 +54,8 @@ export async function getCloudinarySignature() {
             timestamp,
             folder,
             signature,
-            cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-            apiKey: process.env.CLOUDINARY_API_KEY
+            cloudName: process.env.ROSCA_CLOUDINARY_CLOUD_NAME,
+            apiKey: process.env.ROSCA_CLOUDINARY_API_KEY
         };
     } catch (error: any) {
         console.error('[Server Action] Signature Generation Failed:', error);
