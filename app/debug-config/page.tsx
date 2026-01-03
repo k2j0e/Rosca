@@ -7,6 +7,7 @@ export default function DebugConfigPage() {
         ROSCA_API_SECRET: process.env.ROSCA_CLOUDINARY_API_SECRET,
         // Check old ones too just in case
         OLD_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+        CLOUDINARY_URL: process.env.CLOUDINARY_URL,
         VERCEL_ENV: process.env.VERCEL_ENV,
         NODE_ENV: process.env.NODE_ENV,
     };
