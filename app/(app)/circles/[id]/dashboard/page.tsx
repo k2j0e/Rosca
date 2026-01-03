@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCircle, getCurrentUser } from "@/lib/data";
+import InviteButton from "@/app/components/InviteButton";
 
 export default async function CircleDashboard(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -81,10 +82,12 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
                         </div>
 
                         <div className="flex gap-2 mt-6">
-                            <Link href={`/circles/${circle.id}/invite`} className="flex-1 bg-white text-blue-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-50 transition-colors shadow-lg">
-                                <span className="material-symbols-outlined">ios_share</span>
-                                Invite
-                            </Link>
+                            <InviteButton
+                                circleId={circle.id}
+                                circleName={circle.name}
+                                text="Invite"
+                                className="flex-1 bg-white text-blue-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-50 transition-colors shadow-lg cursor-pointer"
+                            />
 
                             {myMember?.role === 'admin' && (
                                 <form action={async () => {
