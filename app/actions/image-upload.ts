@@ -32,9 +32,10 @@ export async function getCloudinarySignature() {
 
             const envName = process.env.VERCEL_ENV || 'unknown';
             const region = process.env.VERCEL_REGION || 'unknown';
+            const host = process.env.VERCEL_URL || 'unknown project';
 
-            console.error(`[Server Action] Missing Credentials in ${envName} (${region}):`, missing);
-            return { error: `Server Config Error (${envName}/${region}). Missing: ${missing.join(', ')}` };
+            console.error(`[Server Action] Missing Credentials in ${envName} (${region}) on ${host}:`, missing);
+            return { error: `Server Config Error (${envName}/${region}). Host: ${host}. Missing: ${missing.join(', ')}` };
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
