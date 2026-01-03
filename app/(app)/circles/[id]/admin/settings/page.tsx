@@ -39,7 +39,7 @@ export default async function CircleSettingsPage(props: { params: Promise<{ id: 
                 id: circle.id,
                 name: circle.name,
                 coverImage: circle.coverImage,
-                mission: circle.mission,
+                mission: circle.description,
             }}
         />
     );

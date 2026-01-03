@@ -31,7 +31,7 @@ export async function updateCircleSettings(circleId: string, prevState: any, for
             data: {
                 coverImage: coverImage || null,
                 name: name || undefined,
-                mission: description || undefined,
+                description: description || undefined,
             }
         });
 
