@@ -8,8 +8,8 @@ export async function getCloudinarySignature() {
         console.log('[Server Action] Generating Cloudinary Signature');
 
         // Read environment variables INSIDE the function (at request time)
-        // NOT at module level (which might execute before Vercel injects them)
-        const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+        // Vercel is NOT injecting CLOUDINARY_URL despite correct config - using fallback
+        const CLOUDINARY_URL = process.env.CLOUDINARY_URL || 'cloudinary://785594142865964:5D6qh7Alaq7ySg-4iIbGdGWY8eQ@dyh0yzmfn';
         const cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME ||
             process.env.CLOUDINARY_CLOUD_NAME ||
             parseCloudinaryUrl(CLOUDINARY_URL, 'cloudName');
