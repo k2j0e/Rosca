@@ -26,7 +26,10 @@ export async function getCloudinarySignature() {
             hasApiKey: !!apiKey,
             hasApiSecret: !!apiSecret,
             hasUrl: !!CLOUDINARY_URL,
-            urlStart: CLOUDINARY_URL ? CLOUDINARY_URL.substring(0, 20) : 'N/A'
+            urlStart: CLOUDINARY_URL ? CLOUDINARY_URL.substring(0, 20) : 'N/A',
+            // DEBUG: Log first 5 chars of secret to verify parsing
+            secretStart: apiSecret ? apiSecret.substring(0, 5) : 'N/A',
+            cloudNameVal: cloudName
         });
 
         if (!cloudName || !apiKey || !apiSecret) {
