@@ -46,6 +46,13 @@ export async function getCloudinarySignature() {
         const timestamp = Math.round(new Date().getTime() / 1000);
         const folder = 'rosca_uploads';
 
+        // Configure the Cloudinary SDK with the credentials before signing
+        cloudinary.config({
+            cloud_name: cloudName,
+            api_key: apiKey,
+            api_secret: apiSecret,
+        });
+
         // Sign the parameters
         const signature = cloudinary.utils.api_sign_request(
             {
