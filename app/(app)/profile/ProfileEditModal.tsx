@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect } from 'react';
 import { updateProfileAction } from './actions';
-import ImageUpload from '@/app/components/ImageUpload';
+import CloudinaryUpload from '@/app/components/CloudinaryUpload';
 
 interface UserData {
     name: string;
@@ -49,7 +49,7 @@ export default function ProfileEditModal({ user, isOpen, onClose }: ProfileEditM
 
                 <form action={formAction} className="space-y-4">
                     <div className="flex justify-center mb-6">
-                        <ImageUpload
+                        <CloudinaryUpload
                             name="avatar"
                             defaultValue={user.avatar}
                             shape="circle"

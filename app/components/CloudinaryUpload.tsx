@@ -11,7 +11,7 @@ interface ImageUploadProps {
     className?: string;
 }
 
-export default function ImageUpload({
+export default function CloudinaryUpload({
     name,
     label,
     defaultValue,
@@ -131,4 +131,4 @@ export default function ImageUpload({
         </div>
     );
 }
- 
+

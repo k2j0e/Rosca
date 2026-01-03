@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { createCircleAction } from "@/app/actions";
-import ImageUpload from "@/app/components/ImageUpload";
+import CloudinaryUpload from "@/app/components/CloudinaryUpload";
 
 function CreateDetailsContent() {
     const searchParams = useSearchParams();
@@ -63,7 +63,7 @@ function CreateDetailsContent() {
 
                     {/* Cover Photo */}
                     <div>
-                        <ImageUpload
+                        <CloudinaryUpload
                             name="coverImage"
                             label="Cover Photo"
                             defaultValue="https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80"
