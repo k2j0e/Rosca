@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from 'react';
 import { updateProfileAction } from './actions';
+import ImageUpload from '@/app/components/ImageUpload';
 
 interface UserData {
     name: string;
@@ -47,6 +48,15 @@ export default function ProfileEditModal({ user, isOpen, onClose }: ProfileEditM
                 </div>
 
                 <form action={formAction} className="space-y-4">
+                    <div className="flex justify-center mb-6">
+                        <ImageUpload
+                            name="avatar"
+                            defaultValue={user.avatar}
+                            shape="circle"
+                            className="w-32 h-32"
+                            label="Profile Photo"
+                        />
+                    </div>
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Display Name</label>
                         <input

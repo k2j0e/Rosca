@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { createCircleAction } from "@/app/actions";
+import ImageUpload from "@/app/components/ImageUpload";
 
 function CreateDetailsContent() {
     const searchParams = useSearchParams();
@@ -62,15 +63,13 @@ function CreateDetailsContent() {
 
                     {/* Cover Photo */}
                     <div>
-                        <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-yellow-200 to-green-300 shadow-inner group cursor-pointer">
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                                <span className="text-white font-bold">Change Photo</span>
-                            </div>
-                            <button type="button" className="absolute bottom-3 right-3 bg-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm hover:scale-105 transition-transform text-text-main">
-                                Change Photo
-                            </button>
-                            <input type="hidden" name="coverImage" value="https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80" />
-                        </div>
+                        <ImageUpload
+                            name="coverImage"
+                            label="Cover Photo"
+                            defaultValue="https://images.unsplash.com/photo-1500964757637-c85e8a162699?w=800&q=80"
+                            shape="wide"
+                            className="w-full"
+                        />
                         <p className="text-xs text-text-sub mt-2 flex items-center gap-1">
                             <span className="material-symbols-outlined text-[14px] text-blue-500">verified</span>
                             Circles with a personal photo build trust 3x faster.
