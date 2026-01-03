@@ -238,6 +238,7 @@ function SignUpForm() {
                         <form action={completeSignupAction} className="flex flex-col gap-6">
                             {/* Hidden inputs to carry over data from previous steps */}
                             <input type="hidden" name="phone" value={phone} />
+                            <input type="hidden" name="redirect" value={searchParams.get('redirect') || ''} />
 
                             {/* Photo Upload Mock */}
                             <div className="flex justify-center mb-2">

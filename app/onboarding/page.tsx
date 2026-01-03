@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import { completeOnboardingAction } from "@/app/actions";
+import { useSearchParams } from "next/navigation";
 
 // Hook for counting numbers up
 function useCounter(end: number, duration: number = 2000, trigger: boolean) {
@@ -30,9 +31,11 @@ function useCounter(end: number, duration: number = 2000, trigger: boolean) {
     return count;
 }
 
-export default function WelcomeScreen() {
+function OnboardingContent() {
     const [step, setStep] = useState(0);
     const [isShimLoading, setIsShimLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect');
     const totalSteps = 5;
 
     const potValue = useCounter(1000, 1500, step === 2);
@@ -48,7 +51,7 @@ export default function WelcomeScreen() {
 
     const handleComplete = async () => {
         setIsShimLoading(true);
-        await completeOnboardingAction();
+        await completeOnboardingAction(redirectUrl || undefined);
     };
 
     const screens = [
@@ -261,6 +264,14 @@ export default function WelcomeScreen() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function WelcomeScreen() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-black flex items-center justify-center"><span className="loader"></span></div>}>
+            <OnboardingContent />
+        </Suspense>
     );
 }
 

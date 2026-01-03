@@ -631,10 +631,10 @@ export async function completeSignupAction(formData: FormData) {
         }
     });
 
-    redirect('/onboarding');
+    redirect('/onboarding' + (formData.get('redirect') ? `?redirect=${encodeURIComponent(formData.get('redirect') as string)}` : ''));
 }
 
-export async function completeOnboardingAction() {
+export async function completeOnboardingAction(redirectUrl?: string) {
     const { prisma } = await import("@/lib/db");
     const { getCurrentUser } = await import("@/lib/data");
 
@@ -649,7 +649,11 @@ export async function completeOnboardingAction() {
         data: { hasCompletedOnboarding: true }
     });
 
-    redirect('/home');
+    if (redirectUrl) {
+        redirect(redirectUrl);
+    } else {
+        redirect('/home');
+    }
 }
 
 // --- CIRCLE ADMIN ACTIONS ---

@@ -26,8 +26,14 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
 
                 {/* Visual Avatar/Icon */}
                 <div className="mb-8 relative">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-orange-400 flex items-center justify-center text-white shadow-xl shadow-primary/30">
-                        <span className="material-symbols-outlined text-[48px]">groups</span>
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-orange-400 flex items-center justify-center text-white shadow-xl shadow-primary/30 overflow-hidden border-4 border-white dark:border-background-dark">
+                        {(() => {
+                            const admin = circle.members.find(m => m.role === 'admin');
+                            if (admin?.avatar) {
+                                return <img src={admin.avatar} alt={admin.name} className="w-full h-full object-cover" />;
+                            }
+                            return <span className="material-symbols-outlined text-[48px]">groups</span>;
+                        })()}
                     </div>
                     <div className="absolute -bottom-2 -right-2 bg-white dark:bg-black p-2 rounded-full">
                         <span className="material-symbols-outlined text-green-500 text-2xl">verified</span>
@@ -73,7 +79,7 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
 
                 {/* Actions */}
                 <div className="w-full space-y-4">
-                    <Link href={`/circles/${circle.id}/join`} className="block w-full">
+                    <Link href={`/invite/${circle.id}/tutorial`} className="block w-full">
                         <button className="w-full py-4 bg-primary text-white font-bold text-lg rounded-2xl hover:scale-[1.02] shadow-xl shadow-primary/25 transition-all">
                             Check it out
                         </button>
