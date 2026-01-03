@@ -56,9 +56,10 @@ export async function getCloudinarySignature() {
             const region = process.env.VERCEL_REGION || 'unknown';
             const host = process.env.VERCEL_URL || 'unknown project';
             const projectName = process.env.VERCEL_PROJECT_NAME || 'UNKNOWN';
+            const hasDbUrl = !!process.env.DATABASE_URL;
 
             console.error(`[Server Action] Missing Credentials. Env: ${envName}. Project: ${projectName}. Missing: ${missing.join(', ')}`);
-            return { error: `Server Config Error. Project: ${projectName}. Missing: ${missing.join(', ')}. CLOUDINARY_URL detected? ${!!CLOUDINARY_URL ? 'YES' : 'NO'}` };
+            return { error: `Server Config Error. Project: ${projectName}. Missing: ${missing.join(', ')}. CLOUDINARY_URL: ${!!CLOUDINARY_URL ? 'YES' : 'NO'}. DB_URL: ${hasDbUrl ? 'YES' : 'NO'}` };
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
