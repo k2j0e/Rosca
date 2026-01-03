@@ -16,13 +16,9 @@ const getEnvVar = (key: string, roscaKey: string) => {
     if (val) return val;
 
     // Fallback: Try parsing CLOUDINARY_URL
-    // TEMPORARY DEBUG: Using hardcoded URL from user to bypass Vercel Env Var failure
-    const hardcodedUrl = 'cloudinary://641664524559161:i2AbVIQnyls_E5_EJwJRTL1Fizg@dyh0yzmfn';
-    const envUrl = process.env.CLOUDINARY_URL || hardcodedUrl;
-
-    if (envUrl) {
+    if (process.env.CLOUDINARY_URL) {
         try {
-            const url = new URL(envUrl.startsWith('cloudinary://') ? envUrl.replace('cloudinary://', 'http://') : envUrl);
+            const url = new URL(process.env.CLOUDINARY_URL.startsWith('cloudinary://') ? process.env.CLOUDINARY_URL.replace('cloudinary://', 'http://') : process.env.CLOUDINARY_URL);
             if (key === 'CLOUDINARY_API_KEY') return url.username;
             if (key === 'CLOUDINARY_API_SECRET') return url.password;
             if (key === 'CLOUDINARY_CLOUD_NAME') return url.hostname;
