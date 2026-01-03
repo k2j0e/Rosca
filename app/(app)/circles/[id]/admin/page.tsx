@@ -137,6 +137,19 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                     Quick Actions
                 </h3>
 
+                <Link href={`/circles/${params.id}/admin/settings`}>
+                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors group cursor-pointer">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                            <span className="material-symbols-outlined text-xl">settings</span>
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-sm">Circle Settings</h4>
+                            <p className="text-xs text-text-sub dark:text-text-sub-dark">Edit cover photo, name</p>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-400 text-sm">arrow_forward_ios</span>
+                    </div>
+                </Link>
+
                 <Link href={`/circles/${params.id}/admin/members`}>
                     <div className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-surface-dark shadow-sm border border-gray-100 dark:border-white/5 hover:border-primary/50 transition-colors group cursor-pointer">
                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400">
