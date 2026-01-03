@@ -25,8 +25,13 @@ export async function getCloudinarySignature() {
         });
 
         if (!cloudName || !apiKey || !apiSecret) {
-            console.error('[Server Action] Missing Cloudinary Credentials');
-            return { error: 'Server Config Error: Missing Cloudinary Keys. Check server logs.' };
+            const missing = [];
+            if (!cloudName) missing.push('CLOUDINARY_CLOUD_NAME');
+            if (!apiKey) missing.push('CLOUDINARY_API_KEY');
+            if (!apiSecret) missing.push('CLOUDINARY_API_SECRET');
+
+            console.error('[Server Action] Missing Credentials:', missing);
+            return { error: `Server Config Error. Missing: ${missing.join(', ')}` };
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
