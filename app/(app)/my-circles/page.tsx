@@ -32,55 +32,71 @@ export default async function MyCirclesScreen() {
 
                         return (
                             <Link key={circle.id} href={`/circles/${circle.id}/dashboard`}>
-                                <div className="flex flex-col gap-4 bg-white dark:bg-surface-dark p-4 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 active:scale-[0.98] transition-all group hover:border-[#F25F15]/30 relative overflow-hidden">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            {/* Avatar/Icon */}
-                                            <div className="h-14 w-14 rounded-full bg-[#FCF0E9] dark:bg-white/10 flex items-center justify-center text-[#F25F15] font-extrabold text-2xl shrink-0">
-                                                {circle.name.charAt(0).toUpperCase()}
-                                            </div>
+                                <div className="flex flex-col bg-white dark:bg-surface-dark rounded-3xl shadow-sm border border-gray-100 dark:border-white/5 active:scale-[0.98] transition-all group hover:border-[#F25F15]/30 overflow-hidden">
 
-                                            <div className="flex flex-col">
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="font-extrabold text-text-main dark:text-white text-lg leading-tight">
-                                                        {circle.name}
-                                                    </h3>
-                                                    {isAdmin && (
-                                                        <span className="material-symbols-outlined text-[16px] text-[#F25F15]" title="Admin">
-                                                            verified_user
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <span className="text-sm font-medium text-text-sub dark:text-text-sub-dark capitalize">
-                                                        {circle.frequency}
-                                                    </span>
-                                                    <span className="text-[10px] text-text-sub dark:text-text-sub-dark">•</span>
-                                                    <span className="text-sm font-medium text-text-sub dark:text-text-sub-dark">
-                                                        ${circle.amount}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    {/* Cover Image Section */}
+                                    <div className="relative h-32 w-full">
+                                        {circle.coverImage ? (
+                                            <img
+                                                src={circle.coverImage}
+                                                alt={circle.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-[#F25F15] via-[#FF8A50] to-[#FFB088]" />
+                                        )}
+                                        {/* Gradient overlay for text readability */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                                        {/* Status Badge */}
-                                        <div className={`px-2.5 py-1 rounded-md text-xs font-bold capitalize tabular-nums tracking-wide ${circle.status === 'recruiting'
-                                            ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                                            : circle.status === 'active'
-                                                ? 'bg-[#E8FBF5] text-[#0FAE7A] dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                : 'bg-gray-100 text-gray-500'
+                                        {/* Status Badge - overlaid on image */}
+                                        <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-md text-xs font-bold capitalize backdrop-blur-sm ${circle.status === 'recruiting'
+                                                ? 'bg-blue-500/80 text-white'
+                                                : circle.status === 'active'
+                                                    ? 'bg-emerald-500/80 text-white'
+                                                    : 'bg-gray-500/80 text-white'
                                             }`}>
                                             {circle.status}
                                         </div>
+
+                                        {/* Circle Name - overlaid on image */}
+                                        <div className="absolute bottom-3 left-4 right-4 flex items-center gap-2">
+                                            <h3 className="font-extrabold text-white text-xl leading-tight drop-shadow-lg">
+                                                {circle.name}
+                                            </h3>
+                                            {isAdmin && (
+                                                <span className="material-symbols-outlined text-[18px] text-orange-300 drop-shadow" title="Admin">
+                                                    verified_user
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* Progress Bar */}
-                                    <div className="relative pt-2">
-                                        <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-[#F25F15] rounded-full transition-all duration-1000"
-                                                style={{ width: `${progress}%` }}
-                                            ></div>
+                                    {/* Card Body */}
+                                    <div className="p-4 flex flex-col gap-3">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-sm font-semibold text-text-sub dark:text-text-sub-dark capitalize">
+                                                    {circle.frequency}
+                                                </span>
+                                                <span className="text-[10px] text-text-sub dark:text-text-sub-dark">•</span>
+                                                <span className="text-sm font-bold text-[#F25F15]">
+                                                    ${circle.amount}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-1 text-xs text-text-sub dark:text-text-sub-dark">
+                                                <span className="material-symbols-outlined text-[14px]">group</span>
+                                                <span className="font-medium">{circle.members?.length || 0} members</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Progress Bar */}
+                                        <div className="relative">
+                                            <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-[#F25F15] rounded-full transition-all duration-1000"
+                                                    style={{ width: `${progress}%` }}
+                                                ></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
