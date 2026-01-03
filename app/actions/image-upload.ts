@@ -10,42 +10,78 @@ cloudinary.config({
 });
 
 export async function uploadImageAction(formData: FormData) {
-    const file = formData.get('file') as File;
-
-    if (!file) {
-        return { error: 'No file provided' };
-    }
-
-    // Check for keys
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-        console.error('SERVER ERROR: Cloudinary credentials missing in environment.');
-        return { error: 'Server configuration error: Missing Cloudinary credentials' };
-    }
-
     try {
-        console.log(`Starting upload for file: ${file.name}, size: ${file.size}`);
+        console.log('[Server Action] Starting uploadImageAction');
+
+        // 1. Validate File Existence
+        const file = formData.get('file') as File;
+        if (!file) {
+            console.error('[Server Action] No file received');
+            return { error: 'No file provided' };
+        }
+
+        console.log(`[Server Action] File received: ${file.name} (${file.size} bytes)`);
+
+        // 2. Validate Env Vars
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const apiKey = process.env.CLOUDINARY_API_KEY;
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+        if (!cloudName || !apiKey || !apiSecret) {
+            console.error('[Server Action] Missing Cloudinary Credentials');
+            return { error: 'Server Config Error: Missing Cloudinary Keys' };
+        }
+
+        // 3. Configure Cloudinary (Safe Re-config)
+        cloudinary.config({
+            cloud_name: cloudName,
+            api_key: apiKey,
+            api_secret: apiSecret,
+        });
+
+        // 4. Convert File to Buffer
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        // Upload to Cloudinary using a Promise wrapper
+        console.log('[Server Action] Buffer created, starting upload stream...');
+
+        // 5. Upload via Stream
         const result = await new Promise<any>((resolve, reject) => {
-            cloudinary.uploader.upload_stream(
+            const uploadStream = cloudinary.uploader.upload_stream(
                 {
                     folder: 'rosca_uploads',
                     resource_type: 'auto',
                 },
                 (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
+                    if (error) {
+                        console.error('[Server Action] Cloudinary Stream Error:', error);
+                        reject(error);
+                    } else {
+                        console.log('[Server Action] Upload Success:', result?.secure_url);
+                        resolve(result);
+                    }
                 }
-            ).end(buffer);
+            );
+
+            // Handle stream errors directly just in case
+            uploadStream.on('error', (err) => {
+                console.error('[Server Action] Stream Internal Error:', err);
+                reject(err);
+            });
+
+            uploadStream.end(buffer);
         });
+
+        if (!result || !result.secure_url) {
+            throw new Error("Upload completed but no URL returned");
+        }
 
         return { success: true, url: result.secure_url };
 
     } catch (error: any) {
-        console.error('Cloudinary Upload Error:', error);
-        return { error: error.message || 'Upload failed' };
+        // Catch-all for ANY crash
+        console.error('[Server Action] CRITICAL FAILURE:', error);
+        return { error: `Upload Failed: ${error.message}` };
     }
 }
 // force rebuild
