@@ -38,7 +38,7 @@ export async function getCloudinarySignature() {
                 timestamp,
                 folder,
             },
-            process.env.CLOUDINARY_API_SECRET
+            apiSecret! // Verified above
         );
 
         return {
