@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { getCircle, getCurrentUser, MOCK_USER } from "@/lib/data";
 import InviteButton from "@/app/components/InviteButton";
 
-export default async function CircleDetail(props: { params: Promise<{ id: string }> }) {
+export default async function CircleDetail(props: { params: Promise<{ id: string }>, searchParams: Promise<{ new?: string }> }) {
     const params = await props.params;
     const circle = await getCircle(params.id);
     const user = await getCurrentUser();
@@ -18,8 +18,23 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
         notFound();
     }
 
+    const isNew = (await props.searchParams)?.new === 'true';
+
     return (
         <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white">
+            {isNew && (
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-4 fade-in duration-500 w-[90%] max-w-sm">
+                    <div className="bg-green-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3">
+                        <div className="bg-white/20 p-2 rounded-full">
+                            <span className="material-symbols-outlined text-xl">celebration</span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-bold text-sm">Circle Created!</span>
+                            <span className="text-xs text-white/90">Invite your friends to get started.</span>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Sticky Header with Back Button */}
             <div className="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
                 <div className="w-12"></div>
@@ -197,8 +212,9 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     <div className="flex-1">
                         <InviteButton
                             circleId={circle.id}
-                            text="Share"
-                            className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark"
+                            circleName={circle.name}
+                            text="Share Invite Link"
+                            className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark flex gap-2 items-center justify-center"
                         />
                     </div>
                     {user && circle.members.some(m => m.userId === user.id) ? (

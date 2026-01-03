@@ -284,7 +284,8 @@ export async function createCircleAction(formData: FormData) {
     // Small delay to ensure DB (mock) consistency if concurrent
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    redirect('/profile');
+    // Redirect to the new circle page to show details and allow sharing immediately
+    redirect(`/circles/${newCircle.id}?new=true`);
 }
 
 export async function joinCircleAction(formData: FormData) {
