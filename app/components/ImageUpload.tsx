@@ -43,7 +43,7 @@ export default function ImageUpload({
             formData.append('file', file);
 
             // Dynamically import the action to avoid build issues if not ready
-            const { uploadImageAction } = await import('@/app/actions/upload');
+            const { uploadImageAction } = await import('@/app/actions/image-upload');
             const result = await uploadImageAction(formData);
 
             if (result.success && result.url) {
