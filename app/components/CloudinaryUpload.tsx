@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
-import { uploadImageAction } from '@/app/actions/image-upload';
+import { getCloudinarySignature } from '@/app/actions/image-upload';
 
 interface ImageUploadProps {
     name: string;
@@ -34,9 +34,9 @@ export default function CloudinaryUpload({
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Client-side validation: Max 9MB (leaving buffer for encoding overhead)
-        if (file.size > 9 * 1024 * 1024) {
-            alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max size is 9MB.`);
+        // Client-side validation: Max 95MB (Cloudinary free tier is generous, but let's be safe)
+        if (file.size > 95 * 1024 * 1024) {
+            alert(`File is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max size is 95MB.`);
             if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
@@ -47,25 +47,39 @@ export default function CloudinaryUpload({
         setIsUploading(true);
 
         try {
+            // 1. Get Signature from Server
+            const { timestamp, folder, signature, cloudName, apiKey } = await getCloudinarySignature();
+
+            // 2. Prepare FormData for Direct Upload
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('api_key', apiKey || '');
+            formData.append('timestamp', timestamp.toString());
+            formData.append('signature', signature);
+            formData.append('folder', folder);
 
-            formData.append('file', file);
+            // 3. Upload Directly to Cloudinary
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: 'POST',
+                body: formData
+            });
 
-            // Call the imported action directly
-            const result = await uploadImageAction(formData);
-
-            if (result.success && result.url) {
-                setPreview(result.url);
-                // We're relying on the hidden input to pass the value to the parent form
-            } else {
-                console.error('Upload failed:', result.error);
-                alert('Upload failed. Please try again.');
-                setPreview(defaultValue || null); // Revert
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Upload failed');
             }
+
+            const data = await response.json();
+
+            // 4. Success
+            if (data.secure_url) {
+                setPreview(data.secure_url);
+            } else {
+                throw new Error("No URL returned from Cloudinary");
+            }
+
         } catch (error: any) {
             console.error('Upload error:', error);
-            // Alert the actual error message for debugging
             alert(`Upload failed: ${error.message || 'Unknown error'}`);
             setPreview(defaultValue || null);
         } finally {
