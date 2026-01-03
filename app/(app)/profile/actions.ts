@@ -40,7 +40,7 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
                 email: validated.data.email || null, // Convert empty string to null
                 bio: validated.data.bio,
                 location: validated.data.location,
-                image: validated.data.avatar || null, // Save avatar to 'image' field
+                avatar: validated.data.avatar || null, // Save avatar URL
             }
         });
 
