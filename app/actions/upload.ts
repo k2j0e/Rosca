@@ -18,11 +18,15 @@ export async function uploadImageAction(formData: FormData) {
 
     // Check for keys
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-        console.error('Cloudinary credentials missing');
+        console.error('SERVER ERROR: Cloudinary credentials missing in environment.');
+        console.error('Cloud Name present:', !!process.env.CLOUDINARY_CLOUD_NAME);
+        console.error('API Key present:', !!process.env.CLOUDINARY_API_KEY);
+        console.error('API Secret present:', !!process.env.CLOUDINARY_API_SECRET);
         return { error: 'Server configuration error: Missing Cloudinary credentials' };
     }
 
     try {
+        console.log(`Starting upload for file: ${file.name}, size: ${file.size}`);
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 

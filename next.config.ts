@@ -19,9 +19,18 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'ui-avatars.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5mb',
+    },
   },
 };
 
