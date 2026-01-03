@@ -1,7 +1,6 @@
 'use server';
 
-// Ensure this runs on Node.js (required for Cloudinary signing)
-export const runtime = 'nodejs';
+
 
 import { v2 as cloudinary } from 'cloudinary';
 
