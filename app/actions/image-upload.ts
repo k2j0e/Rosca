@@ -49,21 +49,24 @@ export async function getCloudinarySignature() {
         const timestamp = Math.round(new Date().getTime() / 1000);
         const folder = 'rosca_uploads';
 
-        // Configure the Cloudinary SDK with the credentials before signing
+        // Configure the Cloudinary SDK with the credentials
         cloudinary.config({
             cloud_name: cloudName,
             api_key: apiKey,
             api_secret: apiSecret,
         });
 
-        // Sign the parameters
-        const signature = cloudinary.utils.api_sign_request(
-            {
-                timestamp,
-                folder,
-            },
-            apiSecret
-        );
+        // Compute signature manually using crypto (Cloudinary formula: SHA1(params_string + api_secret))
+        const crypto = await import('crypto');
+        const stringToSign = `folder=${folder}&timestamp=${timestamp}`;
+        const signature = crypto.createHash('sha1')
+            .update(stringToSign + apiSecret)
+            .digest('hex');
+
+        console.log('[Server Action] Signature Debug:', {
+            stringToSign,
+            signatureStart: signature.substring(0, 10)
+        });
 
         return {
             timestamp,
