@@ -173,7 +173,7 @@ function CreateDetailsContent() {
                             onChange={(e) => setCategory(e.target.value)}
                             className="bg-white dark:bg-surface-dark p-3 rounded-xl border border-gray-200 dark:border-white/10 text-sm font-bold focus:outline-none"
                         >
-                            {["Travel", "Business", "Emergency", "Other"].map(c => <option key={c} value={c}>{c}</option>)}
+                            {["Travel", "Business", "Emergency", "Education", "Home Improvement", "Debt Consolidation", "Wedding", "Gadgets", "Health/Medical", "Vehicle", "Other"].map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                         <button
                             type="button"

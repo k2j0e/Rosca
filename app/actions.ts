@@ -242,14 +242,14 @@ export async function createCircleAction(formData: FormData) {
         throw new Error("Invalid circle data: " + JSON.stringify(validated.error.flatten().fieldErrors));
     }
 
-    const { name, category, amount, membersCount, frequency, description, rules, coverImage, payoutSchedule } = validated.data;
+    const { name, category, amount, membersCount, frequency, description, rules, coverImage, payoutSchedule, privacy } = validated.data;
 
     const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Must be logged in to create a circle");
 
     const newCircle = await createCircle({
         name,
-        category,
+        category: category as CircleCategory,
         amount, // This is technically contribution per person
         frequency,
         payoutTotal: amount * membersCount, // Simplification for MVP
@@ -260,7 +260,8 @@ export async function createCircleAction(formData: FormData) {
         description: description || `A ${frequency} circle for ${category}.`,
         rules,
         coverImage,
-        payoutSchedule: JSON.parse(formData.get("payoutSchedule") as string || "[]"),
+        isPrivate: privacy === 'private',
+        payoutSchedule,
         settings: {}, // Future use
     }, currentUser);
 

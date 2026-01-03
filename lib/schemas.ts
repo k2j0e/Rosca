@@ -26,7 +26,7 @@ export const verifyOtpSchema = z.object({
 
 export const createCircleSchema = z.object({
     name: z.string().min(3, "Circle name must be at least 3 characters").max(50),
-    category: z.enum(["Travel", "Business", "Emergency", "Other"]),
+    category: z.enum(["Travel", "Business", "Emergency", "Education", "Home Improvement", "Debt Consolidation", "Wedding", "Gadgets", "Health/Medical", "Vehicle", "Other"]),
     amount: z.number().min(5, "Contribution must be at least $5").max(10000, "Contribution limit exceeded"),
     membersCount: z.number().int().min(2, "Minimum 2 members").max(50, "Maximum 50 members"),
     frequency: z.enum(["weekly", "monthly", "bi-weekly"]),
