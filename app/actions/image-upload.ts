@@ -14,9 +14,19 @@ export async function getCloudinarySignature() {
     try {
         console.log('[Server Action] Generating Cloudinary Signature');
 
-        if (!process.env.CLOUDINARY_API_SECRET) {
-            console.error('[Server Action] Missing API Secret');
-            return { error: 'Server configuration error: Missing Cloudinary Secret' };
+        const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+        const apiKey = process.env.CLOUDINARY_API_KEY;
+        const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+        console.log('[Server Action] Debug Env Vars:', {
+            hasCloudName: !!cloudName,
+            hasApiKey: !!apiKey,
+            hasApiSecret: !!apiSecret,
+        });
+
+        if (!cloudName || !apiKey || !apiSecret) {
+            console.error('[Server Action] Missing Cloudinary Credentials');
+            return { error: 'Server Config Error: Missing Cloudinary Keys. Check server logs.' };
         }
 
         const timestamp = Math.round(new Date().getTime() / 1000);
