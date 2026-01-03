@@ -7,7 +7,7 @@ export default function InviteButton({ circleId, className, text, circleName }: 
 
     const handleInvite = async () => {
         const origin = typeof window !== 'undefined' ? window.location.origin : '';
-        const inviteLink = `${origin}/circles/${circleId}/join`;
+        const inviteLink = `${origin}/invite/${circleId}`;
         const shareData = {
             title: circleName ? `Join ${circleName} on Rosca` : 'Join my Savings Circle',
             text: 'I started a savings circle on Rosca. Check it out and join me!',

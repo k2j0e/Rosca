@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCircle, getCurrentUser } from "@/lib/data";
 import InviteButton from "@/app/components/InviteButton";
+import ShareLinkDisplay from "@/app/components/ShareLinkDisplay";
 
 export default async function CircleDashboard(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -109,6 +110,9 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
                                 </form>
                             )}
                         </div>
+
+                        {/* Share Link Display */}
+                        <ShareLinkDisplay circleId={circle.id} />
                     </div>
                 </div>
             ) : (
