@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
+import { uploadImageAction } from '@/app/actions/image-upload';
 
 interface ImageUploadProps {
     name: string;
@@ -42,8 +43,9 @@ export default function CloudinaryUpload({
             const formData = new FormData();
             formData.append('file', file);
 
-            // Dynamically import the action to avoid build issues if not ready
-            const { uploadImageAction } = await import('@/app/actions/image-upload');
+            formData.append('file', file);
+
+            // Call the imported action directly
             const result = await uploadImageAction(formData);
 
             if (result.success && result.url) {
