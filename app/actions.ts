@@ -93,6 +93,40 @@ export async function sendOtpAction(formData: FormData) {
     redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
 }
 
+// Resend OTP without redirecting - for use in verify page
+export async function resendOtpAction(formData: FormData) {
+    const { sendSms, generateOtp } = await import("@/lib/sms");
+    const { prisma } = await import("@/lib/db");
+
+    const rawPhone = formData.get('phone') as string;
+    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+
+    const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
+
+    if (!user) {
+        return { error: 'User not found' };
+    }
+
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            otpCode: otp,
+            otpExpiresAt: expiresAt
+        }
+    });
+
+    const smsResult = await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
+
+    if (!smsResult.success) {
+        return { error: 'Failed to send SMS' };
+    }
+
+    return { success: true };
+}
+
 export async function verifyOtpAction(formData: FormData) {
     const { verifyOtpSchema } = await import("@/lib/schemas");
     const { prisma } = await import("@/lib/db");
