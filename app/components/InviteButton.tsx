@@ -8,9 +8,12 @@ export default function InviteButton({ circleId, className, text, circleName }: 
     const handleInvite = async () => {
         const origin = typeof window !== 'undefined' ? window.location.origin : '';
         const inviteLink = `${origin}/invite/${circleId}`;
+
+        console.log('[DEBUG] InviteButton Link:', inviteLink);
+
         const shareData = {
             title: circleName ? `Join ${circleName} on Rosca` : 'Join my Savings Circle',
-            text: 'I started a savings circle on Rosca. Check it out and join me!',
+            // text: 'I started a savings circle on Rosca. Check it out and join me!', // Removed to preventing copying text with URL on some devices
             url: inviteLink
         };
 
