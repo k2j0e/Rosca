@@ -82,6 +82,11 @@ export async function sendOtpAction(formData: FormData) {
 
     // Skip SMS for test phone
     if (phone === TEST_PHONE) {
+        // Reset onboarding so user can test tutorial again
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { hasCompletedOnboarding: false }
+        });
         console.log('[TEST MODE] Skipping SMS for test phone. Use code:', TEST_CODE);
         redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
     }
@@ -175,9 +180,14 @@ export async function sendEmailOtpAction(formData: FormData) {
             });
             console.log('[TEST MODE] Created test user:', user.id);
         } else {
+            // Reset onboarding so user can test tutorial again
             await prisma.user.update({
                 where: { id: user.id },
-                data: { otpCode: TEST_CODE, otpExpiresAt: new Date(Date.now() + 60 * 60 * 1000) }
+                data: {
+                    otpCode: TEST_CODE,
+                    otpExpiresAt: new Date(Date.now() + 60 * 60 * 1000),
+                    hasCompletedOnboarding: false // Always show tutorial for test user
+                }
             });
         }
         console.log('[TEST MODE] Skipping email for test account. Use code:', TEST_CODE);
