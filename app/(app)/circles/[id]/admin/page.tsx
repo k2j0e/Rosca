@@ -96,6 +96,56 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                 </div>
             </div>
 
+            {/* Pending Requests Alert Banner */}
+            {health.pendingRequests > 0 && (() => {
+                const pendingMembers = members.filter(m => m.status === 'requested');
+                return (
+                    <div className="px-4 pb-4">
+                        <Link href={`/circles/${params.id}/admin/members`}>
+                            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 rounded-2xl text-white shadow-lg shadow-blue-500/20 animate-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-xl animate-pulse">person_add</span>
+                                        <span className="font-bold">New Member Request{health.pendingRequests > 1 ? 's' : ''}</span>
+                                    </div>
+                                    <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                                        {health.pendingRequests} pending
+                                    </span>
+                                </div>
+                                <div className="flex items-center gap-2 mb-3">
+                                    {pendingMembers.slice(0, 4).map((member, idx) => (
+                                        <div
+                                            key={member.id}
+                                            className="w-10 h-10 rounded-full bg-white/20 border-2 border-white flex items-center justify-center text-sm font-bold overflow-hidden"
+                                            style={{ marginLeft: idx > 0 ? '-8px' : 0 }}
+                                        >
+                                            {member.avatar ? (
+                                                <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                member.name.charAt(0).toUpperCase()
+                                            )}
+                                        </div>
+                                    ))}
+                                    {health.pendingRequests > 4 && (
+                                        <div className="w-10 h-10 rounded-full bg-white/20 border-2 border-white flex items-center justify-center text-xs font-bold" style={{ marginLeft: '-8px' }}>
+                                            +{health.pendingRequests - 4}
+                                        </div>
+                                    )}
+                                    <span className="text-white/80 text-sm ml-2">
+                                        {pendingMembers.slice(0, 2).map(m => m.name.split(' ')[0]).join(', ')}
+                                        {health.pendingRequests > 2 && ` & ${health.pendingRequests - 2} more`}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-white/70">Tap to review and approve</span>
+                                    <span className="material-symbols-outlined">arrow_forward</span>
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                );
+            })()}
+
             {/* Member Payment Grid */}
             <div className="px-4 pb-6">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark mb-3 px-2">
