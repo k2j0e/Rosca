@@ -1,11 +1,27 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid errors during build
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+    if (!resendClient) {
+        if (!process.env.RESEND_API_KEY) {
+            throw new Error('RESEND_API_KEY environment variable is not set');
+        }
+        resendClient = new Resend(process.env.RESEND_API_KEY);
+    }
+    return resendClient;
+}
 
 export async function sendEmailOtp(email: string, code: string): Promise<{ success: boolean; error?: string }> {
     try {
-        const { error } = await resend.emails.send({
-            from: process.env.EMAIL_FROM || 'Orbit <onboarding@resend.dev>',
+        const resend = getResendClient();
+
+        const fromEmail = process.env.EMAIL_FROM || 'Orbit <onboarding@resend.dev>';
+        console.log('[sendEmailOtp] Sending to:', email, 'from:', fromEmail);
+
+        const { error, data } = await resend.emails.send({
+            from: fromEmail,
             to: email,
             subject: `Your verification code: ${code}`,
             html: `
@@ -25,9 +41,11 @@ export async function sendEmailOtp(email: string, code: string): Promise<{ succe
             return { success: false, error: error.message };
         }
 
+        console.log('[sendEmailOtp] Email sent successfully, id:', data?.id);
         return { success: true };
-    } catch (err) {
-        console.error('[sendEmailOtp] Error:', err);
-        return { success: false, error: 'Failed to send email' };
+    } catch (err: any) {
+        console.error('[sendEmailOtp] Error:', err?.message || err);
+        return { success: false, error: err?.message || 'Failed to send email' };
     }
 }
+
