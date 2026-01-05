@@ -92,6 +92,14 @@ export default function InviteTutorial({ params }: { params: { id: string } }) {
                     {step === slides.length - 1 ? "Create Account & Join" : "Next"}
                 </button>
 
+                {step === slides.length - 1 && (
+                    <Link href={`/signin?redirect=${encodeURIComponent(`/circles/${circleId}/join`)}`} className="w-full">
+                        <button className="w-full py-4 mt-3 bg-primary/10 text-primary font-bold text-lg rounded-2xl hover:bg-primary/20 transition-all active:scale-[0.98]">
+                            Have Account? Sign In
+                        </button>
+                    </Link>
+                )}
+
             </main>
         </div>
     );
