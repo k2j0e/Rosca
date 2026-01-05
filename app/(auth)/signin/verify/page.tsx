@@ -97,6 +97,7 @@ function VerifyForm() {
                         placeholder="123456"
                         autoComplete="one-time-code"
                         inputMode="numeric"
+                        autoFocus
                         className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300"
                     />
                 </div>
