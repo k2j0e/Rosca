@@ -268,7 +268,14 @@ export async function verifyOtpAction(formData: FormData): Promise<{ error?: str
 
     // Handle Custom Redirect
     if (redirectUrl) {
-        redirect(redirectUrl);
+        console.log('[verifyOtpAction] Redirecting to custom URL:', redirectUrl);
+        // Ensure strictly relative path for security
+        if (redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+            redirect(redirectUrl);
+        } else {
+            console.warn('[verifyOtpAction] Invalid redirect URL ignored:', redirectUrl);
+            redirect('/home');
+        }
     }
 
     // Redirect based on onboarding status

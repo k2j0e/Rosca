@@ -6,10 +6,13 @@ import { getCircle, getCurrentUser } from "@/lib/data";
 
 export default async function JoinCircleConfirm(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
+    console.log('[DEBUG] JoinCircleConfirm Page loading for ID:', params.id);
     const circle = await getCircle(params.id);
     const currentUser = await getCurrentUser();
+    console.log('[DEBUG] JoinCircleConfirm: Circle found?', !!circle, 'User?', !!currentUser);
 
     if (!circle) {
+        console.log('[DEBUG] JoinCircleConfirm: Circle not found');
         notFound();
     }
 
