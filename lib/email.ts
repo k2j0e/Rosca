@@ -3,10 +3,11 @@ import { Resend } from 'resend';
 // Lazy initialization to avoid errors during build
 let resendClient: Resend | null = null;
 
-function getResendClient(): Resend {
+function getResendClient(): Resend | null {
     if (!resendClient) {
         if (!process.env.RESEND_API_KEY) {
-            throw new Error('RESEND_API_KEY environment variable is not set');
+            console.error('[Email] RESEND_API_KEY not set');
+            return null;
         }
         resendClient = new Resend(process.env.RESEND_API_KEY);
     }
@@ -16,6 +17,10 @@ function getResendClient(): Resend {
 export async function sendEmailOtp(email: string, code: string): Promise<{ success: boolean; error?: string }> {
     try {
         const resend = getResendClient();
+
+        if (!resend) {
+            return { success: false, error: 'Email service not configured' };
+        }
 
         const fromEmail = process.env.EMAIL_FROM || 'Orbit <onboarding@resend.dev>';
         console.log('[sendEmailOtp] Sending to:', email, 'from:', fromEmail);
