@@ -13,6 +13,10 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
         return notFound();
     }
 
+    // Safe Admin Logic
+    const admin = circle.members.find(m => m.role === 'admin');
+    console.log('[DEBUG] Circle data:', JSON.stringify({ ...circle, members: circle.members.length }, null, 2));
+
     return (
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col font-display">
             {/* Header */}
@@ -30,13 +34,11 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
                 {/* Visual Avatar/Icon */}
                 <div className="mb-8 relative">
                     <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-orange-400 flex items-center justify-center text-white shadow-xl shadow-primary/30 overflow-hidden border-4 border-white dark:border-background-dark">
-                        {(() => {
-                            const admin = circle.members.find(m => m.role === 'admin');
-                            if (admin?.avatar) {
-                                return <img src={admin.avatar} alt={admin.name} className="w-full h-full object-cover" />;
-                            }
-                            return <span className="material-symbols-outlined text-[48px]">groups</span>;
-                        })()}
+                        {admin?.avatar ? (
+                            <img src={admin.avatar} alt={admin.name || 'Admin'} className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="material-symbols-outlined text-[48px]">groups</span>
+                        )}
                     </div>
                     <div className="absolute -bottom-2 -right-2 bg-white dark:bg-black p-2 rounded-full">
                         <span className="material-symbols-outlined text-green-500 text-2xl">verified</span>
