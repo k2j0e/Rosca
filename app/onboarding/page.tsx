@@ -98,8 +98,8 @@ function OnboardingContent() {
                             <div
                                 key={i}
                                 className={`absolute size-10 rounded-full shadow-md flex items-center justify-center transition-all duration-500 ${highlightedUser === i
-                                        ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/30'
-                                        : 'bg-white dark:bg-gray-800 text-gray-400'
+                                    ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/30'
+                                    : 'bg-white dark:bg-gray-800 text-gray-400'
                                     }`}
                                 style={{
                                     transform: `rotate(${i * 60}deg) translateX(112px) rotate(-${i * 60}deg)`,
@@ -121,19 +121,63 @@ function OnboardingContent() {
                     />
                 )}
 
-                {/* Slide 4: Receipt / Payment Visual */}
+                {/* Slide 4: Flow Diagram - Non-custodial visual */}
                 {step === 3 && (
-                    <Image
-                        src="https://images.unsplash.com/photo-1634733988138-bf2c3a2a13fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-                        alt="Payment receipt"
-                        fill
-                        className="object-cover animate-in fade-in duration-500"
-                    />
+                    <div className="w-full h-full flex items-center justify-center p-8 animate-in fade-in duration-500">
+                        {/* Flow Diagram */}
+                        <div className="flex items-center justify-center gap-4">
+                            {/* Person A */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="size-16 rounded-full bg-primary/20 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-3xl text-primary">person</span>
+                                </div>
+                                <span className="text-xs font-medium text-gray-500">Member A</span>
+                                <div className="size-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-lg text-green-600">payments</span>
+                                </div>
+                            </div>
+
+                            {/* Arrow 1 */}
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-0.5 border-t-2 border-dashed border-gray-300 dark:border-gray-600"></div>
+                            </div>
+
+                            {/* Platform (Center) */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="size-14 rounded-xl bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-2xl text-gray-400">sync_alt</span>
+                                </div>
+                                <span className="text-[10px] font-medium text-gray-400 text-center leading-tight">Coordination<br />only</span>
+                            </div>
+
+                            {/* Arrow 2 */}
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-0.5 border-t-2 border-dashed border-gray-300 dark:border-gray-600"></div>
+                            </div>
+
+                            {/* Person B */}
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="size-16 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-3xl text-blue-600">person</span>
+                                </div>
+                                <span className="text-xs font-medium text-gray-500">Member B</span>
+                                <div className="size-8 rounded-full bg-green-100 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-lg text-green-600">payments</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
-                {/* Slide 5: No image, just gradient background */}
+                {/* Slide 5: Gradient background with animated pattern */}
                 {step === 4 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-primary/10 dark:from-primary/10 dark:via-gray-900 dark:to-primary/5"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-white dark:from-primary/20 dark:via-primary/10 dark:to-gray-900">
+                        {/* Subtle animated circles */}
+                        <div className="absolute inset-0 overflow-hidden">
+                            <div className="absolute top-1/4 left-1/4 size-32 rounded-full bg-primary/10 animate-pulse"></div>
+                            <div className="absolute bottom-1/3 right-1/4 size-24 rounded-full bg-primary/5 animate-pulse delay-500"></div>
+                        </div>
+                    </div>
                 )}
 
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white dark:to-black"></div>
@@ -166,19 +210,21 @@ function OnboardingContent() {
                     {/* SLIDE 2: How it works */}
                     {step === 1 && (
                         <div className="animate-in slide-in-from-bottom-4 fade-in duration-500">
-                            <h1 className="text-3xl font-extrabold tracking-tight mb-2 text-gray-900 dark:text-white">
+                            <h1 className="text-3xl font-extrabold tracking-tight mb-3 text-gray-900 dark:text-white">
                                 How it works
                             </h1>
-                            <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed max-w-xs mx-auto">
-                                A simple way to save<br />by taking turns.
-                            </p>
+                            <div className="text-gray-500 dark:text-gray-400 text-base leading-relaxed max-w-xs mx-auto space-y-2">
+                                <p>Everyone contributes the same amount on a schedule.</p>
+                                <p>Each round, one person receives the full group total.</p>
+                                <p className="text-gray-400 dark:text-gray-500">Over time, everyone gets their turn — fairly and predictably.</p>
+                            </div>
                         </div>
                     )}
 
                     {/* SLIDE 3: Why save together */}
                     {step === 2 && (
                         <div className="animate-in slide-in-from-bottom-4 fade-in duration-500 delay-200">
-                            <h1 className="text-3xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-white italic">
+                            <h1 className="text-3xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-white">
                                 Why save together?
                             </h1>
                             <p className="text-gray-600 dark:text-gray-300 text-base leading-relaxed max-w-sm mx-auto mb-3">
