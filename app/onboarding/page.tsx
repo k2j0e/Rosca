@@ -111,13 +111,13 @@ function OnboardingContent() {
                     </div>
                 )}
 
-                {/* Slide 3: Diverse People Image */}
+                {/* Slide 3: Diverse People Image with Ken Burns */}
                 {step === 2 && (
                     <Image
                         src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                         alt="Group of diverse friends"
                         fill
-                        className="object-cover animate-in fade-in zoom-in-105 duration-1000"
+                        className="object-cover animate-ken-burns"
                     />
                 )}
 
@@ -172,10 +172,11 @@ function OnboardingContent() {
                 {/* Slide 5: Gradient background with animated pattern */}
                 {step === 4 && (
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-white dark:from-primary/20 dark:via-primary/10 dark:to-gray-900">
-                        {/* Subtle animated circles */}
+                        {/* Animated breathing circles */}
                         <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute top-1/4 left-1/4 size-32 rounded-full bg-primary/10 animate-pulse"></div>
-                            <div className="absolute bottom-1/3 right-1/4 size-24 rounded-full bg-primary/5 animate-pulse delay-500"></div>
+                            <div className="absolute top-1/4 left-1/4 size-40 rounded-full bg-primary/15 animate-breathing"></div>
+                            <div className="absolute bottom-1/3 right-1/4 size-28 rounded-full bg-primary/10 animate-breathing-delayed"></div>
+                            <div className="absolute top-1/2 right-1/3 size-20 rounded-full bg-primary/10 animate-breathing" style={{ animationDelay: '0.75s' }}></div>
                         </div>
                     </div>
                 )}
