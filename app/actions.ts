@@ -143,10 +143,45 @@ export async function sendEmailOtpAction(formData: FormData) {
     const { generateOtp } = await import("@/lib/sms");
     const { prisma } = await import("@/lib/db");
 
+    // Test email bypass - no real email sent
+    const TEST_EMAIL = 'test@example.com';
+    const TEST_CODE = '123456';
+
     const email = (formData.get('email') as string)?.toLowerCase().trim();
 
     if (!email || !email.includes('@')) {
         redirect('/signin?error=invalid_email');
+    }
+
+    // For test email, create user if doesn't exist (for easy testing)
+    if (email === TEST_EMAIL) {
+        let user = await prisma.user.findUnique({ where: { email } });
+        if (!user) {
+            // Auto-create test user
+            const stubId = 'test_' + Math.random().toString(36).substr(2, 9);
+            user = await prisma.user.create({
+                data: {
+                    id: stubId,
+                    email: TEST_EMAIL,
+                    phoneNumber: '+15559999999',
+                    name: 'Test User',
+                    role: 'user',
+                    isBanned: false,
+                    trustScore: 100,
+                    hasCompletedOnboarding: false,
+                    otpCode: TEST_CODE,
+                    otpExpiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+                }
+            });
+            console.log('[TEST MODE] Created test user:', user.id);
+        } else {
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { otpCode: TEST_CODE, otpExpiresAt: new Date(Date.now() + 60 * 60 * 1000) }
+            });
+        }
+        console.log('[TEST MODE] Skipping email for test account. Use code:', TEST_CODE);
+        redirect(`/signin/verify?email=${encodeURIComponent(email)}`);
     }
 
     // Find user by email
