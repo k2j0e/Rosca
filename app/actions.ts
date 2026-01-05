@@ -820,9 +820,13 @@ export async function completeOnboardingAction(redirectUrl?: string) {
         data: { hasCompletedOnboarding: true }
     });
 
+
+
     if (redirectUrl) {
+        console.log('[completeOnboardingAction] Redirecting to:', redirectUrl);
         redirect(redirectUrl);
     } else {
+        console.log('[completeOnboardingAction] No redirect URL, going home');
         redirect('/home');
     }
 }

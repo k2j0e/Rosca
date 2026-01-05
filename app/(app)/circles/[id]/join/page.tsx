@@ -12,8 +12,8 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
     console.log('[DEBUG] JoinCircleConfirm: Circle found?', !!circle, 'User?', !!currentUser);
 
     if (!circle) {
-        console.log('[DEBUG] JoinCircleConfirm: Circle not found');
-        notFound();
+        console.error('[JoinCircleConfirm] Circle not found for ID:', params.id);
+        redirect('/home?error=circle_not_found');
     }
 
     // Redirect if already a member
