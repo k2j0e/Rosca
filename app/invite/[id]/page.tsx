@@ -4,9 +4,12 @@ import { getCircle } from "@/lib/data";
 
 export default async function InvitePage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
+    console.log('[DEBUG] Invite Page params:', params);
     const circle = await getCircle(params.id);
+    console.log('[DEBUG] Invite Page circle found:', !!circle, circle?.id);
 
     if (!circle) {
+        console.log('[DEBUG] Invite Page: Circle not found, returning 404');
         return notFound();
     }
 
