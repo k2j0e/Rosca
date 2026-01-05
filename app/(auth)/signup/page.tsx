@@ -19,6 +19,7 @@ function SignUpForm() {
     const [phone, setPhone] = useState(searchParams.get('phone') || '');
     const [otp, setOtp] = useState('');
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [location, setLocation] = useState('');
 
     useEffect(() => {
@@ -43,6 +44,7 @@ function SignUpForm() {
             const data = new FormData();
             data.set('phone', phone);
             data.set('name', name);
+            data.set('email', email);
 
             const result = await beginSignupAction(data);
             if (result?.error) {
@@ -140,6 +142,18 @@ function SignUpForm() {
                                         <Link href="/signin" className="underline ml-1">Log In instead</Link>
                                     </p>
                                 )}
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Email <span className="text-gray-400 font-normal normal-case">(Backup login)</span></label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="you@example.com"
+                                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-medium focus:outline-none focus:border-primary transition-colors placeholder:font-normal"
+                                />
+                                <p className="text-[11px] text-gray-400">Optional backup method to receive login codes.</p>
                             </div>
 
                             <p className="text-xs text-gray-400 leading-snug">

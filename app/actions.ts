@@ -127,27 +127,68 @@ export async function resendOtpAction(formData: FormData) {
     return { success: true };
 }
 
-export async function verifyOtpAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
-    const { verifyOtpSchema } = await import("@/lib/schemas");
+// Send OTP via email for login
+export async function sendEmailOtpAction(formData: FormData) {
+    const { sendEmailOtp } = await import("@/lib/email");
+    const { generateOtp } = await import("@/lib/sms");
     const { prisma } = await import("@/lib/db");
 
-    const rawData = {
-        phone: formData.get('phone') as string,
-        code: formData.get('code') as string
-    };
+    const email = (formData.get('email') as string)?.toLowerCase().trim();
 
-    console.log('[verifyOtpAction] Raw data received:', { phone: rawData.phone, codeLength: rawData.code?.length, code: rawData.code });
+    if (!email || !email.includes('@')) {
+        redirect('/signin?error=invalid_email');
+    }
 
-    const validated = verifyOtpSchema.safeParse(rawData);
+    // Find user by email
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (!validated.success) {
-        console.log('[verifyOtpAction] Validation failed:', validated.error.issues);
+    if (!user) {
+        redirect('/signin?error=email_not_found');
+    }
+
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            otpCode: otp,
+            otpExpiresAt: expiresAt
+        }
+    });
+
+    const emailResult = await sendEmailOtp(email, otp);
+
+    if (!emailResult.success) {
+        redirect(`/signin?error=${encodeURIComponent(emailResult.error || 'Failed to send email')}`);
+    }
+
+    // Redirect to verify page with email param
+    redirect(`/signin/verify?email=${encodeURIComponent(email)}`);
+}
+
+export async function verifyOtpAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
+    const { prisma } = await import("@/lib/db");
+
+    const phone = formData.get('phone') as string;
+    const email = formData.get('email') as string;
+    const code = formData.get('code') as string;
+
+    console.log('[verifyOtpAction] Received:', { phone, email, codeLength: code?.length });
+
+    // Validate code format
+    if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
         return { error: 'invalid_code_format' };
     }
 
-    const { phone, code } = validated.data;
-
-    const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
+    // Find user by phone or email
+    let user;
+    if (phone) {
+        const normalizedPhone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`;
+        user = await prisma.user.findUnique({ where: { phoneNumber: normalizedPhone } });
+    } else if (email) {
+        user = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+    }
 
     if (!user || user.otpCode !== code || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
         return { error: 'invalid_code' };
@@ -537,6 +578,7 @@ export async function launchCircleAction(circleId: string) {
 export async function beginSignupAction(formData: FormData) {
     const rawPhone = formData.get('phone') as string;
     const name = formData.get('name') as string || 'Guest';
+    const email = formData.get('email') as string || null;
     // Normalize: If no '+', assume US (+1)
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
 
@@ -556,13 +598,14 @@ export async function beginSignupAction(formData: FormData) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     if (existing) {
-        // User exists but hasn't completed onboarding - update their OTP and name
+        // User exists but hasn't completed onboarding - update their OTP, name, and email
         await prisma.user.update({
             where: { id: existing.id },
             data: {
                 otpCode: otp,
                 otpExpiresAt: expiresAt,
-                name: name || existing.name // Update name if provided
+                name: name || existing.name,
+                email: email || existing.email // Update email if provided
             }
         });
     } else {
@@ -585,7 +628,11 @@ export async function beginSignupAction(formData: FormData) {
 
         await prisma.user.update({
             where: { id: stubId },
-            data: { otpCode: otp, otpExpiresAt: expiresAt }
+            data: {
+                otpCode: otp,
+                otpExpiresAt: expiresAt,
+                email: email
+            }
         });
     }
 

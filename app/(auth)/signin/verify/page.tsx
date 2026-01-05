@@ -3,13 +3,13 @@
 
 import Link from "next/link";
 import { verifyOtpAction, resendOtpAction } from "@/app/actions";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState, useRef, useTransition } from "react";
 
 function VerifyForm() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const phone = searchParams.get("phone") || "";
+    const email = searchParams.get("email") || "";
 
     const [code, setCode] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -17,6 +17,9 @@ function VerifyForm() {
     const [resendSuccess, setResendSuccess] = useState(false);
     const [isPending, startTransition] = useTransition();
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const isEmailVerification = !!email && !phone;
+    const identifier = isEmailVerification ? email : phone;
 
     // Error messages
     const errorMap: Record<string, string> = {
@@ -44,7 +47,11 @@ function VerifyForm() {
 
         startTransition(async () => {
             const formData = new FormData();
-            formData.append('phone', phone);
+            if (isEmailVerification) {
+                formData.append('email', email);
+            } else {
+                formData.append('phone', phone);
+            }
             formData.append('code', code);
 
             const result = await verifyOtpAction(formData);
@@ -59,8 +66,14 @@ function VerifyForm() {
         });
     };
 
-    // Handle resend code
+    // Handle resend code (only for phone - email uses redirect flow)
     const handleResendCode = async () => {
+        if (isEmailVerification) {
+            // For email, redirect back to signin to resend
+            window.location.href = `/signin?method=email`;
+            return;
+        }
+
         setIsResending(true);
         setError(null);
         setResendSuccess(false);
@@ -84,9 +97,9 @@ function VerifyForm() {
 
     return (
         <div>
-            <h1 className="text-3xl font-extrabold tracking-tight mb-2">Verify number</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight mb-2">Verify {isEmailVerification ? 'email' : 'number'}</h1>
             <p className="text-text-sub dark:text-text-sub-dark mb-10">
-                Enter the code sent to <span className="font-bold text-text-main dark:text-white">{phone}</span>.
+                Enter the code sent to <span className="font-bold text-text-main dark:text-white">{identifier}</span>.
             </p>
 
             {error && (
@@ -97,7 +110,7 @@ function VerifyForm() {
 
             {resendSuccess && (
                 <div className="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-4 rounded-xl mb-6 text-sm font-bold border border-green-100 dark:border-green-900">
-                    New code sent! Check your messages.
+                    New code sent! Check your {isEmailVerification ? 'inbox' : 'messages'}.
                 </div>
             )}
 
