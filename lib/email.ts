@@ -3,13 +3,16 @@ import { Resend } from 'resend';
 // Lazy initialization to avoid errors during build
 let resendClient: Resend | null = null;
 
+// Temporary hardcoded key until Vercel env var issue is resolved
+const HARDCODED_API_KEY = 're_ZrRywaxs_7qUow3woBtxWxMETwG5AVsRL';
+
 function getResendClient(): Resend | null {
     if (!resendClient) {
-        const apiKey = process.env.RESEND_API_KEY;
-        console.log('[Email] RESEND_API_KEY exists:', !!apiKey, 'length:', apiKey?.length);
+        const apiKey = process.env.RESEND_API_KEY || HARDCODED_API_KEY;
+        console.log('[Email] Using API key, source:', process.env.RESEND_API_KEY ? 'env' : 'hardcoded');
 
         if (!apiKey) {
-            console.error('[Email] RESEND_API_KEY not set');
+            console.error('[Email] No API key available');
             return null;
         }
         resendClient = new Resend(apiKey);
