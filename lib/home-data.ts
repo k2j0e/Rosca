@@ -41,6 +41,13 @@ export interface HomePageData {
         createdAt: Date;
         circleName?: string;
     }>;
+    pendingMemberRequests: Array<{
+        circleId: string;
+        circleName: string;
+        userId: string;
+        userName: string;
+        userAvatar: string | null;
+    }>;
 }
 
 /**
@@ -141,6 +148,27 @@ export async function getHomePageData(userId: string): Promise<HomePageData | nu
         circleName: e.circle?.name
     }));
 
+    // Get pending member requests for circles where user is admin
+    const adminCircles = await prisma.circle.findMany({
+        where: { adminId: userId },
+        include: {
+            members: {
+                where: { status: 'requested' },
+                include: { user: { select: { id: true, name: true, avatar: true } } }
+            }
+        }
+    });
+
+    const pendingMemberRequests = adminCircles.flatMap(circle =>
+        circle.members.map(m => ({
+            circleId: circle.id,
+            circleName: circle.name,
+            userId: m.user.id,
+            userName: m.user.name,
+            userAvatar: m.user.avatar
+        }))
+    );
+
     return {
         user,
         stats: {
@@ -151,6 +179,7 @@ export async function getHomePageData(userId: string): Promise<HomePageData | nu
         },
         upcomingObligations,
         activeCircles,
-        recentActivity
+        recentActivity,
+        pendingMemberRequests
     };
 }

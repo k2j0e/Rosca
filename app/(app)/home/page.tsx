@@ -19,7 +19,7 @@ export default async function HomePage() {
         redirect('/signin');
     }
 
-    const { stats, upcomingObligations, activeCircles, recentActivity } = data;
+    const { stats, upcomingObligations, activeCircles, recentActivity, pendingMemberRequests } = data;
 
     // Format activity type for display
     const formatActivityType = (type: string) => {
@@ -41,9 +41,9 @@ export default async function HomePage() {
                     <h1 className="text-2xl font-extrabold">{data.user.name.split(' ')[0]}</h1>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                    <Link href="/notifications" className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
                         <span className="material-symbols-outlined text-2xl">notifications</span>
-                    </button>
+                    </Link>
                     <Link href="/profile" className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
                         {data.user.avatar ? (
                             <img src={data.user.avatar} alt="" className="w-full h-full object-cover" />
@@ -75,6 +75,45 @@ export default async function HomePage() {
                     </div>
                 </div>
             </div>
+
+            {/* Pending Member Requests (for admins) */}
+            {pendingMemberRequests.length > 0 && (
+                <div className="px-4 pb-4">
+                    <Link href="/notifications">
+                        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 rounded-2xl text-white shadow-lg shadow-blue-500/20">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-xl animate-pulse">person_add</span>
+                                    <span className="font-bold">New Member Request{pendingMemberRequests.length > 1 ? 's' : ''}</span>
+                                </div>
+                                <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                                    {pendingMemberRequests.length} pending
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {pendingMemberRequests.slice(0, 4).map((req, idx) => (
+                                    <div
+                                        key={`${req.circleId}-${req.userId}`}
+                                        className="w-8 h-8 rounded-full bg-white/20 border-2 border-white flex items-center justify-center text-xs font-bold overflow-hidden"
+                                        style={{ marginLeft: idx > 0 ? '-6px' : 0 }}
+                                    >
+                                        {req.userAvatar ? (
+                                            <img src={req.userAvatar} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                            req.userName.charAt(0)
+                                        )}
+                                    </div>
+                                ))}
+                                <span className="text-white/80 text-sm ml-1">
+                                    {pendingMemberRequests.slice(0, 2).map(r => r.userName.split(' ')[0]).join(', ')}
+                                    {pendingMemberRequests.length > 2 && ` +${pendingMemberRequests.length - 2}`}
+                                </span>
+                                <span className="material-symbols-outlined ml-auto">arrow_forward</span>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+            )}
 
             {/* Create Circle CTA */}
             <div className="px-4 pb-6">
