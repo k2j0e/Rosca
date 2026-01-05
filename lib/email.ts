@@ -5,11 +5,14 @@ let resendClient: Resend | null = null;
 
 function getResendClient(): Resend | null {
     if (!resendClient) {
-        if (!process.env.RESEND_API_KEY) {
+        const apiKey = process.env.RESEND_API_KEY;
+        console.log('[Email] RESEND_API_KEY exists:', !!apiKey, 'length:', apiKey?.length);
+
+        if (!apiKey) {
             console.error('[Email] RESEND_API_KEY not set');
             return null;
         }
-        resendClient = new Resend(process.env.RESEND_API_KEY);
+        resendClient = new Resend(apiKey);
     }
     return resendClient;
 }
