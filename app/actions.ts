@@ -267,6 +267,17 @@ export async function verifyOtpAction(formData: FormData): Promise<{ error?: str
     });
 
     // Handle Custom Redirect
+    // Logic: If user is NOT onboarded, they MUST go to onboarding first.
+    // We pass the intended redirectUrl to onboarding so they can go there after finishing.
+    if (!user.hasCompletedOnboarding) {
+        const onboardingUrl = redirectUrl
+            ? `/onboarding?redirect=${encodeURIComponent(redirectUrl)}`
+            : '/onboarding';
+        console.log('[verifyOtpAction] User requires onboarding. Redirecting to:', onboardingUrl);
+        redirect(onboardingUrl);
+    }
+
+    // If user IS onboarded, follow their intended destination
     if (redirectUrl) {
         console.log('[verifyOtpAction] Redirecting to custom URL:', redirectUrl);
         // Ensure strictly relative path for security
@@ -278,12 +289,8 @@ export async function verifyOtpAction(formData: FormData): Promise<{ error?: str
         }
     }
 
-    // Redirect based on onboarding status
-    if (user.hasCompletedOnboarding) {
-        redirect('/home');
-    } else {
-        redirect('/onboarding');
-    }
+    // Default for onboarded users
+    redirect('/home');
 }
 
 export async function checkUserExistsAction(rawPhone: string) {
