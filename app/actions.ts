@@ -52,7 +52,8 @@ export async function sendOtpAction(formData: FormData) {
     const validated = signInSchema.safeParse(rawData);
 
     if (!validated.success) {
-        redirect('/signin?error=invalid_phone');
+        const redirectUrl = formData.get('redirect') as string;
+        redirect(`/signin?error=invalid_phone${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
 
 
@@ -70,7 +71,8 @@ export async function sendOtpAction(formData: FormData) {
     const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
 
     if (!user) {
-        redirect('/signup?error=user_not_found');
+        const redirectUrl = formData.get('redirect') as string;
+        redirect(`/signup?error=user_not_found${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
 
     await prisma.user.update({
@@ -157,7 +159,7 @@ export async function sendEmailOtpAction(formData: FormData) {
     const redirectUrl = formData.get('redirect') as string;
 
     if (!email || !email.includes('@')) {
-        redirect('/signin?error=invalid_email');
+        redirect(`/signin?error=invalid_email${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
 
     // For test email, create user if doesn't exist (for easy testing)
