@@ -22,7 +22,8 @@ export async function sendEmailOtp(email: string, code: string): Promise<{ succe
             return { success: false, error: 'Email service not configured' };
         }
 
-        const fromEmail = process.env.EMAIL_FROM || 'Orbit <onboarding@resend.dev>';
+        // Use Resend sandbox email for testing (works without domain verification)
+        const fromEmail = 'Orbit <onboarding@resend.dev>';
         console.log('[sendEmailOtp] Sending to:', email, 'from:', fromEmail);
 
         const { error, data } = await resend.emails.send({
