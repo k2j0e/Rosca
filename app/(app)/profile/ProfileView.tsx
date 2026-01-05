@@ -48,7 +48,7 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
             <div className="flex items-center px-4 py-3 justify-between sticky top-0 z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
                 <div className="w-10"></div>
                 <h2 className="text-text-main dark:text-white text-[17px] font-bold tracking-tight">
-                    Trust Passport
+                    Your Saving Journey
                 </h2>
                 <div className="p-2 -mr-2 text-text-sub dark:text-text-sub-dark">
                     <ExplainRoscaTrigger variant="icon" />
@@ -109,10 +109,10 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                 {/* Trust Statement */}
                 <div className="mb-8 text-center px-2">
                     <h3 className="text-xl font-bold text-text-main dark:text-white mb-2 leading-tight">
-                        Trust Score: {user?.trustScore || 100}
+                        Saving Consistency
                     </h3>
                     <p className="text-text-sub dark:text-text-sub-dark/80 text-[15px] leading-relaxed">
-                        Your consistent support helps your circle thrive.
+                        Your steady contributions make a difference to your community.
                     </p>
                 </div>
 
@@ -152,7 +152,7 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                     <div className="flex flex-col">
                         <span className="font-bold text-text-main dark:text-white text-[15px] mb-0.5">Community Supporter</span>
                         <p className="text-[13px] text-text-sub dark:text-text-sub-dark leading-snug">
-                            You supported others <span className="font-bold text-amber-600 dark:text-amber-500">{stats.supportCount} times</span> before taking your own payout.
+                            You contributed <span className="font-bold text-amber-600 dark:text-amber-500">{stats.supportCount} times</span> before receiving your turn.
                         </p>
                     </div>
                 </div>

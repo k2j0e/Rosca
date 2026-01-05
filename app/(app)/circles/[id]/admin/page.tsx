@@ -48,7 +48,7 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                     </span>
                 </Link>
                 <h2 className="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
-                    Admin Tools
+                    Coordinator Tools
                 </h2>
                 <div className="w-12"></div>
             </div>
@@ -115,7 +115,7 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                                 <p className="font-bold text-sm truncate">{member.name}</p>
                                 <p className="text-xs text-text-sub dark:text-text-sub-dark">
                                     Slot #{member.payoutMonth || '—'}
-                                    {member.role === 'admin' && <span className="ml-1 text-primary">• Admin</span>}
+                                    {member.role === 'admin' && <span className="ml-1 text-primary">• Coordinator</span>}
                                 </p>
                             </div>
                             <div className="flex items-center gap-2">

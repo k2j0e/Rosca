@@ -30,7 +30,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                         </div>
                         <div className="flex flex-col">
                             <span className="font-bold text-sm">Circle Created!</span>
-                            <span className="text-xs text-white/90">Invite your friends to get started.</span>
+                            <span className="text-xs text-white/90">Invite your community to start saving together.</span>
                         </div>
                     </div>
                 </div>
@@ -55,17 +55,20 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                 </span>
                 {circle.status === 'recruiting' && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-bold text-blue-700 dark:text-blue-400">
-                        Recruiting
+                        Accepting Members
                     </span>
                 )}
             </div>
 
             <div className="flex flex-col items-center mt-4 mb-2">
                 <span className="text-text-sub dark:text-text-sub-dark text-lg font-medium">
-                    Monthly Pot
+                    Circle Savings
                 </span>
                 <span className="text-[48px] font-extrabold text-primary leading-none tracking-tight">
                     ${circle.payoutTotal.toLocaleString()}
+                </span>
+                <span className="text-text-sub dark:text-text-sub-dark text-sm mt-1">
+                    per round
                 </span>
             </div>
 
@@ -91,7 +94,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                         {circle.duration}
                     </span>
                     <span className="text-text-sub dark:text-text-sub-dark text-[10px]">
-                        Wait Rounds
+                        rounds
                     </span>
                 </div>
                 <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-sm">
@@ -120,12 +123,17 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                         </span>
                     </summary>
                     <div className="px-4 pb-4 leading-relaxed text-sm text-text-sub dark:text-text-sub-dark">
-                        <p className="mb-2">{circle.description}</p>
-                        <ul className="list-disc pl-4 space-y-1">
-                            <li>{circle.maxMembers} members contribute ${circle.amount.toLocaleString()} {circle.frequency}.</li>
-                            <li>One member receives the total pot of ${circle.payoutTotal.toLocaleString()} each round.</li>
-                            <li>Order is determined by the Admin before starting.</li>
-                        </ul>
+                        <p className="mb-3">{circle.description}</p>
+                        <div className="bg-white dark:bg-surface-dark rounded-xl p-3 border border-gray-100 dark:border-gray-800">
+                            <p className="text-xs text-text-main dark:text-white font-medium mb-2">
+                                Some members receive their savings sooner. Others save steadily. Everyone contributes equally.
+                            </p>
+                            <ul className="list-disc pl-4 space-y-1 text-xs">
+                                <li>{circle.maxMembers} members commit to ${circle.amount.toLocaleString()} {circle.frequency}.</li>
+                                <li>Each round, one member receives ${circle.payoutTotal.toLocaleString()}.</li>
+                                <li>Turn order is coordinated by the circle admin before starting.</li>
+                            </ul>
+                        </div>
                     </div>
                 </details>
             </div>
@@ -158,7 +166,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                             {(() => {
                                 const start = new Date(circle.startDate);
                                 const monthsToAdd = circle.frequency === 'monthly' ? circle.duration :
-                                    circle.frequency === 'weekly' ? circle.duration / 4 : circle.duration; // Approximate
+                                    circle.frequency === 'weekly' ? circle.duration / 4 : circle.duration;
                                 const end = new Date(start);
                                 if (circle.frequency === 'monthly') end.setMonth(start.getMonth() + circle.duration);
                                 else if (circle.frequency === 'weekly') end.setDate(start.getDate() + (circle.duration * 7));
@@ -172,9 +180,9 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                         admin_panel_settings
                     </span>
                     <div className="flex flex-col">
-                        <span className="font-bold text-blue-900 dark:text-blue-300 text-sm">Admin Curated</span>
+                        <span className="font-bold text-blue-900 dark:text-blue-300 text-sm">Coordinator Managed</span>
                         <span className="text-blue-700 dark:text-blue-400 text-xs mt-0.5 leading-snug">
-                            Payout slots are assigned by the Admin based on need and reputation.
+                            Turn order is assigned by the circle coordinator based on member preferences and needs.
                         </span>
                     </div>
                 </div>
@@ -183,7 +191,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
             {/* Admin/Creator Profile */}
             <div className="flex flex-col px-4 mb-4">
                 <h3 className="text-text-main dark:text-white font-bold text-lg mb-3">
-                    Meet the Stewards
+                    Circle Coordinator
                 </h3>
                 {circle.members.filter(m => m.role === 'admin').map(admin => (
                     <div key={admin.userId} className="flex gap-4 items-start p-4 rounded-2xl bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-800 shadow-sm">
@@ -194,10 +202,10 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                         <div className="flex flex-col gap-1">
                             <div className="flex items-center gap-1.5">
                                 <span className="font-bold text-text-main dark:text-white">{admin.name}</span>
-                                <span className="bg-primary/10 text-primary text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md">Admin</span>
+                                <span className="bg-primary/10 text-primary text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md">Coordinator</span>
                             </div>
                             <p className="text-text-sub dark:text-text-sub-dark text-xs italic">
-                                "{circle.description || 'Join us to reach your goals!'}"
+                                "{circle.description || 'Join us to reach your saving goals together!'}"
                             </p>
                         </div>
                     </div>
@@ -213,7 +221,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                         <InviteButton
                             circleId={circle.id}
                             circleName={circle.name}
-                            text="Share Invite Link"
+                            text="Share Invite"
                             className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark flex gap-2 items-center justify-center"
                         />
                     </div>
@@ -226,7 +234,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     ) : (
                         <Link href={`/circles/${circle.id}/join`} className="flex-[2]">
                             <button className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-orange-600 transition shadow-lg shadow-primary/25">
-                                Request to Join
+                                Request to Participate
                             </button>
                         </Link>
                     )}

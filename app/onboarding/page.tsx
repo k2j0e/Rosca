@@ -38,7 +38,7 @@ function OnboardingContent() {
     const redirectUrl = searchParams.get('redirect');
     const totalSteps = 5;
 
-    const potValue = useCounter(1000, 1500, step === 2);
+    const savingsValue = useCounter(1000, 1500, step === 2);
     const monthlyValue = useCounter(100, 1000, step === 2);
 
     const handleNext = () => {
@@ -56,39 +56,39 @@ function OnboardingContent() {
 
     const screens = [
         {
-            title: "Save together.\nAccess cash.\nNo interest.",
-            subtitle: "A trusted group helps each other reach goals — without banks or debt."
+            title: "Freedom starts\nwith saving.\nTogether.",
+            subtitle: "A trusted community helps each other reach goals — without banks, debt, or interest."
         },
         {
-            title: "How it works in 3 steps:",
+            title: "How it works:",
             content: (
                 <div className="flex flex-col gap-6 mt-4 w-full">
                     {/* Step 1 */}
                     <div className="flex gap-4 items-center animate-in slide-in-from-right-4 fade-in duration-500 delay-100 fill-mode-forwards opacity-0" style={{ animationFillMode: 'forwards' }}>
                         <div className="size-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg">1</div>
-                        <p className="text-left text-gray-700 dark:text-gray-300 font-medium">Join a savings circle with people you trust.</p>
+                        <p className="text-left text-gray-700 dark:text-gray-300 font-medium">Commit to a savings circle with people you trust.</p>
                     </div>
                     {/* Step 2 */}
                     <div className="flex gap-4 items-center animate-in slide-in-from-right-4 fade-in duration-500 delay-300 fill-mode-forwards opacity-0" style={{ animationFillMode: 'forwards' }}>
                         <div className="size-10 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-lg">2</div>
-                        <p className="text-left text-gray-700 dark:text-gray-300 font-medium">Everyone contributes the same amount perfectly.</p>
+                        <p className="text-left text-gray-700 dark:text-gray-300 font-medium">Everyone contributes the same amount on a regular schedule.</p>
                     </div>
                     {/* Step 3 */}
                     <div className="flex gap-4 items-center animate-in slide-in-from-right-4 fade-in duration-500 delay-500 fill-mode-forwards opacity-0" style={{ animationFillMode: 'forwards' }}>
                         <div className="size-10 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center font-bold text-lg">3</div>
-                        <p className="text-left text-gray-700 dark:text-gray-300 font-medium">One person takes the full pot each month — everyone gets a turn.</p>
+                        <p className="text-left text-gray-700 dark:text-gray-300 font-medium">Each round, one member receives the circle's savings — everyone takes a turn.</p>
                     </div>
                 </div>
             )
         },
         {
-            title: "Real Simple Math",
+            title: "Simple Math",
             content: (
                 <div className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-6 mt-4 w-full text-center">
                     <div className="grid grid-cols-3 gap-2 mb-4">
                         <div className="flex flex-col">
                             <span className="text-2xl font-bold">10</span>
-                            <span className="text-[10px] uppercase text-gray-500">People</span>
+                            <span className="text-[10px] uppercase text-gray-500">Members</span>
                         </div>
                         <div className="flex flex-col border-x border-gray-200 dark:border-gray-700">
                             <span className="text-2xl font-bold">${monthlyValue}</span>
@@ -101,10 +101,10 @@ function OnboardingContent() {
                     </div>
                     <div className="h-px w-full bg-gray-200 dark:bg-gray-700 my-4"></div>
                     <p className="text-lg font-medium text-gray-600 dark:text-gray-300">
-                        Each month, one person gets <span className="font-black text-primary text-xl">${potValue}</span>.
+                        Each round, one member receives <span className="font-black text-primary text-xl">${savingsValue}</span>.
                     </p>
                     <p className="text-xs text-gray-400 mt-2">
-                        By the end, everyone has received exactly what they put in. Simple.
+                        By the end, everyone has received exactly what they contributed. Fair and simple.
                     </p>
                 </div>
             )
@@ -113,35 +113,38 @@ function OnboardingContent() {
             title: "Your Money, Your Control",
             content: (
                 <div className="flex flex-col gap-4 mt-2 w-full">
-                    <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 p-4 rounded-xl flex gap-3 text-left animate-in slide-in-from-bottom-4 fade-in duration-500 delay-100">
-                        <span className="material-symbols-outlined text-red-500 shrink-0">no_accounts</span>
+                    <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 p-4 rounded-xl flex gap-3 text-left animate-in slide-in-from-bottom-4 fade-in duration-500 delay-100">
+                        <span className="material-symbols-outlined text-amber-600 shrink-0">info</span>
                         <div>
-                            <h4 className="font-bold text-red-900 dark:text-red-400 text-sm">Non-Custodial</h4>
-                            <p className="text-xs text-red-800 dark:text-red-300/80">
-                                This app <span className="underline">never holds your money</span>. Payments happen directly between members via Zelle, CashApp, or Venmo.
+                            <h4 className="font-bold text-amber-900 dark:text-amber-400 text-sm">Non-Custodial</h4>
+                            <p className="text-xs text-amber-800 dark:text-amber-300/80">
+                                This app <span className="underline">never holds your money</span>. Contributions happen directly between members via your preferred payment method.
                             </p>
                         </div>
                     </div>
                     <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 p-4 rounded-xl flex gap-3 text-left animate-in slide-in-from-bottom-4 fade-in duration-500 delay-300">
                         <span className="material-symbols-outlined text-blue-500 shrink-0">visibility</span>
                         <div>
-                            <h4 className="font-bold text-blue-900 dark:text-blue-400 text-sm">Member Governed</h4>
+                            <h4 className="font-bold text-blue-900 dark:text-blue-400 text-sm">Community Governed</h4>
                             <p className="text-xs text-blue-800 dark:text-blue-300/80">
-                                Circle admins verify payments. Everything is transparent to the group.
+                                Circle coordinators verify contributions. Everything is transparent to the community.
                             </p>
                         </div>
                     </div>
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2 italic">
+                        "You're not risking money — you're choosing when you receive it."
+                    </p>
                 </div>
             )
         },
         {
-            title: "Why join a circle?",
+            title: "Why save together?",
             content: (
                 <div className="grid grid-cols-2 gap-3 mt-4 w-full">
-                    <BenefitCard icon="savings" label="Force Savings" delay={0} />
-                    <BenefitCard icon="credit_score" label="No Interest" delay={100} />
-                    <BenefitCard icon="bolt" label="Cash Sooner" delay={200} />
-                    <BenefitCard icon="diversity_3" label="Support Friends" delay={300} />
+                    <BenefitCard icon="savings" label="Build Discipline" delay={0} />
+                    <BenefitCard icon="credit_score" label="Zero Interest" delay={100} />
+                    <BenefitCard icon="calendar_month" label="Choose Your Turn" delay={200} />
+                    <BenefitCard icon="diversity_3" label="Support Community" delay={300} />
                 </div>
             )
         }
@@ -167,7 +170,7 @@ function OnboardingContent() {
                 {step === 1 && (
                     // Orbit Animation
                     <div className="relative size-64 flex items-center justify-center animate-in fade-in duration-500">
-                        {/* Center Pot */}
+                        {/* Center Circle */}
                         <div className="absolute size-20 rounded-full bg-primary/20 flex items-center justify-center z-10 shadow-lg shadow-primary/20">
                             <span className="material-symbols-outlined text-4xl text-primary">savings</span>
                         </div>
@@ -189,7 +192,7 @@ function OnboardingContent() {
                     </div>
                 )}
 
-                {/* Other Images for Step 3, 4, 5 (reusing static or implementing simpler visuals) */}
+                {/* Other Images for Step 3, 4, 5 */}
                 {step > 1 && (
                     <Image
                         src={step === 2

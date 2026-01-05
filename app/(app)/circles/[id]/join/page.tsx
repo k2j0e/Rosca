@@ -38,17 +38,17 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
 
             <div className="px-6 py-4 flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold leading-tight mb-2">
-                    Confirm your commitment
+                    Confirm Your Commitment
                 </h1>
                 <p className="text-text-sub dark:text-text-sub-dark text-sm max-w-xs">
-                    Review the details for <span className="font-bold text-text-main dark:text-white">{circle.name}</span> before joining.
+                    Review the details for <span className="font-bold text-text-main dark:text-white">{circle.name}</span> before committing.
                 </p>
             </div>
 
             {/* Hero Value Card */}
             <div className="px-4 mb-6">
                 <div className="bg-primary p-6 rounded-3xl text-white shadow-xl shadow-primary/20 flex flex-col items-center">
-                    <p className="text-white/80 font-medium text-sm mb-1 uppercase tracking-wide">Total Payout</p>
+                    <p className="text-white/80 font-medium text-sm mb-1 uppercase tracking-wide">Circle Savings</p>
                     <span className="text-5xl font-extrabold tracking-tight mb-4">${circle.payoutTotal.toLocaleString()}</span>
 
                     <div className="w-full h-px bg-white/20 mb-4"></div>
@@ -56,11 +56,11 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
                     <div className="grid grid-cols-2 gap-8 w-full">
                         <div className="flex flex-col items-center border-r border-white/20">
                             <span className="text-2xl font-bold">${circle.amount}</span>
-                            <span className="text-white/80 text-xs">{circle.frequency}</span>
+                            <span className="text-white/80 text-xs">{circle.frequency} contribution</span>
                         </div>
                         <div className="flex flex-col items-center">
                             <span className="text-2xl font-bold">{circle.duration}</span>
-                            <span className="text-white/80 text-xs">Rounds</span>
+                            <span className="text-white/80 text-xs">rounds</span>
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
                     <div>
                         <h3 className="font-bold text-text-main dark:text-white">Starts {new Date(circle.startDate).toLocaleDateString()}</h3>
                         <p className="text-sm text-text-sub dark:text-text-sub-dark leading-snug">
-                            First payment is due on this date. Late payments affect your trust score.
+                            Your first contribution is due on this date. Consistent contributions build trust within your community.
                         </p>
                     </div>
                 </div>
@@ -85,9 +85,9 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
                         <span className="material-symbols-outlined">lock_clock</span>
                     </div>
                     <div>
-                        <h3 className="font-bold text-text-main dark:text-white">Duration: {circle.duration} Months</h3>
+                        <h3 className="font-bold text-text-main dark:text-white">Duration: {circle.duration} Rounds</h3>
                         <p className="text-sm text-text-sub dark:text-text-sub-dark leading-snug">
-                            You are committing to the full cycle. Early exit requires finding a replacement.
+                            You are committing to the full saving cycle. This ensures everyone receives their turn.
                         </p>
                     </div>
                 </div>
@@ -98,13 +98,13 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
                 <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 dark:border-white/10 has-[:checked]:border-primary transition-colors cursor-pointer mb-4">
                     <input type="checkbox" className="mt-1 w-5 h-5 accent-primary rounded-md" />
                     <span className="text-sm text-text-sub dark:text-text-sub-dark leading-snug">
-                        I understand that this is a financial commitment to my community. I agree to the <span className="font-bold text-text-main dark:text-white underline">Rules</span>.
+                        I understand that this is a shared saving commitment, and that members take turns accessing the group's savings. I agree to the <span className="font-bold text-text-main dark:text-white underline">Circle Rules</span>.
                     </span>
                 </label>
 
                 <Link href={`/circles/${circle.id}/join/intent`}>
                     <button className="w-full h-14 bg-text-main dark:bg-white text-white dark:text-text-main font-bold text-lg rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all">
-                        Confirm & Join
+                        Commit to This Circle
                         <span className="material-symbols-outlined">check_circle</span>
                     </button>
                 </Link>

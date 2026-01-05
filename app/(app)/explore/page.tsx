@@ -21,8 +21,8 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
                             <span className="material-symbols-outlined text-xl">check</span>
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-bold text-sm">Request Sent</span>
-                            <span className="text-xs text-white/90">Your join request is pending approval.</span>
+                            <span className="font-bold text-sm">Request Submitted</span>
+                            <span className="text-xs text-white/90">The circle coordinator will review your request.</span>
                         </div>
                     </div>
                 </div>
@@ -32,7 +32,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
             <div className="flex flex-col gap-2 bg-background-light dark:bg-background-dark p-4 pb-0 sticky top-0 z-20">
                 <div className="flex items-center justify-between">
                     <p className="text-text-main dark:text-text-main-dark tracking-tight text-[28px] font-bold leading-tight">
-                        Explore Circles
+                        Find Your Circle
                     </p>
                     <div className="flex items-center gap-2">
                         <button className="text-text-main dark:text-text-main-dark transition-colors hover:text-primary p-1">
@@ -57,7 +57,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
                         </div>
                         <input
                             className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-text-main dark:text-text-main-dark focus:outline-0 focus:ring-0 border-none bg-transparent focus:border-none h-full placeholder:text-text-sub dark:placeholder:text-text-sub-dark px-4 rounded-l-none pl-2 text-base font-normal leading-normal"
-                            placeholder="Try 'Travel' or 'Under $200'"
+                            placeholder="Search by goal or contribution..."
                             defaultValue=""
                         />
                         <div className="text-primary flex border-none items-center justify-center pr-4 rounded-r-xl cursor-pointer">
@@ -71,7 +71,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
             <div className="flex gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
                 <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
                     <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Budget
+                        Contribution
                     </p>
                     <span className="material-symbols-outlined text-lg">expand_more</span>
                 </button>
@@ -86,12 +86,12 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
                 </button>
                 <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
                     <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Emergency
+                        Goals
                     </p>
                 </button>
                 <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
                     <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Business
+                        Community
                     </p>
                 </button>
             </div>
@@ -108,7 +108,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
                     <Link href="/create/financials">
                         <button className="flex items-center gap-2 px-4 py-2 bg-text-main dark:bg-white text-white dark:text-text-main rounded-full text-sm font-bold shadow-md">
                             <span className="material-symbols-outlined text-[18px]">add</span>
-                            Create New Circle
+                            Start a Saving Circle
                         </button>
                     </Link>
                 </div>
