@@ -3,34 +3,27 @@
 
 import Link from "next/link";
 import { verifyOtpAction, resendOtpAction } from "@/app/actions";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState, useEffect, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useState, useRef, useTransition } from "react";
 
 function VerifyForm() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const phone = searchParams.get("phone") || "";
-    const errorParam = searchParams.get("error");
 
     const [code, setCode] = useState("");
-    const [error, setError] = useState<string | null>(errorParam);
+    const [error, setError] = useState<string | null>(null);
     const [isResending, setIsResending] = useState(false);
     const [resendSuccess, setResendSuccess] = useState(false);
+    const [isPending, startTransition] = useTransition();
     const inputRef = useRef<HTMLInputElement>(null);
 
     // Error messages
     const errorMap: Record<string, string> = {
         'invalid_code': 'Invalid or expired code. Please try again.',
         'invalid_code_format': 'Code must be 6 digits.',
+        'resend_failed': 'Failed to resend code. Please try again.',
     };
-
-    // Clear code and focus input when there's an error
-    useEffect(() => {
-        if (errorParam) {
-            setCode("");
-            setError(errorParam);
-            inputRef.current?.focus();
-        }
-    }, [errorParam]);
 
     // Handle code input change
     const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,6 +31,32 @@ function VerifyForm() {
         setCode(value);
         // Clear error when user starts typing
         if (error) setError(null);
+    };
+
+    // Handle form submission
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (code.length !== 6) {
+            setError('invalid_code_format');
+            return;
+        }
+
+        startTransition(async () => {
+            const formData = new FormData();
+            formData.append('phone', phone);
+            formData.append('code', code);
+
+            const result = await verifyOtpAction(formData);
+
+            // If we get here with an error, show it and clear the code
+            if (result?.error) {
+                setError(result.error);
+                setCode("");
+                inputRef.current?.focus();
+            }
+            // If success, the action will redirect automatically
+        });
     };
 
     // Handle resend code
@@ -82,9 +101,7 @@ function VerifyForm() {
                 </div>
             )}
 
-            <form action={verifyOtpAction} className="flex flex-col gap-6">
-                <input type="hidden" name="phone" value={phone} />
-                <input type="hidden" name="code" value={code} />
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                     <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Verification Code</label>
                     <input
@@ -98,16 +115,17 @@ function VerifyForm() {
                         autoComplete="one-time-code"
                         inputMode="numeric"
                         autoFocus
-                        className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300"
+                        disabled={isPending}
+                        className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-mono text-3xl tracking-[0.5em] text-center focus:outline-none focus:border-primary transition-colors placeholder:text-gray-300 disabled:opacity-50"
                     />
                 </div>
 
                 <button
                     type="submit"
-                    disabled={code.length !== 6}
+                    disabled={code.length !== 6 || isPending}
                     className="mt-4 w-full h-14 bg-primary text-white font-bold text-lg rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Verify
+                    {isPending ? 'Verifying...' : 'Verify'}
                 </button>
             </form>
 
@@ -117,7 +135,7 @@ function VerifyForm() {
                 <button
                     type="button"
                     onClick={handleResendCode}
-                    disabled={isResending}
+                    disabled={isResending || isPending}
                     className="text-primary font-bold text-sm hover:underline disabled:opacity-50"
                 >
                     {isResending ? 'Sending...' : 'Resend Code'}

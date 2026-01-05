@@ -127,7 +127,7 @@ export async function resendOtpAction(formData: FormData) {
     return { success: true };
 }
 
-export async function verifyOtpAction(formData: FormData) {
+export async function verifyOtpAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
     const { verifyOtpSchema } = await import("@/lib/schemas");
     const { prisma } = await import("@/lib/db");
 
@@ -136,14 +136,13 @@ export async function verifyOtpAction(formData: FormData) {
         code: formData.get('code') as string
     };
 
-    // Debug: Log received data
     console.log('[verifyOtpAction] Raw data received:', { phone: rawData.phone, codeLength: rawData.code?.length, code: rawData.code });
 
     const validated = verifyOtpSchema.safeParse(rawData);
 
     if (!validated.success) {
         console.log('[verifyOtpAction] Validation failed:', validated.error.issues);
-        redirect(`/signin/verify?phone=${rawData.phone}&error=invalid_code_format`);
+        return { error: 'invalid_code_format' };
     }
 
     const { phone, code } = validated.data;
@@ -151,7 +150,7 @@ export async function verifyOtpAction(formData: FormData) {
     const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
 
     if (!user || user.otpCode !== code || !user.otpExpiresAt || user.otpExpiresAt < new Date()) {
-        redirect(`/signin/verify?phone=${phone}&error=invalid_code`);
+        return { error: 'invalid_code' };
     }
 
     // Success: Clear OTP and Set Session
