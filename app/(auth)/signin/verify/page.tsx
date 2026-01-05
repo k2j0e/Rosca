@@ -84,14 +84,13 @@ function VerifyForm() {
 
             <form action={verifyOtpAction} className="flex flex-col gap-6">
                 <input type="hidden" name="phone" value={phone} />
+                <input type="hidden" name="code" value={code} />
                 <div className="flex flex-col gap-2">
                     <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Verification Code</label>
                     <input
                         ref={inputRef}
                         type="text"
-                        name="code"
                         id="otp-input"
-                        required
                         maxLength={6}
                         value={code}
                         onChange={handleCodeChange}
