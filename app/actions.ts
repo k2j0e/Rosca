@@ -136,9 +136,13 @@ export async function verifyOtpAction(formData: FormData) {
         code: formData.get('code') as string
     };
 
+    // Debug: Log received data
+    console.log('[verifyOtpAction] Raw data received:', { phone: rawData.phone, codeLength: rawData.code?.length, code: rawData.code });
+
     const validated = verifyOtpSchema.safeParse(rawData);
 
     if (!validated.success) {
+        console.log('[verifyOtpAction] Validation failed:', validated.error.issues);
         redirect(`/signin/verify?phone=${rawData.phone}&error=invalid_code_format`);
     }
 
