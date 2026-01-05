@@ -39,6 +39,10 @@ export async function sendOtpAction(formData: FormData) {
     const { sendSms, generateOtp } = await import("@/lib/sms");
     const { prisma } = await import("@/lib/db");
 
+    // Test phone bypass
+    const TEST_PHONE = '+15551234567';
+    const TEST_CODE = '123456';
+
     const rawPhone = formData.get('phone') as string;
     // Normalize: If no '+', assume US (+1) because UI shows +1 prefix hardcoded
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
@@ -71,10 +75,16 @@ export async function sendOtpAction(formData: FormData) {
     await prisma.user.update({
         where: { id: user.id },
         data: {
-            otpCode: otp,
+            otpCode: phone === TEST_PHONE ? TEST_CODE : otp,
             otpExpiresAt: expiresAt
         }
     });
+
+    // Skip SMS for test phone
+    if (phone === TEST_PHONE) {
+        console.log('[TEST MODE] Skipping SMS for test phone. Use code:', TEST_CODE);
+        redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
+    }
 
     // Send SMS
     const smsResult = await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
@@ -582,6 +592,10 @@ export async function beginSignupAction(formData: FormData) {
     // Normalize: If no '+', assume US (+1)
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
 
+    // Test phone bypass
+    const TEST_PHONE = '+15551234567';
+    const TEST_CODE = '123456';
+
     const { sendSms, generateOtp } = await import("@/lib/sms");
     const { prisma } = await import("@/lib/db");
     const { registerUser, findUserByPhone } = await import("@/lib/data");
@@ -594,7 +608,7 @@ export async function beginSignupAction(formData: FormData) {
         return { error: 'Account already exists. Please sign in instead.', shouldSignIn: true };
     }
 
-    const otp = generateOtp();
+    const otp = phone === TEST_PHONE ? TEST_CODE : generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     if (existing) {
@@ -634,6 +648,12 @@ export async function beginSignupAction(formData: FormData) {
                 email: email
             }
         });
+    }
+
+    // Skip SMS for test phone
+    if (phone === TEST_PHONE) {
+        console.log('[TEST MODE] Skipping SMS for test phone. Use code:', TEST_CODE);
+        return { success: true };
     }
 
     // Send SMS
