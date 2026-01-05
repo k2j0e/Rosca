@@ -44,6 +44,7 @@ export async function sendOtpAction(formData: FormData) {
     const TEST_CODE = '123456';
 
     const rawPhone = formData.get('phone') as string;
+    const redirectUrl = formData.get('redirect') as string;
     // Normalize: If no '+', assume US (+1) because UI shows +1 prefix hardcoded
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
 
@@ -88,7 +89,7 @@ export async function sendOtpAction(formData: FormData) {
             data: { hasCompletedOnboarding: false }
         });
         console.log('[TEST MODE] Skipping SMS for test phone. Use code:', TEST_CODE);
-        redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
+        redirect(`/signin/verify?phone=${encodeURIComponent(phone)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
 
     // Send SMS
@@ -105,7 +106,7 @@ export async function sendOtpAction(formData: FormData) {
 
     // Redirect to verify page (we need to pass phone via query param or hidden state)
     // Ideally we shouldn't expose phone in URL but for MVP it's fine.
-    redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
+    redirect(`/signin/verify?phone=${encodeURIComponent(phone)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
 }
 
 // Resend OTP without redirecting - for use in verify page
@@ -153,6 +154,7 @@ export async function sendEmailOtpAction(formData: FormData) {
     const TEST_CODE = '123456';
 
     const email = (formData.get('email') as string)?.toLowerCase().trim();
+    const redirectUrl = formData.get('redirect') as string;
 
     if (!email || !email.includes('@')) {
         redirect('/signin?error=invalid_email');
@@ -191,7 +193,7 @@ export async function sendEmailOtpAction(formData: FormData) {
             });
         }
         console.log('[TEST MODE] Skipping email for test account. Use code:', TEST_CODE);
-        redirect(`/signin/verify?email=${encodeURIComponent(email)}`);
+        redirect(`/signin/verify?email=${encodeURIComponent(email)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
 
     // Find user by email
@@ -219,7 +221,7 @@ export async function sendEmailOtpAction(formData: FormData) {
     }
 
     // Redirect to verify page with email param
-    redirect(`/signin/verify?email=${encodeURIComponent(email)}`);
+    redirect(`/signin/verify?email=${encodeURIComponent(email)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
 }
 
 export async function verifyOtpAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
@@ -227,9 +229,10 @@ export async function verifyOtpAction(formData: FormData): Promise<{ error?: str
 
     const phone = formData.get('phone') as string;
     const email = formData.get('email') as string;
+    const redirectUrl = formData.get('redirect') as string;
     const code = formData.get('code') as string;
 
-    console.log('[verifyOtpAction] Received:', { phone, email, codeLength: code?.length });
+    console.log('[verifyOtpAction] Received:', { phone, email, codeLength: code?.length, redirect: redirectUrl });
 
     // Validate code format
     if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
@@ -262,6 +265,11 @@ export async function verifyOtpAction(formData: FormData): Promise<{ error?: str
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax'
     });
+
+    // Handle Custom Redirect
+    if (redirectUrl) {
+        redirect(redirectUrl);
+    }
 
     // Redirect based on onboarding status
     if (user.hasCompletedOnboarding) {

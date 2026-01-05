@@ -10,6 +10,7 @@ function VerifyForm() {
     const searchParams = useSearchParams();
     const phone = searchParams.get("phone") || "";
     const email = searchParams.get("email") || "";
+    const redirectUrl = searchParams.get("redirect") || "";
 
     const [code, setCode] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -53,6 +54,7 @@ function VerifyForm() {
                 formData.append('phone', phone);
             }
             formData.append('code', code);
+            if (redirectUrl) formData.append('redirect', redirectUrl);
 
             const result = await verifyOtpAction(formData);
 

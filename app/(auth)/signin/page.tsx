@@ -10,6 +10,7 @@ type LoginMethod = 'phone' | 'email';
 function SignInForm() {
     const searchParams = useSearchParams();
     const error = searchParams.get("error");
+    const redirectUrl = searchParams.get("redirect");
     const [method, setMethod] = useState<LoginMethod>('phone');
 
     const errorMap: Record<string, string> = {
@@ -31,8 +32,8 @@ function SignInForm() {
                     type="button"
                     onClick={() => setMethod('phone')}
                     className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${method === 'phone'
-                            ? 'bg-white dark:bg-gray-800 text-text-main dark:text-white shadow-sm'
-                            : 'text-text-sub dark:text-text-sub-dark'
+                        ? 'bg-white dark:bg-gray-800 text-text-main dark:text-white shadow-sm'
+                        : 'text-text-sub dark:text-text-sub-dark'
                         }`}
                 >
                     Phone
@@ -41,8 +42,8 @@ function SignInForm() {
                     type="button"
                     onClick={() => setMethod('email')}
                     className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all ${method === 'email'
-                            ? 'bg-white dark:bg-gray-800 text-text-main dark:text-white shadow-sm'
-                            : 'text-text-sub dark:text-text-sub-dark'
+                        ? 'bg-white dark:bg-gray-800 text-text-main dark:text-white shadow-sm'
+                        : 'text-text-sub dark:text-text-sub-dark'
                         }`}
                 >
                     Email
@@ -57,6 +58,7 @@ function SignInForm() {
 
             {method === 'phone' ? (
                 <form action={sendOtpAction} className="flex flex-col gap-6">
+                    {redirectUrl && <input type="hidden" name="redirect" value={redirectUrl} />}
                     <div className="flex flex-col gap-2">
                         <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Mobile Number</label>
                         <div className="flex gap-3">
@@ -82,6 +84,7 @@ function SignInForm() {
                 </form>
             ) : (
                 <form action={sendEmailOtpAction} className="flex flex-col gap-6">
+                    {redirectUrl && <input type="hidden" name="redirect" value={redirectUrl} />}
                     <div className="flex flex-col gap-2">
                         <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Email Address</label>
                         <input

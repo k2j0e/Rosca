@@ -87,9 +87,18 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
                             Check it out
                         </button>
                     </Link>
-                    <p className="text-xs text-text-sub dark:text-text-sub-dark">
-                        You'll need to create a free account to join.
-                    </p>
+
+                    <div className="flex flex-col items-center gap-4 mt-6">
+                        <p className="text-xs text-text-sub dark:text-text-sub-dark">
+                            New to Orbit? You'll create a free account to join.
+                        </p>
+
+                        <Link href={`/signin?redirect=${encodeURIComponent(`/circles/${circle.id}/join`)}`}>
+                            <button className="text-primary font-bold text-sm hover:underline">
+                                Already have an account? Sign In
+                            </button>
+                        </Link>
+                    </div>
                 </div>
 
             </main>
