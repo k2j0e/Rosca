@@ -31,6 +31,98 @@ function useCounter(end: number, duration: number = 2000, trigger: boolean) {
     return count;
 }
 
+// Ledger Animation - shows money flowing from 9 members to 1 recipient
+function LedgerAnimation() {
+    const [currentRecipient, setCurrentRecipient] = useState(0);
+    const [showFlow, setShowFlow] = useState(false);
+    const members = ['Maria', 'James', 'Aisha', 'Carlos', 'Sarah', 'David', 'Priya', 'Michael', 'Lisa', 'Ahmed'];
+
+    useEffect(() => {
+        // Cycle through recipients every 3 seconds
+        const cycleInterval = setInterval(() => {
+            setShowFlow(false);
+            setTimeout(() => {
+                setCurrentRecipient(prev => (prev + 1) % 10);
+                setShowFlow(true);
+            }, 300);
+        }, 3000);
+
+        // Initial show
+        setTimeout(() => setShowFlow(true), 500);
+
+        return () => clearInterval(cycleInterval);
+    }, []);
+
+    return (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
+            <div className="w-full max-w-xs">
+                {/* Header */}
+                <div className="text-center mb-3">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Round {currentRecipient + 1} of 10</span>
+                </div>
+
+                {/* Member Grid */}
+                <div className="grid grid-cols-5 gap-2">
+                    {members.map((name, i) => {
+                        const isRecipient = i === currentRecipient;
+                        const isContributor = !isRecipient;
+
+                        return (
+                            <div
+                                key={i}
+                                className={`relative flex flex-col items-center transition-all duration-500 ${isRecipient ? 'scale-110 z-10' : 'scale-100'
+                                    }`}
+                            >
+                                {/* Avatar */}
+                                <div
+                                    className={`size-10 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${isRecipient
+                                        ? 'bg-primary text-white ring-2 ring-primary ring-offset-2 shadow-lg shadow-primary/30'
+                                        : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                                        }`}
+                                >
+                                    {name[0]}
+                                </div>
+
+                                {/* Money indicator */}
+                                <div
+                                    className={`mt-1 text-[10px] font-bold transition-all duration-300 ${showFlow
+                                        ? isRecipient
+                                            ? 'text-green-600 opacity-100'
+                                            : 'text-gray-400 opacity-100'
+                                        : 'opacity-0'
+                                        }`}
+                                >
+                                    {isRecipient ? '+$900' : '-$100'}
+                                </div>
+
+                                {/* Flow arrow for contributors */}
+                                {isContributor && showFlow && (
+                                    <div
+                                        className="absolute -top-1 left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-bottom-2 duration-500"
+                                        style={{ animationDelay: `${i * 50}ms` }}
+                                    >
+                                        <div className="size-3 rounded-full bg-primary/60 animate-ping"></div>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Total received indicator */}
+                <div className={`mt-4 text-center transition-all duration-500 ${showFlow ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="inline-flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-3 py-1.5 rounded-full">
+                        <span className="material-symbols-outlined text-green-600 text-sm">arrow_downward</span>
+                        <span className="text-sm font-bold text-green-700 dark:text-green-400">
+                            {members[currentRecipient]} receives <span className="text-green-600">$1,000</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function OnboardingContent() {
     const [step, setStep] = useState(0);
     const [isShimLoading, setIsShimLoading] = useState(false);
@@ -169,16 +261,9 @@ function OnboardingContent() {
                     </div>
                 )}
 
-                {/* Slide 5: Gradient background with animated pattern */}
+                {/* Slide 5: Animated Ledger showing money flow */}
                 {step === 4 && (
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-white dark:from-primary/20 dark:via-primary/10 dark:to-gray-900">
-                        {/* Animated breathing circles */}
-                        <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute top-1/4 left-1/4 size-40 rounded-full bg-primary/15 animate-breathing"></div>
-                            <div className="absolute bottom-1/3 right-1/4 size-28 rounded-full bg-primary/10 animate-breathing-delayed"></div>
-                            <div className="absolute top-1/2 right-1/3 size-20 rounded-full bg-primary/10 animate-breathing" style={{ animationDelay: '0.75s' }}></div>
-                        </div>
-                    </div>
+                    <LedgerAnimation />
                 )}
 
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white dark:to-black"></div>
