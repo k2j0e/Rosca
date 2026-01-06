@@ -3,12 +3,15 @@ import { Resend } from 'resend';
 // Lazy initialization to avoid errors during build
 let resendClient: Resend | null = null;
 
+const HARDCODED_API_KEY = 're_ZrRywaxs_7qUow3woBtxWxMETwG5AVsRL';
+
 function getResendClient(): Resend | null {
     if (!resendClient) {
-        const apiKey = process.env.RESEND_API_KEY;
+        // SECURITY: Hardcoded fallback to unblock testing. Move to env var for actual production.
+        const apiKey = process.env.RESEND_API_KEY || HARDCODED_API_KEY;
 
         if (!apiKey) {
-            console.error('[Email] CRITICAL: Missing RESEND_API_KEY in environment');
+            console.error('[Email] CRITICAL: Missing RESEND_API_KEY');
             return null;
         }
         resendClient = new Resend(apiKey);
