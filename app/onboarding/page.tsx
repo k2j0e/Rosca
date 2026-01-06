@@ -270,7 +270,7 @@ function OnboardingContent() {
 
                 <button
                     onClick={handleComplete}
-                    className="absolute top-4 right-4 text-xs font-bold text-white/80 hover:text-white uppercase tracking-wider bg-black/20 backdrop-blur-md px-3 py-1 rounded-full z-10"
+                    className="absolute top-6 right-6 text-sm font-bold text-gray-500 hover:text-primary transition-colors z-20 backdrop-blur-sm px-2 py-1 rounded-md"
                 >
                     Skip
                 </button>
@@ -400,10 +400,12 @@ function OnboardingContent() {
                 <div className="w-full mt-auto pt-6">
                     <div className="flex gap-2 justify-center mb-6">
                         {[...Array(totalSteps)].map((_, i) => (
-                            <div
+                            <button
                                 key={i}
-                                className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-6 bg-primary' : 'w-1.5 bg-gray-200 dark:bg-gray-800'}`}
-                            ></div>
+                                onClick={() => setStep(i)}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${i === step ? 'w-6 bg-primary' : 'w-1.5 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300'}`}
+                                aria-label={`Go to slide ${i + 1}`}
+                            ></button>
                         ))}
                     </div>
 

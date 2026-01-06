@@ -23,33 +23,102 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
 
     return (
         <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white">
-            {/* Progress Header */}
-            <div className="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
-                <Link href={`/circles/${circle.id}`} className="flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer">
-                    <span className="material-symbols-outlined text-[24px]">
-                        arrow_back
-                    </span>
+
+            {/* Hero Cover Image */}
+            <div className="relative w-full h-48 overflow-hidden">
+                {circle.coverImage ? (
+                    <img
+                        src={circle.coverImage}
+                        alt={circle.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 via-orange-100 to-amber-50 dark:from-primary/30 dark:via-orange-900/20 dark:to-amber-900/10" />
+                )}
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-background-light dark:to-background-dark" />
+
+                {/* Back Button */}
+                <Link
+                    href={`/circles/${circle.id}`}
+                    className="absolute top-4 left-4 flex size-10 items-center justify-center rounded-full bg-white/80 dark:bg-black/50 backdrop-blur-md shadow-lg hover:bg-white dark:hover:bg-black/70 transition-colors"
+                >
+                    <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                 </Link>
-                <div className="flex gap-1">
-                    <div className="w-16 h-1 rounded-full bg-primary overflow-hidden">
-                        <div className="w-1/2 h-full bg-primary"></div>
-                    </div>
-                    <div className="w-16 h-1 rounded-full bg-primary/20"></div>
+
+                {/* Progress indicator */}
+                <div className="absolute top-4 right-4 flex gap-1">
+                    <div className="w-8 h-1 rounded-full bg-white/80"></div>
+                    <div className="w-8 h-1 rounded-full bg-white/30"></div>
                 </div>
-                <div className="w-12"></div>
             </div>
 
-            <div className="px-6 py-4 flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold leading-tight mb-2">
-                    Confirm Your Commitment
-                </h1>
-                <p className="text-text-sub dark:text-text-sub-dark text-sm max-w-xs">
-                    Review the details for <span className="font-bold text-text-main dark:text-white">{circle.name}</span> before committing.
-                </p>
+            {/* Title Section */}
+            <div className="px-6 py-4 flex flex-col items-center text-center -mt-6 relative z-10">
+                <div className="bg-background-light dark:bg-background-dark rounded-2xl px-6 py-4 shadow-lg border border-gray-100 dark:border-white/5">
+                    <h1 className="text-xl font-bold leading-tight mb-1">
+                        {circle.name}
+                    </h1>
+                    <p className="text-text-sub dark:text-text-sub-dark text-sm">
+                        Confirm your commitment to join
+                    </p>
+                </div>
+            </div>
+
+            {/* Member Preview Strip (Option A) */}
+            <div className="px-6 py-3">
+                <div className="flex items-center justify-center gap-2">
+                    <div className="flex -space-x-2">
+                        {circle.members.slice(0, 4).map((member, i) => (
+                            <div
+                                key={member.userId}
+                                className="size-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold ring-2 ring-background-light dark:ring-background-dark"
+                                style={{ zIndex: 10 - i }}
+                            >
+                                {member.name?.[0]?.toUpperCase() || '?'}
+                            </div>
+                        ))}
+                        {circle.members.length === 0 && (
+                            <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-sm text-gray-400">person</span>
+                            </div>
+                        )}
+                    </div>
+                    <span className="text-sm text-text-sub dark:text-text-sub-dark">
+                        {circle.members.length > 0
+                            ? `Join ${circle.members.length} other${circle.members.length > 1 ? 's' : ''}`
+                            : 'Be the first to join!'
+                        }
+                    </span>
+                </div>
+            </div>
+
+            {/* Quick Stats Row (Option B) */}
+            <div className="px-4 mb-4">
+                <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-white dark:bg-surface-dark rounded-xl p-3 text-center border border-gray-100 dark:border-white/5">
+                        <span className="block text-lg font-bold text-text-main dark:text-white">
+                            {new Date(circle.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                        <span className="text-xs text-text-sub dark:text-text-sub-dark">Starts</span>
+                    </div>
+                    <div className="bg-white dark:bg-surface-dark rounded-xl p-3 text-center border border-gray-100 dark:border-white/5">
+                        <span className="block text-lg font-bold text-text-main dark:text-white">
+                            {circle.members.length}/{circle.maxMembers}
+                        </span>
+                        <span className="text-xs text-text-sub dark:text-text-sub-dark">Spots</span>
+                    </div>
+                    <div className="bg-white dark:bg-surface-dark rounded-xl p-3 text-center border border-gray-100 dark:border-white/5">
+                        <span className="block text-lg font-bold text-text-main dark:text-white">
+                            {circle.duration}
+                        </span>
+                        <span className="text-xs text-text-sub dark:text-text-sub-dark">Rounds</span>
+                    </div>
+                </div>
             </div>
 
             {/* Hero Value Card */}
-            <div className="px-4 mb-6">
+            <div className="px-4 mb-4">
                 <div className="bg-primary p-6 rounded-3xl text-white shadow-xl shadow-primary/20 flex flex-col items-center">
                     <p className="text-white/80 font-medium text-sm mb-1 uppercase tracking-wide">Circle Savings</p>
                     <span className="text-5xl font-extrabold tracking-tight mb-4">${circle.payoutTotal.toLocaleString()}</span>
@@ -69,31 +138,62 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
                 </div>
             </div>
 
-            {/* Details List */}
-            <div className="px-6 flex flex-col gap-6 mb-8">
-                <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 mt-1">
-                        <span className="material-symbols-outlined">calendar_month</span>
+            {/* How This Works Dropdown */}
+            <div className="px-4 mb-4">
+                <details className="group bg-gray-50 dark:bg-white/5 rounded-2xl overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                    <summary className="flex cursor-pointer items-center justify-between gap-1.5 p-4 text-text-main dark:text-white font-bold transition">
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-primary">info</span>
+                            <span>How this circle works</span>
+                        </div>
+                        <span className="material-symbols-outlined transition group-open:-rotate-180">
+                            expand_more
+                        </span>
+                    </summary>
+                    <div className="px-4 pb-4 leading-relaxed text-sm text-text-sub dark:text-text-sub-dark">
+                        <p className="mb-3">{circle.description || 'Join a community-driven savings circle where members support each other to reach financial goals.'}</p>
+                        <div className="bg-white dark:bg-surface-dark rounded-xl p-3 border border-gray-100 dark:border-gray-800">
+                            <ul className="list-disc pl-4 space-y-1 text-xs">
+                                <li>{circle.maxMembers} members commit to ${circle.amount.toLocaleString()} {circle.frequency}.</li>
+                                <li>Each round, one member receives ${circle.payoutTotal.toLocaleString()}.</li>
+                                <li>Turn order is coordinated by the admin before starting.</li>
+                            </ul>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="font-bold text-text-main dark:text-white">Starts {new Date(circle.startDate).toLocaleDateString()}</h3>
-                        <p className="text-sm text-text-sub dark:text-text-sub-dark leading-snug">
-                            Your first contribution is due on this date. Consistent contributions build trust within your community.
-                        </p>
-                    </div>
-                </div>
+                </details>
+            </div>
 
-                <div className="flex items-start gap-4">
-                    <div className="p-2 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 mt-1">
-                        <span className="material-symbols-outlined">lock_clock</span>
+            {/* Circle Coordinator - Emphasized */}
+            <div className="px-4 mb-6">
+                <h3 className="text-text-main dark:text-white font-bold text-base mb-3">Circle Coordinator</h3>
+                {circle.members.filter(m => m.role === 'admin').map(admin => (
+                    <div key={admin.userId} className="flex gap-4 items-center p-4 rounded-2xl bg-gradient-to-r from-primary/5 to-orange-50 dark:from-primary/10 dark:to-orange-900/10 border-2 border-primary/20 shadow-sm">
+                        <div
+                            className="w-14 h-14 rounded-full bg-gray-300 bg-cover bg-center shrink-0 ring-3 ring-primary shadow-lg"
+                            style={{ backgroundImage: admin.avatar ? `url("${admin.avatar}")` : undefined }}
+                        >
+                            {!admin.avatar && (
+                                <div className="w-full h-full rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold">
+                                    {admin.name?.[0]?.toUpperCase() || '?'}
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-1 flex-1">
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-text-main dark:text-white text-lg">{admin.name}</span>
+                                <span className="bg-primary text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">Coordinator</span>
+                            </div>
+                            <p className="text-text-sub dark:text-text-sub-dark text-sm">
+                                Manages this circle and assigns payout order
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="font-bold text-text-main dark:text-white">Duration: {circle.duration} Rounds</h3>
-                        <p className="text-sm text-text-sub dark:text-text-sub-dark leading-snug">
-                            You are committing to the full saving cycle. This ensures everyone receives their turn.
-                        </p>
+                ))}
+                {circle.members.filter(m => m.role === 'admin').length === 0 && (
+                    <div className="p-4 rounded-2xl bg-gray-50 dark:bg-white/5 text-center text-text-sub dark:text-text-sub-dark text-sm">
+                        Coordinator information will be available soon.
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Agreement Checkbox */}

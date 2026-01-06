@@ -80,7 +80,12 @@ export default function InviteTutorial({ params }: { params: { id: string } }) {
                 {/* Dots */}
                 <div className="flex gap-2 mb-12">
                     {slides.map((_, i) => (
-                        <div key={i} className={`h-2 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-primary' : 'w-2 bg-gray-200 dark:bg-gray-700'}`}></div>
+                        <button
+                            key={i}
+                            onClick={() => setStep(i)}
+                            className={`h-2 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-primary' : 'w-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300'}`}
+                            aria-label={`Go to step ${i + 1}`}
+                        ></button>
                     ))}
                 </div>
 

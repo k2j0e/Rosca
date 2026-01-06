@@ -133,7 +133,7 @@ export function JoinIntentForm({ circleId, circleName }: JoinIntentFormProps) {
                 <button
                     type="button"
                     onClick={() => router.push('/')}
-                    className="w-full py-3 text-text-sub dark:text-text-sub-dark font-bold hover:text-text-main dark:hover:text-white transition-colors"
+                    className="w-full py-3 text-text-sub dark:text-text-sub-dark font-bold hover:text-primary dark:hover:text-primary transition-colors uppercase text-sm tracking-wide"
                 >
                     Skip for now
                 </button>
