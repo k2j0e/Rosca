@@ -117,7 +117,7 @@ export default async function HomePage() {
 
             {/* Create Circle CTA */}
             <div className="px-4 pb-6">
-                <Link href="/create/details">
+                <Link href="/create/financials">
                     <div className="bg-gradient-to-r from-primary/10 to-orange-100 dark:from-primary/20 dark:to-orange-900/20 p-5 rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary/50 transition-colors cursor-pointer group">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">

@@ -23,7 +23,7 @@ export default function SideNav({ user }: SideNavProps) {
         { name: "Home", path: "/home", icon: "home" },
         { name: "Explore", path: "/explore", icon: "explore" },
         { name: "My Circles", path: "/my-circles", icon: "groups" },
-        { name: "Create Circle", path: "/create/schedule", icon: "add_circle" },
+        { name: "Create Circle", path: "/create/financials", icon: "add_circle" },
     ];
 
     const bottomItems = [
@@ -49,8 +49,8 @@ export default function SideNav({ user }: SideNavProps) {
                     return (
                         <Link key={item.path} href={item.path}>
                             <div className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${active
-                                    ? "bg-primary/10 text-primary font-bold"
-                                    : "text-text-sub dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-main dark:hover:text-white"
+                                ? "bg-primary/10 text-primary font-bold"
+                                : "text-text-sub dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-main dark:hover:text-white"
                                 }`}>
                                 <span
                                     className="material-symbols-outlined text-xl"
@@ -72,8 +72,8 @@ export default function SideNav({ user }: SideNavProps) {
                     return (
                         <Link key={item.path} href={item.path}>
                             <div className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${active
-                                    ? "bg-primary/10 text-primary font-bold"
-                                    : "text-text-sub dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-main dark:hover:text-white"
+                                ? "bg-primary/10 text-primary font-bold"
+                                : "text-text-sub dark:text-text-sub-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-main dark:hover:text-white"
                                 }`}>
                                 {user?.avatar ? (
                                     <img src={user.avatar} alt="" className="w-6 h-6 rounded-full object-cover" />

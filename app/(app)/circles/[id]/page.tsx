@@ -35,29 +35,71 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     </div>
                 </div>
             )}
-            {/* Sticky Header with Back Button */}
-            <div className="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
-                <div className="w-12"></div>
-                <div className="flex w-12 items-center justify-end">
-                    <span className="material-symbols-outlined text-text-sub dark:text-text-sub-dark hover:text-text-main transition-colors cursor-pointer">
-                        ios_share
-                    </span>
-                </div>
+
+            {/* Cover Image Header */}
+            <div className="relative w-full h-44 overflow-hidden">
+                {circle.coverImage ? (
+                    <img
+                        src={circle.coverImage}
+                        alt={circle.name}
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/20 via-orange-100 to-amber-50 dark:from-primary/30 dark:via-orange-900/20 dark:to-amber-900/10" />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-background-light dark:to-background-dark" />
+
+                {/* Share Button */}
+                <button className="absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/80 dark:bg-black/50 backdrop-blur-md shadow-lg">
+                    <span className="material-symbols-outlined text-[20px]">ios_share</span>
+                </button>
             </div>
 
             {/* Hero Section */}
-            <div className="flex flex-col gap-2 px-6 pt-2 pb-6 items-center">
-                <h1 className="text-center text-[32px] font-bold leading-tight tracking-[-0.015em] text-text-main dark:text-white">
-                    {circle.name}
-                </h1>
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 text-xs font-bold text-primary">
-                    {circle.category}
-                </span>
-                {circle.status === 'recruiting' && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-bold text-blue-700 dark:text-blue-400">
-                        Accepting Members
+            <div className="flex flex-col gap-2 px-6 pt-4 pb-4 items-center -mt-6 relative z-10">
+                <div className="bg-background-light dark:bg-background-dark rounded-2xl px-6 py-4 shadow-lg border border-gray-100 dark:border-white/5 text-center">
+                    <h1 className="text-2xl font-bold leading-tight tracking-[-0.015em] text-text-main dark:text-white mb-1">
+                        {circle.name}
+                    </h1>
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 text-xs font-bold text-primary">
+                            {circle.category}
+                        </span>
+                        {circle.status === 'recruiting' && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-bold text-blue-700 dark:text-blue-400">
+                                Accepting Members
+                            </span>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Member Preview Strip */}
+            <div className="px-6 py-2 mb-2">
+                <div className="flex items-center justify-center gap-3">
+                    <div className="flex -space-x-2">
+                        {circle.members.slice(0, 5).map((member, i) => (
+                            <div
+                                key={member.userId}
+                                className="size-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold ring-2 ring-background-light dark:ring-background-dark"
+                                style={{ zIndex: 10 - i, backgroundImage: member.avatar ? `url("${member.avatar}")` : undefined, backgroundSize: 'cover' }}
+                            >
+                                {!member.avatar && (member.name?.[0]?.toUpperCase() || '?')}
+                            </div>
+                        ))}
+                        {circle.members.length === 0 && (
+                            <div className="size-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-sm text-gray-400">person</span>
+                            </div>
+                        )}
+                    </div>
+                    <span className="text-sm text-text-sub dark:text-text-sub-dark">
+                        {circle.members.length > 0
+                            ? `${circle.members.length}/${circle.maxMembers} members`
+                            : 'Be the first to join!'
+                        }
                     </span>
-                )}
+                </div>
             </div>
 
             <div className="flex flex-col items-center mt-4 mb-2">
