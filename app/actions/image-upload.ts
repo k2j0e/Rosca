@@ -8,7 +8,7 @@ export async function getCloudinarySignature() {
         console.log('[Server Action] Generating Cloudinary Signature');
 
         // Read environment variables INSIDE the function (at request time)
-        const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+        const CLOUDINARY_URL = process.env.CLOUDINARY_URL || process.env.ROSCA_CLOUDINARY_URL;
 
         // Fallback: Try reading individual keys if URL is missing
         let cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME;
