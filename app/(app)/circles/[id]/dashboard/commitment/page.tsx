@@ -17,13 +17,33 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
     const myMember = currentUser ? circle.members.find(m => m.userId === currentUser.id) : null;
     const isMember = !!myMember;
 
-    // Dynamic Date Calculation (Next 1st of the month)
+    // Dynamic Date Calculation
     const today = new Date();
-    let nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-    const nextPaymentDate = nextMonth.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const startDate = new Date(circle.startDate);
+
+    // Calculate next payment date based on frequency
+    let nextPaymentDate: Date;
+    if (circle.frequency === 'weekly') {
+        nextPaymentDate = new Date(today);
+        nextPaymentDate.setDate(today.getDate() + (7 - today.getDay()) % 7 || 7);
+    } else if (circle.frequency === 'bi-weekly') {
+        nextPaymentDate = new Date(today);
+        nextPaymentDate.setDate(today.getDate() + 14);
+    } else {
+        // Monthly - next 1st of month
+        nextPaymentDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    }
+    const nextPaymentDateStr = nextPaymentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    // Calculate current round based on start date and frequency
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / msPerDay);
+    const daysPerRound = circle.frequency === 'weekly' ? 7 : circle.frequency === 'bi-weekly' ? 14 : 30;
+    const currentRound = Math.max(1, Math.min(circle.duration, Math.ceil(daysSinceStart / daysPerRound) || 1));
+    const progressPercent = Math.round((currentRound / circle.duration) * 100);
 
     // Trust Score from user profile
-    const trustScore = currentUser?.trustScore || 850;
+    const trustScore = currentUser?.trustScore || 115;
 
     return (
         <div className="flex flex-col h-full">
@@ -81,7 +101,7 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
                                     Due Date
                                 </p>
                                 <h2 className="text-4xl font-extrabold tracking-tight text-text-main dark:text-white mb-3">
-                                    {nextPaymentDate}
+                                    {nextPaymentDateStr}
                                 </h2>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-text-sub dark:text-text-sub-dark font-medium text-lg">Amount:</span>
@@ -183,18 +203,18 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
                                 Cycle Progress
                             </h3>
                             <p className="text-text-sub dark:text-text-sub-dark text-sm font-medium mt-1">
-                                Round 1 of {circle.duration}
+                                Round {currentRound} of {circle.duration}
                             </p>
                         </div>
                         <div className="text-right">
-                            <span className="text-3xl font-bold text-[#F25F15]">10%</span>
+                            <span className="text-3xl font-bold text-[#F25F15]">{progressPercent}%</span>
                         </div>
                     </div>
                     <div className="relative pt-2">
                         <div className="overflow-hidden h-2.5 mb-2 text-xs flex rounded-full bg-gray-100 dark:bg-white/10">
                             <div
                                 className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#F25F15] rounded-full transition-all duration-1000 ease-out"
-                                style={{ width: "10%" }}
+                                style={{ width: `${progressPercent}%` }}
                             ></div>
                         </div>
                         <div className="flex justify-between text-xs font-bold text-text-sub dark:text-text-sub-dark uppercase tracking-wide">
