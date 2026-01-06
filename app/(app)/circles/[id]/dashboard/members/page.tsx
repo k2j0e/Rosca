@@ -16,7 +16,7 @@ export default async function DashboardMembers(props: { params: Promise<{ id: st
     }
 
     // Sort members: Payout Month first, then Admin, then Name
-    const sortedMembers = [...circle.members].sort((a, b) => {
+    const sortedMembers = [...(circle.members || [])].sort((a, b) => {
         // If payout months are set, standard members logic
         if (a.payoutMonth && b.payoutMonth) return a.payoutMonth - b.payoutMonth;
         if (a.payoutMonth) return -1;
