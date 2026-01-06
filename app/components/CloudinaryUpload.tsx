@@ -50,6 +50,10 @@ export default function CloudinaryUpload({
             // 1. Get Signature from Server
             const signatureResult = await getCloudinarySignature();
 
+            if (!signatureResult) {
+                throw new Error("Failed to generate upload signature (Configuration Error)");
+            }
+
             if ('error' in signatureResult && signatureResult.error) {
                 throw new Error(signatureResult.error as string);
             }
