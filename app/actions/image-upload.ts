@@ -9,7 +9,12 @@ export async function getCloudinarySignature() {
 
         // Read environment variables INSIDE the function (at request time)
         // Vercel is NOT injecting CLOUDINARY_URL despite correct config - using fallback
-        const CLOUDINARY_URL = process.env.CLOUDINARY_URL || 'cloudinary://785594142865964:5D6qh7Alaq7ySg-4iIbGdGWY8eQ@dyh0yzmfn';
+        const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
+
+        if (!CLOUDINARY_URL) {
+            console.error('[Server Action] CRITICAL: Missing CLOUDINARY_URL in environment');
+            return null;
+        }
         const cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME ||
             process.env.CLOUDINARY_CLOUD_NAME ||
             parseCloudinaryUrl(CLOUDINARY_URL, 'cloudName');

@@ -8,6 +8,8 @@ export async function GET() {
         EMAIL_FROM: process.env.EMAIL_FROM,
         DATABASE_URL: !!process.env.DATABASE_URL,
         NODE_ENV: process.env.NODE_ENV,
+        CLOUDINARY_URL: !!process.env.CLOUDINARY_URL,
+        CLOUDINARY_CLOUD_NAME: !!process.env.CLOUDINARY_CLOUD_NAME || !!process.env.ROSCA_CLOUDINARY_CLOUD_NAME,
     };
 
     console.log('[Debug] Env check:', envCheck);

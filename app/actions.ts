@@ -379,6 +379,12 @@ export async function createAccountAction(formData: FormData) {
 }
 
 export async function createCircleAction(formData: FormData) {
+    // Safe JSON Parse Helper
+    const safeJson = (str: string | null) => {
+        try { return JSON.parse(str || "[]"); }
+        catch { return []; } // Default to empty array on failure
+    };
+
     const rawData = {
         name: formData.get("name") as string,
         category: formData.get("category"),
@@ -387,9 +393,9 @@ export async function createCircleAction(formData: FormData) {
         frequency: (formData.get("frequency") as string || "monthly").toLowerCase(),
         privacy: formData.get("privacy"),
         description: formData.get("description") as string,
-        rules: JSON.parse(formData.get("rules") as string || "[]"),
+        rules: safeJson(formData.get("rules") as string),
         coverImage: formData.get("coverImage") as string,
-        payoutSchedule: JSON.parse(formData.get("payoutSchedule") as string || "[]")
+        payoutSchedule: safeJson(formData.get("payoutSchedule") as string)
     };
 
     const validated = createCircleSchema.safeParse(rawData);
@@ -464,22 +470,29 @@ export async function joinCircleAction(formData: FormData) {
     if (!currentUser) throw new Error("Must be logged in to join");
 
     // Add real user to circle
-    await joinCircle(circleId, currentUser, preference);
-
-    // In a real app we might presumably log the intent somewhere
-    console.log(`User joining circle ${circleId} with preference: ${preference} and intent: ${intent}`);
-
-    // Ledger: Log Member Join
     try {
-        await recordLedgerEntry({
-            type: LedgerEntryType.MEMBER_JOINED,
-            direction: LedgerEntryDirection.NEUTRAL,
-            description: `${currentUser.name} joined the circle`,
-            circleId: circleId,
-            userId: currentUser.id,
-            metadata: { preference, intent }
-        });
-    } catch (e) { console.error("Ledger join error", e); }
+        await joinCircle(circleId, currentUser, preference);
+
+        // In a real app we might presumably log the intent somewhere
+        console.log(`User joining circle ${circleId} with preference: ${preference} and intent: ${intent}`);
+
+        // Ledger: Log Member Join
+        // Note: Ideally this should be in the same transaction as joinCircle
+        try {
+            await recordLedgerEntry({
+                type: LedgerEntryType.MEMBER_JOINED,
+                direction: LedgerEntryDirection.NEUTRAL,
+                description: `${currentUser.name} joined the circle`,
+                circleId: circleId,
+                userId: currentUser.id,
+                metadata: { preference, intent }
+            });
+        } catch (e) { console.error("Ledger join error", e); } // Ledger failure shouldn't block join success for now
+
+    } catch (error: any) {
+        console.error("Join Circle Failed:", error);
+        redirect(`/explore?error=${encodeURIComponent(error.message || "Failed to join circle")}`);
+    }
 
     redirect(`/explore?joined=true`);
 }
@@ -595,9 +608,16 @@ export async function verifyPaymentAction(circleId: string, memberId: string) {
     // In real app, check if currentUser is Admin of circleId here
 
     // Need amount for record
-    const { getCircle } = await import("@/lib/data");
+    const { getCircle, getMember } = await import("@/lib/data");
     const circle = await getCircle(circleId);
     if (!circle) return;
+
+    // Idempotency Check: Prevent double counting
+    const member = await getMember(circleId, memberId);
+    if (!member || member.status === 'paid') {
+        console.log(`[verifyPaymentAction] Idempotent skip: Member ${memberId} is already ${member?.status}`);
+        return;
+    }
 
     await updateMemberStatus(circleId, memberId, 'paid');
 

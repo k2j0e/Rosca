@@ -319,33 +319,62 @@ export async function createCircle(data: Partial<Circle>, creator: User) {
     return newCircle;
 }
 
-export async function joinCircle(circleId: string, user: User, preference: 'early' | 'late' | 'any' = 'any') {
-    // Check if Member exists
-    const existing = await prisma.member.findUnique({
-        where: { userId_circleId: { userId: user.id, circleId } }
+export async function getMember(circleId: string, userId: string) {
+    return prisma.member.findUnique({
+        where: { userId_circleId: { userId, circleId } },
+        include: { user: true }
     });
+}
 
-    if (!existing) {
-        await prisma.member.create({
-            data: {
-                circleId,
-                userId: user.id,
-                role: 'member',
-                status: 'requested',
-                payoutPreference: preference
-            }
+export async function joinCircle(circleId: string, user: User, preference: 'early' | 'late' | 'any' = 'any') {
+    await prisma.$transaction(async (tx) => {
+        // 1. Lock Circle & Check Bounds
+        // We fetching the circle to get maxMembers
+        const circle = await tx.circle.findUnique({
+            where: { id: circleId },
+            select: { maxMembers: true, status: true }
         });
 
-        // Add Event - Removed per user request (only log on acceptance)
-        /* await prisma.circleEvent.create({
-            data: {
-                circleId,
-                type: 'join',
-                message: `${user.name} requested to join`,
-                meta: { userId: user.id, userName: user.name }
-            }
-        }); */
-    }
+        if (!circle) throw new Error("Circle not found");
+        if (circle.status !== 'recruiting') {
+            // Allow joining if active ONLY if invited/replacement (out of scope for now, strictly enforcing status)
+            // Actually, for now, let's keep it strict.
+            // If status is active, we usually lock it.
+            // But existing logic didn't check status strictly here (checked in action).
+            // Let's rely on action for status check but enforce COUNT here.
+        }
+
+        const currentCount = await tx.member.count({
+            where: { circleId }
+        });
+
+        if (currentCount >= circle.maxMembers) {
+            // Check if user is ALREADY a member
+            const isMember = await tx.member.findUnique({
+                where: { userId_circleId: { userId: user.id, circleId } }
+            });
+            if (isMember) return; // Idempotent success
+
+            throw new Error(`Circle is full (${currentCount}/${circle.maxMembers})`);
+        }
+
+        // 2. Check if Member exists (Idempotency)
+        const existing = await tx.member.findUnique({
+            where: { userId_circleId: { userId: user.id, circleId } }
+        });
+
+        if (!existing) {
+            await tx.member.create({
+                data: {
+                    circleId,
+                    userId: user.id, // Using the ID from the passed user object
+                    role: 'member',
+                    status: 'requested', // Default to requested/pending compliance checks
+                    payoutPreference: preference
+                }
+            });
+        }
+    });
 }
 
 export async function updateCircleMembers(circleId: string, members: Member[]) {
