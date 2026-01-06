@@ -14,5 +14,8 @@ export async function GET() {
 
     console.log('[Debug] Env check:', envCheck);
 
-    return NextResponse.json(envCheck);
+    // Security: Only list KEYS, not values
+    const allKeys = Object.keys(process.env).sort();
+
+    return NextResponse.json({ ...envCheck, availableKeys: allKeys });
 }
