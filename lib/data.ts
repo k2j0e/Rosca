@@ -441,4 +441,57 @@ export async function updateCircleStatus(circleId: string, status: 'active' | 'c
             }
         });
     }
+
+    if (status === 'completed') {
+        await prisma.circleEvent.create({
+            data: {
+                circleId,
+                type: 'info',
+                message: '🎉 Circle completed all rounds!',
+                timestamp: new Date()
+            }
+        });
+    }
 }
+
+/**
+ * Determines the current round number for a circle based on PAYOUT_DISTRIBUTED events.
+ * If no payouts have been distributed yet, we're in round 1.
+ */
+export async function getCurrentRound(circleId: string): Promise<number> {
+    const { LedgerEntryType } = await import('@prisma/client');
+
+    const payoutCount = await prisma.userLedgerEntry.count({
+        where: {
+            circleId,
+            type: LedgerEntryType.PAYOUT_DISTRIBUTED
+        }
+    });
+
+    // Current round = completed payouts + 1
+    return payoutCount + 1;
+}
+
+/**
+ * Resets all member statuses to 'pending' for a new round.
+ * Called after a round is completed.
+ */
+export async function resetMemberStatusesForNewRound(circleId: string): Promise<void> {
+    await prisma.member.updateMany({
+        where: { circleId },
+        data: { status: 'pending' }
+    });
+
+    // Log event
+    await prisma.circleEvent.create({
+        data: {
+            circleId,
+            type: 'round_start',
+            message: 'New round started - contributions reset',
+            timestamp: new Date()
+        }
+    });
+
+    console.log(`[resetMemberStatusesForNewRound] All members reset to pending for circle ${circleId}`);
+}
+
