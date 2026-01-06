@@ -8,22 +8,23 @@ export async function getCloudinarySignature() {
         console.log('[Server Action] Generating Cloudinary Signature');
 
         // Read environment variables INSIDE the function (at request time)
-        // Vercel is NOT injecting CLOUDINARY_URL despite correct config - using fallback
         const CLOUDINARY_URL = process.env.CLOUDINARY_URL;
 
-        if (!CLOUDINARY_URL) {
-            console.error('[Server Action] CRITICAL: Missing CLOUDINARY_URL in environment');
-            return null;
+        // Fallback: Try reading individual keys if URL is missing
+        let cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME;
+        let apiKey = process.env.ROSCA_CLOUDINARY_API_KEY || process.env.CLOUDINARY_API_KEY;
+        let apiSecret = process.env.ROSCA_CLOUDINARY_API_SECRET || process.env.CLOUDINARY_API_SECRET;
+
+        // If URL exists, parse it to fill gaps
+        if (CLOUDINARY_URL && (!cloudName || !apiKey || !apiSecret)) {
+            const parsedName = parseCloudinaryUrl(CLOUDINARY_URL, 'cloudName');
+            const parsedKey = parseCloudinaryUrl(CLOUDINARY_URL, 'apiKey');
+            const parsedSecret = parseCloudinaryUrl(CLOUDINARY_URL, 'apiSecret');
+
+            if (!cloudName) cloudName = parsedName;
+            if (!apiKey) apiKey = parsedKey;
+            if (!apiSecret) apiSecret = parsedSecret;
         }
-        const cloudName = process.env.ROSCA_CLOUDINARY_CLOUD_NAME ||
-            process.env.CLOUDINARY_CLOUD_NAME ||
-            parseCloudinaryUrl(CLOUDINARY_URL, 'cloudName');
-        const apiKey = process.env.ROSCA_CLOUDINARY_API_KEY ||
-            process.env.CLOUDINARY_API_KEY ||
-            parseCloudinaryUrl(CLOUDINARY_URL, 'apiKey');
-        const apiSecret = process.env.ROSCA_CLOUDINARY_API_SECRET ||
-            process.env.CLOUDINARY_API_SECRET ||
-            parseCloudinaryUrl(CLOUDINARY_URL, 'apiSecret');
 
         console.log('[Server Action] Config Check:', {
             hasCloudName: !!cloudName,
