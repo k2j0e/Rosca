@@ -1,20 +1,67 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #ec5b13;
-  --color-primary-soft: #fdede7;
-  --color-background-light: #f8f6f6;
-  --color-background-dark: #221610;
-  --color-surface-light: #ffffff;
-  --color-surface-dark: #2d2420;
-  --color-text-main: #181311;
-  --color-text-sub: #896f61;
-  --color-text-main-dark: #eaddd7;
-  --color-text-sub-dark: #b0a095;
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 
-  --font-display: var(--font-work-sans), sans-serif;
+  /* Circle8 Brand Palette */
+  --color-primary: #FF6B2B;
+  /* Vibrant Orange */
+  --color-primary-light: #FF8F5E;
+  --color-primary-soft: #FFF0E8;
+  --color-primary-hover: #E55A1F;
+  --color-primary-foreground: #FFFFFF;
 
-  --radius-xl: 1.5rem;
+  --color-secondary: #2D3142;
+  /* Deep Neutral */
+  --color-secondary-foreground: #FFFFFF;
+
+  --color-background-light: #F8F9FC;
+  /* Cool Light Gray */
+  --color-background-dark: #0F172A;
+  /* Slate 900 */
+
+  --color-surface-light: #FFFFFF;
+  --color-surface-dark: #1E293B;
+
+  --color-text-main: #1A1C29;
+  --color-text-sub: #64748B;
+  --color-text-muted: #9498A4;
+  --color-text-main-dark: #F8FAFC;
+  --color-text-sub-dark: #94A3B8;
+
+  --color-success: #00C48C;
+  --color-info: #3B82F6;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  /* Shapes */
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+  --radius-4xl: 2.25rem;
+
+  /* Shadows */
+  --shadow-soft: 0 8px 30px -4px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-glow: 0 10px 40px -10px rgba(255, 107, 43, 0.35);
+  --shadow-float: 0 20px 40px -10px rgba(255, 107, 43, 0.2);
+  --shadow-inner-glow: inset 0 2px 4px 0 rgba(255, 255, 255, 0.3);
+
+  /* Animations */
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 }
 
 /* Custom scrollbar utility */
@@ -107,6 +154,7 @@
   0% {
     transform: scale(1);
   }
+
   100% {
     transform: scale(1.08);
   }
@@ -118,10 +166,13 @@
 
 /* Breathing/floating animation for circles */
 @keyframes breathing {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.3;
   }
+
   50% {
     transform: scale(1.1);
     opacity: 0.5;

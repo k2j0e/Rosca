@@ -21,232 +21,207 @@ export default async function HomePage() {
 
     const { stats, upcomingObligations, activeCircles, recentActivity, pendingMemberRequests } = data;
 
-    // Format activity type for display
-    const formatActivityType = (type: string) => {
-        const typeMap: Record<string, { label: string; icon: string; color: string }> = {
-            'CONTRIBUTION_MARKED_PAID': { label: 'Marked paid', icon: 'payments', color: 'text-blue-600' },
-            'CONTRIBUTION_CONFIRMED': { label: 'Payment verified', icon: 'verified', color: 'text-green-600' },
-            'MEMBER_JOINED': { label: 'Joined circle', icon: 'group_add', color: 'text-purple-600' },
-            'PAYOUT_DISTRIBUTED': { label: 'Received payout', icon: 'savings', color: 'text-emerald-600' },
-        };
-        return typeMap[type] || { label: type.replace(/_/g, ' ').toLowerCase(), icon: 'info', color: 'text-gray-600' };
+    // Time ago helper (simplified)
+    const timeAgo = (date: Date) => {
+        const diff = Date.now() - new Date(date).getTime();
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        if (hours < 24) return `${hours}h ago`;
+        return `${Math.floor(hours / 24)}d ago`;
     };
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark pb-24 lg:pb-8">
+        <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark pb-28 font-display">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 sticky top-0 z-20 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
-                <div>
-                    <p className="text-sm text-text-sub dark:text-text-sub-dark">Welcome back,</p>
-                    <h1 className="text-2xl font-extrabold">{data.user.name.split(' ')[0]}</h1>
+            <header className="pt-14 px-6 pb-4 flex items-center justify-between sticky top-0 z-30 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+                <div className="flex flex-col">
+                    <span className="text-text-muted text-sm font-medium tracking-wide mb-0.5">Welcome back</span>
+                    <h1 className="text-2xl font-bold text-text-main dark:text-white flex items-center gap-2">
+                        {data.user.name.split(' ')[0]}
+                        <span className="material-symbols-outlined text-yellow-500 text-xl filled">waving_hand</span>
+                    </h1>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Link href="/notifications" className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
-                        <span className="material-symbols-outlined text-2xl">notifications</span>
-                    </Link>
-                    <Link href="/profile" className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden">
+                <Link href="/profile" className="relative group cursor-pointer">
+                    <div className="p-1 rounded-full border-2 border-white dark:border-white/10 shadow-sm bg-white dark:bg-white/10">
                         {data.user.avatar ? (
-                            <img src={data.user.avatar} alt="" className="w-full h-full object-cover" />
+                            <img alt="Profile" className="w-10 h-10 rounded-full object-cover" src={data.user.avatar} />
                         ) : (
-                            <span className="text-primary font-bold">{data.user.name.charAt(0)}</span>
+                            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                                {data.user.name.charAt(0)}
+                            </div>
                         )}
-                    </Link>
-                </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="px-4 pb-4">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <div className="bg-gradient-to-br from-primary to-orange-500 p-4 rounded-2xl text-white">
-                        <p className="text-xs font-medium opacity-80">Total Contributed</p>
-                        <p className="text-2xl font-black">${stats.totalContributed.toLocaleString()}</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-emerald-500 to-green-600 p-4 rounded-2xl text-white">
-                        <p className="text-xs font-medium opacity-80">Total Received</p>
-                        <p className="text-2xl font-black">${stats.totalReceived.toLocaleString()}</p>
-                    </div>
-                    <div className="bg-white dark:bg-surface-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                        <p className="text-xs font-medium text-text-sub dark:text-text-sub-dark">Active Circles</p>
-                        <p className="text-2xl font-black">{stats.activeCircles}</p>
-                    </div>
-                    <div className="bg-white dark:bg-surface-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                        <p className="text-xs font-medium text-text-sub dark:text-text-sub-dark">Trust Score</p>
-                        <p className="text-2xl font-black text-primary">{data.user.trustScore}</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Pending Member Requests (for admins) */}
-            {pendingMemberRequests.length > 0 && (
-                <div className="px-4 pb-4">
-                    <Link href="/notifications">
-                        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 rounded-2xl text-white shadow-lg shadow-blue-500/20">
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-xl animate-pulse">person_add</span>
-                                    <span className="font-bold">New Member Request{pendingMemberRequests.length > 1 ? 's' : ''}</span>
-                                </div>
-                                <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
-                                    {pendingMemberRequests.length} pending
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {pendingMemberRequests.slice(0, 4).map((req, idx) => (
-                                    <div
-                                        key={`${req.circleId}-${req.userId}`}
-                                        className="w-8 h-8 rounded-full bg-white/20 border-2 border-white flex items-center justify-center text-xs font-bold overflow-hidden"
-                                        style={{ marginLeft: idx > 0 ? '-6px' : 0 }}
-                                    >
-                                        {req.userAvatar ? (
-                                            <img src={req.userAvatar} alt="" className="w-full h-full object-cover" />
-                                        ) : (
-                                            req.userName.charAt(0)
-                                        )}
-                                    </div>
-                                ))}
-                                <span className="text-white/80 text-sm ml-1">
-                                    {pendingMemberRequests.slice(0, 2).map(r => r.userName.split(' ')[0]).join(', ')}
-                                    {pendingMemberRequests.length > 2 && ` +${pendingMemberRequests.length - 2}`}
-                                </span>
-                                <span className="material-symbols-outlined ml-auto">arrow_forward</span>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-            )}
-
-            {/* Create Circle CTA */}
-            <div className="px-4 pb-6">
-                <Link href="/create/financials">
-                    <div className="bg-gradient-to-r from-primary/10 to-orange-100 dark:from-primary/20 dark:to-orange-900/20 p-5 rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary/50 transition-colors cursor-pointer group">
-                        <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
-                                <span className="material-symbols-outlined text-white text-3xl">add</span>
-                            </div>
-                            <div className="flex-1">
-                                <h3 className="font-bold text-lg">Start a Circle</h3>
-                                <p className="text-sm text-text-sub dark:text-text-sub-dark">Create a savings group with friends or family</p>
-                            </div>
-                            <span className="material-symbols-outlined text-primary">arrow_forward</span>
-                        </div>
                     </div>
                 </Link>
-            </div>
+            </header>
 
-            {/* Upcoming Obligations */}
-            {upcomingObligations.length > 0 && (
-                <div className="px-4 pb-6">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark mb-3">
-                        Upcoming Payments
-                    </h2>
-                    <div className="space-y-2">
-                        {upcomingObligations.map(ob => (
-                            <Link key={ob.circleId} href={`/circles/${ob.circleId}/dashboard`}>
-                                <div className="flex items-center gap-3 bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-2xl border border-yellow-100 dark:border-yellow-800">
-                                    <div className="w-10 h-10 bg-yellow-200 dark:bg-yellow-800 rounded-full flex items-center justify-center">
-                                        <span className="material-symbols-outlined text-yellow-700 dark:text-yellow-300">schedule</span>
+            <main className="flex-1 px-6 space-y-8">
+                {/* Stats Section */}
+                <section className="grid grid-cols-2 gap-4">
+                    <div className="col-span-1 bg-gradient-to-br from-primary to-[#FF4500] rounded-3xl p-5 text-white shadow-glow relative overflow-hidden flex flex-col justify-between h-48 group">
+                        <div className="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-white/10 blur-xl group-hover:scale-110 transition-transform duration-500"></div>
+                        <div className="absolute -left-4 -bottom-4 w-20 h-20 rounded-full bg-black/5 blur-lg"></div>
+                        <div className="relative z-10 flex justify-between items-start">
+                            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10">
+                                <span className="material-symbols-outlined text-white text-[20px]">account_balance_wallet</span>
+                            </div>
+                        </div>
+                        <div className="relative z-10 mt-2">
+                            <span className="block text-white/80 text-xs font-semibold tracking-wider uppercase mb-1">Total Committed</span>
+                            <h2 className="text-2xl lg:text-3xl font-bold tracking-tight">${stats.totalContributed.toLocaleString()}</h2>
+                        </div>
+                    </div>
+
+                    <div className="col-span-1 bg-surface-light dark:bg-surface-dark rounded-3xl p-5 shadow-card border border-white dark:border-white/5 relative flex flex-col justify-between h-48 group">
+                        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-transparent to-primary-soft/30 dark:to-primary/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <div className="relative z-10 flex justify-between items-start">
+                            <div className="w-10 h-10 rounded-full bg-primary-soft dark:bg-primary/10 flex items-center justify-center">
+                                <span className="material-symbols-outlined text-primary text-[20px]">pie_chart</span>
+                            </div>
+                        </div>
+                        <div className="relative z-10 mt-2">
+                            <span className="block text-text-muted text-xs font-bold tracking-wider uppercase mb-1">Active Circles</span>
+                            <div className="flex items-baseline gap-1">
+                                <h2 className="text-4xl font-bold text-text-main dark:text-white">{stats.activeCircles}</h2>
+                                <span className="text-sm text-text-muted font-medium">ongoing</span>
+                            </div>
+                            {/* Avatars of first 3 active circles */}
+                            <div className="flex -space-x-2 mt-3 pl-1">
+                                {activeCircles.slice(0, 3).map((circle, i) => (
+                                    <div key={circle.id} className="w-6 h-6 rounded-full bg-gray-100 border-2 border-white dark:border-surface-dark ring-1 ring-gray-50 dark:ring-white/10 overflow-hidden">
+                                        {circle.coverImage && <img src={circle.coverImage} className="w-full h-full object-cover" />}
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="font-bold text-sm">{ob.circleName}</p>
-                                        <p className="text-xs text-text-sub dark:text-text-sub-dark">Due: ${ob.amount}</p>
-                                    </div>
-                                    <span className="material-symbols-outlined text-yellow-600 dark:text-yellow-400">arrow_forward_ios</span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Quick Actions */}
+                <section>
+                    <h3 className="text-lg font-bold text-text-main dark:text-white mb-4">Quick Actions</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
+                        <Link href="/create/financials" className="flex-1 min-w-[140px]">
+                            <button className="w-full bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 active:scale-95 transition-all hover:border-primary/30 group">
+                                <div className="w-14 h-14 rounded-full bg-primary-soft dark:bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                                    <span className="material-symbols-outlined text-3xl">add_circle</span>
                                 </div>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Active Circles */}
-            {activeCircles.length > 0 && (
-                <div className="px-4 pb-6">
-                    <div className="flex items-center justify-between mb-3">
-                        <h2 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark">
-                            Your Circles
-                        </h2>
-                        <Link href="/my-circles" className="text-primary text-xs font-bold">View All</Link>
-                    </div>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                        {activeCircles.slice(0, 6).map(circle => (
-                            <Link key={circle.id} href={`/circles/${circle.id}/dashboard`}>
-                                <div className="flex items-center gap-3 bg-white dark:bg-surface-dark p-4 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-primary/30 transition-colors">
-                                    <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                                        {circle.coverImage ? (
-                                            <img src={circle.coverImage} alt="" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center">
-                                                <span className="material-symbols-outlined text-gray-400">savings</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-bold text-sm truncate">{circle.name}</p>
-                                            {circle.role === 'admin' && (
-                                                <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">Admin</span>
-                                            )}
-                                        </div>
-                                        <p className="text-xs text-text-sub dark:text-text-sub-dark">
-                                            Round {circle.currentRound}/{circle.maxMembers} • ${circle.amount}/{circle.frequency}
-                                        </p>
-                                    </div>
-                                    <div className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${circle.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                        circle.status === 'recruiting' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                                            'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
-                                        }`}>
-                                        {circle.status}
-                                    </div>
+                                <span className="text-sm font-semibold text-text-main dark:text-white group-hover:text-primary transition-colors">New Circle</span>
+                            </button>
+                        </Link>
+                        <Link href="/explore" className="flex-1 min-w-[140px]">
+                            <button className="w-full bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 active:scale-95 transition-all hover:border-blue-200 group">
+                                <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/10 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
+                                    <span className="material-symbols-outlined text-3xl">explore</span>
                                 </div>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Empty State */}
-            {activeCircles.length === 0 && (
-                <div className="px-4 pb-6">
-                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-900/50 rounded-2xl">
-                        <span className="material-symbols-outlined text-5xl text-gray-300 dark:text-gray-600 mb-2">groups</span>
-                        <p className="text-text-sub dark:text-text-sub-dark font-medium">No active circles yet</p>
-                        <p className="text-xs text-gray-400 mt-1">Create or join a circle to get started</p>
-                        <Link href="/explore">
-                            <button className="mt-4 px-4 py-2 bg-primary text-white font-bold rounded-xl text-sm">
-                                Explore Circles
+                                <span className="text-sm font-semibold text-text-main dark:text-white group-hover:text-blue-500 transition-colors">Explore</span>
+                            </button>
+                        </Link>
+                        {/* Placeholder for Payouts/History */}
+                        <Link href="/my-circles" className="flex-1 min-w-[140px]">
+                            <button className="w-full bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5 flex flex-col items-center gap-3 active:scale-95 transition-all hover:border-purple-200 group">
+                                <div className="w-14 h-14 rounded-full bg-purple-50 dark:bg-purple-900/10 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
+                                    <span className="material-symbols-outlined text-3xl">savings</span>
+                                </div>
+                                <span className="text-sm font-semibold text-text-main dark:text-white group-hover:text-purple-500 transition-colors">Circles</span>
                             </button>
                         </Link>
                     </div>
-                </div>
-            )}
+                </section>
 
-            {/* Recent Activity */}
-            {recentActivity.length > 0 && (
-                <div className="px-4 pb-6">
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark mb-3">
-                        Recent Activity
-                    </h2>
-                    <div className="space-y-2">
-                        {recentActivity.slice(0, 5).map(activity => {
-                            const formatted = formatActivityType(activity.type);
-                            return (
-                                <div key={activity.id} className="flex items-center gap-3 py-2">
-                                    <span className={`material-symbols-outlined ${formatted.color}`}>{formatted.icon}</span>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium truncate">{formatted.label}</p>
-                                        {activity.circleName && (
-                                            <p className="text-xs text-text-sub dark:text-text-sub-dark truncate">{activity.circleName}</p>
-                                        )}
+                {/* Upcoming Payments / Updates */}
+                <section>
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-bold text-text-main dark:text-white">Updates</h3>
+                        <Link href="/notifications" className="text-primary text-sm font-semibold hover:text-primary-hover transition-colors">View All</Link>
+                    </div>
+                    <div className="space-y-3">
+                        {/* Admin Requests */}
+                        {pendingMemberRequests.length > 0 && (
+                            <Link href="/notifications">
+                                <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-soft dark:shadow-none dark:border dark:border-white/5 flex items-center justify-between hover:shadow-md transition-shadow cursor-pointer border-l-4 border-blue-500">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-500 flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined animate-pulse">person_add</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-text-main dark:text-white text-sm">New Request</h4>
+                                            <p className="text-xs text-text-muted mt-1">{pendingMemberRequests.length} pending requests</p>
+                                        </div>
                                     </div>
-                                    <span className="text-xs text-gray-400">
-                                        {new Date(activity.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                    </span>
+                                    <span className="material-symbols-outlined text-gray-300 text-sm">arrow_forward_ios</span>
+                                </div>
+                            </Link>
+                        )}
+
+                        {/* Payments Due */}
+                        {upcomingObligations.map(ob => (
+                            <Link key={'due-' + ob.circleId} href={`/circles/${ob.circleId}/dashboard`}>
+                                <div className="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-soft dark:shadow-none dark:border dark:border-white/5 flex items-center justify-between hover:shadow-md transition-shadow cursor-pointer border-l-4 border-warning">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 text-warning flex items-center justify-center shrink-0">
+                                            <span className="material-symbols-outlined">payments</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-text-main dark:text-white text-sm">Payment Due</h4>
+                                            <p className="text-xs text-text-muted mt-1">${ob.amount} for {ob.circleName}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-xs font-semibold text-warning bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-full mb-1">Due Now</span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+
+                        {/* Recent Activity */}
+                        {recentActivity.slice(0, 5).map(activity => {
+                            let icon = 'info';
+                            let colorClass = 'bg-gray-50 text-gray-500';
+                            let title = 'Activity';
+
+                            switch (activity.type) {
+                                case 'CONTRIBUTION_MARKED_PAID':
+                                    icon = 'check_circle';
+                                    colorClass = 'bg-blue-50 dark:bg-blue-900/20 text-blue-500';
+                                    title = 'Marked Paid';
+                                    break;
+                                case 'CONTRIBUTION_CONFIRMED':
+                                    icon = 'verified';
+                                    colorClass = 'bg-green-50 dark:bg-green-900/20 text-green-500';
+                                    title = 'Payment Verified';
+                                    break;
+                                case 'PAYOUT_DISTRIBUTED':
+                                    icon = 'savings';
+                                    colorClass = 'bg-purple-50 dark:bg-purple-900/20 text-purple-500';
+                                    title = 'Payout Distributed';
+                                    break;
+                                case 'MEMBER_JOINED':
+                                    icon = 'group_add';
+                                    colorClass = 'bg-orange-50 dark:bg-orange-900/20 text-orange-500';
+                                    title = 'New Member';
+                                    break;
+                            }
+
+                            return (
+                                <div key={activity.id} className="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-soft dark:shadow-none dark:border dark:border-white/5 flex items-center justify-between hover:shadow-md transition-shadow cursor-pointer">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${colorClass}`}>
+                                            <span className="material-symbols-outlined">{icon}</span>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-text-main dark:text-white text-sm">{title}</h4>
+                                            <p className="text-xs text-text-muted mt-1">{activity.circleName || 'General'}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[10px] text-text-muted">{timeAgo(activity.createdAt)}</span>
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
-                </div>
-            )}
+                </section>
+                <div className="h-4"></div>
+            </main>
         </div>
     );
 }

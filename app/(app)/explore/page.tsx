@@ -3,7 +3,6 @@ export const dynamic = 'force-dynamic';
 
 import Link from "next/link";
 import { getCircles } from "@/lib/data";
-import { ExplainCircle8Trigger } from "@/app/components/ExplainCircle8";
 import { CircleCard } from "@/app/components/CircleCard";
 
 export default async function ExploreCircles(props: { searchParams: Promise<{ joined?: string }> }) {
@@ -12,107 +11,95 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
     const circles = (await getCircles()).filter(c => !c.isPrivate);
 
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark shadow-2xl pb-20 lg:pb-8">
+        <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark pb-28 font-display">
+            {/* Header */}
+            <header className="pt-14 px-6 pb-2 sticky top-0 z-30 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+                <div className="flex justify-between items-end">
+                    <div className="flex flex-col">
+                        <span className="text-text-muted text-sm font-medium tracking-wide mb-0.5">Community</span>
+                        <h1 className="text-3xl font-bold text-text-main dark:text-white">Explore Circles</h1>
+                    </div>
+                </div>
+            </header>
+
+            {/* Search & Filters */}
+            <div className="px-6 py-4 sticky top-[80px] z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm space-y-4">
+                {/* Search Bar */}
+                <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span className="material-symbols-outlined text-text-muted group-focus-within:text-primary transition-colors">search</span>
+                    </div>
+                    <input
+                        type="text"
+                        className="block w-full pl-11 pr-4 py-3.5 bg-surface-light dark:bg-surface-dark border-transparent focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl text-text-main dark:text-white placeholder-text-muted transition-all shadow-sm group-hover:shadow-md"
+                        placeholder="Search by goal, amount, or host..."
+                    />
+                </div>
+
+                {/* Filters */}
+                <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
+                    <button className="flex-none px-5 py-2.5 rounded-full bg-text-main dark:bg-white text-white dark:text-text-main font-bold text-sm shadow-md transition-transform active:scale-95">
+                        All
+                    </button>
+                    <button className="flex-none px-5 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark text-text-sub dark:text-text-sub-dark font-semibold text-sm border border-gray-200 dark:border-white/10 shadow-sm whitespace-nowrap transition-all active:scale-95 hover:border-primary/50 hover:text-primary">
+                        Amount
+                    </button>
+                    <button className="flex-none px-5 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark text-text-sub dark:text-text-sub-dark font-semibold text-sm border border-gray-200 dark:border-white/10 shadow-sm whitespace-nowrap transition-all active:scale-95 hover:border-primary/50 hover:text-primary">
+                        Cadence
+                    </button>
+                    <button className="flex-none px-5 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark text-text-sub dark:text-text-sub-dark font-semibold text-sm border border-gray-200 dark:border-white/10 shadow-sm whitespace-nowrap transition-all active:scale-95 hover:border-primary/50 hover:text-primary">
+                        Duration
+                    </button>
+                    <button className="flex-none px-5 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark text-text-sub dark:text-text-sub-dark font-semibold text-sm border border-gray-200 dark:border-white/10 shadow-sm whitespace-nowrap transition-all active:scale-95 hover:border-primary/50 hover:text-primary">
+                        Travel
+                    </button>
+                </div>
+            </div>
+
             {/* Success Toast */}
             {joined && (
-                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-500 w-[90%] max-w-sm">
-                    <div className="bg-green-600 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3">
-                        <div className="bg-white/20 p-1 rounded-full">
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top-4 fade-in duration-500 w-[90%] max-w-sm">
+                    <div className="bg-emerald-500 text-white px-5 py-4 rounded-3xl shadow-glow flex items-center gap-4 border border-white/20 backdrop-blur-md">
+                        <div className="bg-white/20 p-2 rounded-full flex items-center justify-center">
                             <span className="material-symbols-outlined text-xl">check</span>
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-bold text-sm">Request Submitted</span>
-                            <span className="text-xs text-white/90">The circle coordinator will review your request.</span>
+                            <span className="font-bold">Request Submitted</span>
+                            <span className="text-xs text-white/90 font-medium">Sit tight! We've notified the host.</span>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Top App Bar */}
-            <div className="flex flex-col gap-2 bg-background-light dark:bg-background-dark p-4 pb-0 sticky top-0 z-20">
-                <div className="flex items-center justify-between">
-                    <p className="text-text-main dark:text-text-main-dark tracking-tight text-[28px] font-bold leading-tight">
-                        Find Your Circle
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <button className="text-text-main dark:text-text-main-dark transition-colors hover:text-primary p-1">
-                            <span className="material-symbols-outlined text-2xl">
-                                notifications
-                            </span>
-                        </button>
-                        <ExplainCircle8Trigger variant="icon" />
-                    </div>
-                </div>
-            </div>
-
-            {/* Search Bar */}
-            <div className="px-4 py-3 sticky top-[90px] z-10 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm">
-                <label className="flex flex-col h-12 w-full shadow-sm rounded-xl">
-                    <div className="flex w-full flex-1 items-stretch rounded-xl h-full bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700">
-                        <div
-                            className="text-text-sub dark:text-text-sub-dark flex border-none items-center justify-center pl-4 rounded-l-xl"
-                            data-icon="MagnifyingGlass"
-                        >
-                            <span className="material-symbols-outlined">search</span>
-                        </div>
-                        <input
-                            className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-text-main dark:text-text-main-dark focus:outline-0 focus:ring-0 border-none bg-transparent focus:border-none h-full placeholder:text-text-sub dark:placeholder:text-text-sub-dark px-4 rounded-l-none pl-2 text-base font-normal leading-normal"
-                            placeholder="Search by goal or contribution..."
-                            defaultValue=""
-                        />
-                        <div className="text-primary flex border-none items-center justify-center pr-4 rounded-r-xl cursor-pointer">
-                            <span className="material-symbols-outlined">tune</span>
-                        </div>
-                    </div>
-                </label>
-            </div>
-
-            {/* Filter Chips (Horizontal Scroll) */}
-            <div className="flex gap-2 px-4 pb-2 overflow-x-auto scrollbar-hide">
-                <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
-                    <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Contribution
-                    </p>
-                    <span className="material-symbols-outlined text-lg">expand_more</span>
-                </button>
-                <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-primary text-white pl-3 pr-3 shadow-md shadow-primary/20 active:scale-95 transition-transform">
-                    <p className="text-sm font-medium leading-normal">Duration</p>
-                    <span className="material-symbols-outlined text-lg">close</span>
-                </button>
-                <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
-                    <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Short-term
-                    </p>
-                </button>
-                <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
-                    <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Goals
-                    </p>
-                </button>
-                <button className="flex h-8 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 pl-3 pr-3 shadow-sm active:scale-95 transition-transform">
-                    <p className="text-text-main dark:text-text-main-dark text-sm font-medium leading-normal">
-                        Community
-                    </p>
-                </button>
-            </div>
-
             {/* Main Content: Circles List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 p-4 pb-6">
-                {circles.map((circle) => (
-                    <CircleCard key={circle.id} circle={circle} />
-                ))}
-
-                {/* Create New Circle Button */}
-                <div className="flex flex-col items-center justify-center py-6 gap-2">
-                    <div className="w-12 h-1 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                    <Link href="/create/financials">
-                        <button className="flex items-center gap-2 px-4 py-2 bg-text-main dark:bg-white text-white dark:text-text-main rounded-full text-sm font-bold shadow-md">
-                            <span className="material-symbols-outlined text-[18px]">add</span>
-                            Start a Saving Circle
-                        </button>
-                    </Link>
+            <div className="flex-1 px-6 pb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {circles.map((circle) => (
+                        <div key={circle.id} className="h-full">
+                            <CircleCard circle={circle} />
+                        </div>
+                    ))}
                 </div>
+
+                {/* Empty State / CTA */}
+                {circles.length < 3 && (
+                    <div className="mt-12 mb-6 p-8 rounded-[2rem] bg-gradient-to-br from-primary/5 to-orange-100 dark:from-primary/10 dark:to-orange-900/10 border-2 border-dashed border-primary/20 text-center relative overflow-hidden group">
+                        <div className="relative z-10 flex flex-col items-center gap-3">
+                            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform duration-500">
+                                <span className="material-symbols-outlined text-4xl text-primary">add_circle</span>
+                            </div>
+                            <h3 className="text-lg font-bold text-text-main dark:text-white">Don't see the perfect circle?</h3>
+                            <Link href="/create/financials">
+                                <button className="mt-2 px-8 py-3 bg-primary text-white font-bold rounded-2xl shadow-glow hover:shadow-lg transition-all active:scale-95 hover:bg-primary-hover">
+                                    Start Your Own
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            <div className="h-6"></div>
         </div>
     );
 }

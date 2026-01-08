@@ -7,13 +7,14 @@ interface CircleCardProps {
 
 export function CircleCard({ circle }: CircleCardProps) {
     const isSpotsLow = (circle.maxMembers - circle.members.length) <= 3;
+    const admin = circle.members.find(m => m.role === 'admin') || circle.members[0];
 
     return (
         <Link href={`/circles/${circle.id}`}>
-            <div className="flex flex-col rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] bg-surface-light dark:bg-surface-dark overflow-hidden border border-gray-100 dark:border-gray-800 group transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer relative">
+            <div className="flex flex-col rounded-[2rem] shadow-card bg-surface-light dark:bg-surface-dark overflow-hidden border border-gray-100 dark:border-white/5 group transition-all duration-300 hover:shadow-glow hover:-translate-y-1 cursor-pointer relative h-full">
 
                 {/* Cover Image Header */}
-                <div className="relative h-32 w-full">
+                <div className="relative h-40 w-full overflow-hidden">
                     {circle.coverImage ? (
                         <img
                             src={circle.coverImage}
@@ -21,14 +22,14 @@ export function CircleCard({ circle }: CircleCardProps) {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                     ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#F25F15] via-[#FF8A50] to-[#FFB088]" />
+                        <div className="w-full h-full bg-gradient-to-br from-primary via-orange-500 to-yellow-500" />
                     )}
                     {/* Gradient overlay for text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
                     {/* Category Badge - top left */}
-                    <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center gap-1 rounded-md bg-white/90 dark:bg-black/80 px-2 py-0.5 text-xs font-semibold text-text-main dark:text-white backdrop-blur-md">
+                    <div className="absolute top-4 left-4">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-md border border-white/10 px-3 py-1 text-xs font-bold text-white shadow-sm">
                             <span className="material-symbols-outlined text-[14px]">
                                 {circle.category === 'Travel' ? 'flight_takeoff' :
                                     circle.category === 'Business' ? 'storefront' : 'savings'}
@@ -37,76 +38,68 @@ export function CircleCard({ circle }: CircleCardProps) {
                         </span>
                     </div>
 
-                    {/* Status Badge - top right */}
-                    <span className="absolute top-3 right-3 text-green-400 text-xs font-bold flex items-center gap-1 bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md">
-                        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Open
-                    </span>
-
                     {/* Circle Name - bottom */}
-                    <div className="absolute bottom-3 left-4 right-4">
-                        <h3 className="font-extrabold text-white text-xl leading-tight drop-shadow-lg">
+                    <div className="absolute bottom-4 left-4 right-4">
+                        <h3 className="font-bold text-white text-xl leading-tight drop-shadow-md mb-1">
                             {circle.name}
                         </h3>
-                        {circle.description && (
-                            <p className="text-white/80 text-sm line-clamp-1 drop-shadow">
-                                {circle.description}
-                            </p>
-                        )}
+                        <div className="flex items-center gap-2 text-white/90 text-xs font-medium">
+                            {admin && (
+                                <div className="flex items-center gap-1.5">
+                                    {admin.avatar ? (
+                                        <img src={admin.avatar} className="w-4 h-4 rounded-full border border-white/30" alt="" />
+                                    ) : (
+                                        <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[8px] border border-white/30">
+                                            {admin.name?.charAt(0)}
+                                        </div>
+                                    )}
+                                    <span>By {admin.name?.split(' ')[0] || 'Host'}</span>
+                                </div>
+                            )}
+                            <span className="w-1 h-1 rounded-full bg-white/50"></span>
+                            <span className="text-green-400 font-bold px-1.5 py-0.5 rounded bg-green-500/20 backdrop-blur-sm border border-green-500/30">
+                                Open
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Card Body */}
-                <div className="flex flex-col p-4 gap-3">
-                    {/* Urgency Badge */}
-                    {isSpotsLow && (
-                        <div className="flex items-center gap-1 self-start">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-                            </span>
-                            <span className="text-[10px] font-bold text-orange-600 uppercase tracking-wide">
-                                Only {Math.max(0, circle.maxMembers - circle.members.length)} spots left
-                            </span>
-                        </div>
-                    )}
-
-                    <div className="flex items-baseline gap-2">
+                <div className="flex flex-col p-5 gap-4 flex-1">
+                    <div className="flex items-center justify-between">
                         <div className="flex flex-col">
-                            <span className="text-text-sub text-xs">Contribution</span>
-                            <span className="text-text-main dark:text-text-main-dark font-bold text-lg">
-                                ${circle.amount}
+                            <span className="text-text-sub text-xs font-medium uppercase tracking-wider">Contribution</span>
+                            <span className="text-text-main dark:text-white font-bold text-xl">
+                                ${circle.amount} <span className="text-sm text-text-muted font-medium">/ {circle.frequency}</span>
                             </span>
                         </div>
-                        <span className="text-text-sub text-sm self-end">/ {circle.frequency} • {circle.duration} Rounds</span>
+                        <div className="text-right">
+                            <span className="text-text-sub text-xs font-medium uppercase tracking-wider">Duration</span>
+                            <div className="text-text-main dark:text-white font-bold text-sm flex items-center gap-1 justify-end">
+                                <span className="material-symbols-outlined text-base text-primary">update</span>
+                                {circle.duration} Rounds
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
-                        <div className="flex items-center gap-2">
-                            <div className="flex -space-x-2 overflow-hidden">
-                                {circle.members.slice(0, 3).map((m, i) => (
-                                    <div
-                                        key={i}
-                                        className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-surface-dark bg-gray-200 bg-cover bg-center"
-                                        style={{ backgroundImage: m.avatar ? `url("${m.avatar}")` : undefined }}
-                                    >
-                                        {!m.avatar && (
-                                            <span className="flex items-center justify-center h-full text-[10px] font-bold text-gray-600">
-                                                {m.name?.charAt(0) || '?'}
-                                            </span>
-                                        )}
-                                    </div>
-                                ))}
-                                {circle.members.length > 3 && (
-                                    <div className="inline-flex h-6 w-6 rounded-full ring-2 ring-white dark:ring-surface-dark bg-gray-300 items-center justify-center text-[10px] font-bold text-text-sub">
-                                        +{circle.members.length - 3}
-                                    </div>
-                                )}
-                            </div>
-                            <span className="text-xs text-text-sub group-hover:text-text-main transition-colors">{circle.members.length} joined</span>
+                    {/* Progress Bar / Spots */}
+                    <div>
+                        <div className="flex justify-between text-xs font-semibold mb-2">
+                            <span className="text-text-muted">
+                                {circle.members.length}/{circle.maxMembers} spots filled
+                            </span>
+                            {isSpotsLow && (
+                                <span className="text-orange-500 animate-pulse">
+                                    Few spots left!
+                                </span>
+                            )}
                         </div>
-                        <span className="text-primary font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-1">
-                            View <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                        </span>
+                        <div className="w-full h-2 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-primary rounded-full transition-all duration-1000 ease-out"
+                                style={{ width: `${(circle.members.length / circle.maxMembers) * 100}%` }}
+                            ></div>
+                        </div>
                     </div>
                 </div>
             </div>

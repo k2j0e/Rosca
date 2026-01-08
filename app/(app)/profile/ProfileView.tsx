@@ -25,11 +25,10 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
 
     // Fallback data logic 
     const stats = user?.stats || { circlesCompleted: 0, onTimePercentage: 0, supportCount: 0 };
-    // const history = user?.history || []; // DEPRECATED
     const badges = user?.badges || [];
 
     return (
-        <div className="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white">
+        <div className="flex h-full min-h-screen w-full flex-col overflow-x-hidden bg-background-light dark:bg-background-dark font-display text-text-main dark:text-white pb-24">
 
             {/* Modal */}
             <ProfileEditModal
@@ -45,17 +44,21 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
             />
 
             {/* TopAppBar */}
-            <div className="flex items-center px-4 py-3 justify-between sticky top-0 z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
-                <div className="w-10"></div>
-                <h2 className="text-text-main dark:text-white text-[17px] font-bold tracking-tight">
-                    Your Saving Journey
-                </h2>
-                <div className="p-2 -mr-2 text-text-sub dark:text-text-sub-dark">
-                    <ExplainCircle8Trigger variant="icon" />
+            <div className="flex items-center px-6 pt-14 pb-4 justify-between sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+                <h1 className="text-3xl font-bold text-text-main dark:text-white tracking-tight">
+                    Profile
+                </h1>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className="p-2 bg-surface-light dark:bg-surface-dark border border-gray-200 dark:border-white/10 rounded-full text-text-main dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors shadow-sm"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">settings</span>
+                    </button>
                 </div>
             </div>
 
-            <div className="flex flex-col px-5 pb-6 overflow-y-auto">
+            <div className="flex flex-col px-6 pb-6 overflow-y-auto w-full max-w-lg mx-auto">
                 <ProfileNudge
                     missingFields={[
                         !user?.email && 'email',
@@ -65,169 +68,129 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                     onEdit={() => setIsEditing(true)}
                 />
 
-                {/* Profile Header */}
-                <div className="flex flex-col items-center pt-2 pb-6 relative">
-
-                    {/* Trigger Button */}
-                    <button
-                        onClick={() => setIsEditing(true)}
-                        className="absolute top-3 right-4 p-2 bg-white/50 dark:bg-black/20 backdrop-blur-sm rounded-full text-slate-700 dark:text-white hover:bg-white dark:hover:bg-white/10 transition-colors z-0"
-                        title="Edit Profile"
-                    >
-                        <span className="material-symbols-outlined">edit</span>
-                    </button>
-
-                    <div className="relative mb-3 group">
-                        <div className="absolute -inset-1.5 bg-gradient-to-tr from-amber-300 to-orange-400 rounded-full blur-sm opacity-50 group-hover:opacity-75 transition duration-500"></div>
+                {/* Profile Hero */}
+                <div className="flex flex-col items-center py-6">
+                    <div className="relative mb-4 group cursor-pointer" onClick={() => setIsEditing(true)}>
+                        <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-orange-400 rounded-full blur-md opacity-30 group-hover:opacity-50 transition duration-500"></div>
                         <div
-                            className="relative w-28 h-28 rounded-full bg-cover bg-center border-4 border-white dark:border-surface-dark shadow-sm"
+                            className="relative w-28 h-28 rounded-full bg-cover bg-center border-4 border-white dark:border-surface-dark shadow-xl"
                             style={{ backgroundImage: `url('${user?.avatar || ''}')` }}
                         ></div>
-                        <div className={`absolute bottom-1 right-1 ${user?.email ? 'bg-blue-500' : 'bg-gray-400'} text-white p-1 rounded-full border-[3px] border-white dark:border-surface-dark flex items-center justify-center shadow-sm`}>
-                            <span className="material-symbols-outlined text-[14px]">verified</span>
+                        <div className="absolute bottom-1 right-1 bg-primary text-white p-1.5 rounded-full border-[3px] border-white dark:border-surface-dark flex items-center justify-center shadow-lg">
+                            <span className="material-symbols-outlined text-[14px]">edit</span>
                         </div>
                     </div>
 
-                    <h1 className="text-2xl font-bold text-center text-text-main dark:text-white mb-1">
+                    <h2 className="text-2xl font-bold text-center text-text-main dark:text-white mb-1">
                         {user?.name || 'User'}
-                    </h1>
+                    </h2>
 
-                    <div className="flex items-center gap-2 text-sm">
-                        <span className="text-text-sub dark:text-text-sub-dark font-medium">Member since {user?.memberSince || '2023'}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-white/20"></span>
-                        <span className={`font-bold ${user?.email ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500'}`}>
-                            {user?.email ? 'Verified Profile' : 'Unverified'}
-                        </span>
-                    </div>
-                    {user?.bio && (
-                        <p className="text-center text-sm text-text-sub dark:text-text-sub-dark mt-3 max-w-[280px] leading-relaxed">
-                            "{user.bio}"
-                        </p>
-                    )}
-                </div>
-
-                {/* Trust Statement */}
-                <div className="mb-8 text-center px-2">
-                    <h3 className="text-xl font-bold text-text-main dark:text-white mb-2 leading-tight">
-                        Saving Consistency
-                    </h3>
-                    <p className="text-text-sub dark:text-text-sub-dark/80 text-[15px] leading-relaxed">
-                        Your steady contributions make a difference to your community.
-                    </p>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="bg-white dark:bg-surface-dark rounded-[20px] p-5 shadow-sm border border-gray-100 dark:border-white/5 flex flex-col justify-between min-h-[140px]">
-                        <div className="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/20 text-orange-500 flex items-center justify-center mb-2">
-                            <span className="material-symbols-outlined">all_inclusive</span>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-text-sub dark:text-text-sub-dark uppercase tracking-wider mb-1">Impact</span>
-                            <span className="text-3xl font-bold text-text-main dark:text-white mb-0.5">{stats.circlesCompleted}</span>
-                            <span className="text-[13px] text-text-sub dark:text-text-sub-dark font-medium leading-tight">Circles fully completed</span>
-                        </div>
+                    <div className="flex items-center gap-2 text-sm text-text-sub dark:text-text-sub-dark mb-4">
+                        <span className="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold">Member</span>
+                        <span>Since {user?.memberSince || '2023'}</span>
                     </div>
 
-                    <div className="bg-white dark:bg-surface-dark rounded-[20px] p-5 shadow-sm border border-gray-100 dark:border-white/5 flex flex-col justify-between min-h-[140px]">
-                        <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 flex items-center justify-center mb-2">
-                            <span className="material-symbols-outlined">calendar_month</span>
+                    {/* Stats Row */}
+                    <div className="flex w-full items-center justify-between px-4 py-4 bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
+                        <div className="flex flex-col items-center flex-1 border-r border-gray-100 dark:border-white/5">
+                            <span className="text-lg font-bold text-text-main dark:text-white">{stats.circlesCompleted}</span>
+                            <span className="text-[10px] uppercase font-bold text-text-sub dark:text-text-sub-dark tracking-wide">Circles</span>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-text-sub dark:text-text-sub-dark uppercase tracking-wider mb-1">Habit</span>
-                            <div className="flex items-baseline gap-0.5 mb-0.5">
-                                <span className="text-3xl font-bold text-text-main dark:text-white">{stats.onTimePercentage}</span>
-                                <span className="text-lg font-bold text-text-sub dark:text-text-sub-dark">%</span>
+                        <div className="flex flex-col items-center flex-1 border-r border-gray-100 dark:border-white/5">
+                            <span className="text-lg font-bold text-text-main dark:text-white">
+                                {stats.onTimePercentage}%
+                            </span>
+                            <span className="text-[10px] uppercase font-bold text-text-sub dark:text-text-sub-dark tracking-wide">Reliability</span>
+                        </div>
+                        <div className="flex flex-col items-center flex-1">
+                            <span className="text-lg font-bold text-text-main dark:text-white">{stats.supportCount}</span>
+                            <span className="text-[10px] uppercase font-bold text-text-sub dark:text-text-sub-dark tracking-wide">Support</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Menu / Settings */}
+                <div className="flex flex-col gap-3 mb-8">
+                    <h3 className="font-bold text-lg text-text-main dark:text-white px-1">Account</h3>
+
+                    <div className="bg-white dark:bg-surface-dark rounded-3xl p-1 shadow-sm border border-gray-100 dark:border-white/5">
+                        <button className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 flex items-center justify-center">
+                                    <span className="material-symbols-outlined">badge</span>
+                                </div>
+                                <div className="flex flex-col items-start">
+                                    <span className="font-bold text-text-main dark:text-white text-sm">Personal Information</span>
+                                    <span className="text-xs text-text-sub dark:text-text-sub-dark">Email, Phone, Bio</span>
+                                </div>
                             </div>
-                            <span className="text-[13px] text-text-sub dark:text-text-sub-dark font-medium leading-tight">On-time contributions</span>
-                        </div>
+                            <span className="material-symbols-outlined text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors">chevron_right</span>
+                        </button>
+
+                        <div className="h-[1px] bg-gray-100 dark:bg-white/5 mx-4"></div>
+
+                        <button className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center">
+                                    <span className="material-symbols-outlined">payments</span>
+                                </div>
+                                <div className="flex flex-col items-start">
+                                    <span className="font-bold text-text-main dark:text-white text-sm">Payment Methods</span>
+                                    <span className="text-xs text-text-sub dark:text-text-sub-dark">Manage cards & banks</span>
+                                </div>
+                            </div>
+                            <span className="material-symbols-outlined text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors">chevron_right</span>
+                        </button>
+
+                        <div className="h-[1px] bg-gray-100 dark:bg-white/5 mx-4"></div>
+
+                        <button className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-white/5 rounded-2xl transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 flex items-center justify-center">
+                                    <span className="material-symbols-outlined">notifications</span>
+                                </div>
+                                <div className="flex flex-col items-start">
+                                    <span className="font-bold text-text-main dark:text-white text-sm">Notifications</span>
+                                    <span className="text-xs text-text-sub dark:text-text-sub-dark">Push & Email</span>
+                                </div>
+                            </div>
+                            <span className="material-symbols-outlined text-gray-300 dark:text-gray-600 group-hover:text-primary transition-colors">chevron_right</span>
+                        </button>
                     </div>
                 </div>
 
-                {/* Community Supporter Card */}
-                <div className="bg-[#FAF8F3] dark:bg-surface-dark rounded-[20px] p-5 mb-8 flex items-center gap-4 border border-transparent dark:border-white/5">
-                    <div className="w-12 h-12 rounded-full bg-white dark:bg-white/10 shrink-0 flex items-center justify-center shadow-sm">
-                        <span className="material-symbols-outlined text-amber-500 text-[24px]">handshake</span>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-text-main dark:text-white text-[15px] mb-0.5">Community Supporter</span>
-                        <p className="text-[13px] text-text-sub dark:text-text-sub-dark leading-snug">
-                            You contributed <span className="font-bold text-amber-600 dark:text-amber-500">{stats.supportCount} times</span> before receiving your turn.
-                        </p>
-                    </div>
-                </div>
-
-                {/* Badges & Roles */}
+                {/* Badges */}
                 <div className="mb-8">
-                    <div className="flex items-center justify-between mb-4 px-1">
-                        <h3 className="font-bold text-lg text-text-main dark:text-white">Badges & Roles</h3>
-                        <span className="text-sm font-bold text-amber-600 dark:text-amber-500">View all</span>
+                    <div className="flex items-center justify-between mb-3 px-1">
+                        <h3 className="font-bold text-lg text-text-main dark:text-white">Badges</h3>
                     </div>
-
-                    <div className="flex gap-3 overflow-x-auto pb-4 -mx-5 px-5 scrollbar-hide">
+                    <div className="flex gap-3 overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide">
                         {badges.map((badgeId: string) => {
                             const config = BADGE_CONFIG[badgeId] || { label: badgeId, icon: 'badge', color: 'bg-gray-100 text-gray-700' };
                             return (
-                                <div key={badgeId} className="bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 rounded-[20px] p-4 min-w-[140px] flex flex-col items-center text-center gap-3 shrink-0">
+                                <div key={badgeId} className="bg-white dark:bg-surface-dark border border-gray-100 dark:border-white/5 rounded-[20px] p-4 min-w-[120px] flex flex-col items-center text-center gap-3 shrink-0 shadow-sm">
                                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${config.color.split(' ')[0]} ${config.color.split(' ')[1]}`}>
                                         <span className="material-symbols-outlined text-[24px]">{config.icon}</span>
                                     </div>
                                     <div className="flex flex-col gap-0.5">
                                         <span className="font-bold text-sm text-text-main dark:text-white">{config.label}</span>
-                                        <span className="text-[11px] text-text-sub dark:text-text-sub-dark font-medium">Earned 2023</span>
                                     </div>
                                 </div>
                             );
                         })}
                         {badges.length === 0 && (
-                            <div className="text-sm text-text-sub dark:text-text-sub-dark italic p-2">No badges yet. Join circles to earn them!</div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Recent Activity */}
-                <div className="mb-8">
-                    <h3 className="font-bold text-lg text-text-main dark:text-white mb-4 px-1">Recent Activity</h3>
-                    <div className="flex flex-col gap-5">
-                        {history.length > 0 ? history.map((item: any, index: number) => (
-                            <div
-                                key={item.id}
-                                className="flex items-start gap-4 animate-in slide-in-from-bottom-2 fade-in duration-500 fill-mode-forwards opacity-0"
-                                style={{ animationDelay: `${index * 100}ms`, animationFillMode: 'forwards' }}
-                            >
-                                <div className={`mt-0.5 w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${item.type.includes('PAID') || item.type.includes('CONFIRMED') ? 'bg-green-100 text-green-600' :
-                                    item.type.includes('OBLIGATION') ? 'bg-amber-100 text-amber-600' :
-                                        'bg-blue-100 text-blue-600'
-                                    }`}>
-                                    <span className="material-symbols-outlined text-[20px]">
-                                        {item.type.includes('PAID') ? 'check_circle' :
-                                            item.type.includes('CONFIRMED') ? 'verified' :
-                                                item.type.includes('OBLIGATION') ? 'receipt_long' : 'info'}
-                                    </span>
-                                </div>
-                                <div className="flex flex-col flex-1 gap-0.5">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-bold text-[15px] text-text-main dark:text-white">{item.description}</span>
-                                        <span className="text-[11px] font-medium text-text-sub dark:text-text-sub-dark">
-                                            {new Date(item.createdAt).toLocaleDateString()}
-                                        </span>
-                                    </div>
-                                    <span className="text-[13px] text-text-sub dark:text-text-sub-dark">
-                                        {item.amount ? `${item.direction === 'DEBIT' ? '-' : '+'}$${item.amount}` : item.type.replace(/_/g, ' ')}
-                                    </span>
-                                </div>
+                            <div className="text-sm text-text-sub dark:text-text-sub-dark italic p-2 bg-gray-50 dark:bg-white/5 rounded-xl w-full text-center">
+                                Complete circles to earn badges!
                             </div>
-                        )) : (
-                            <p className="text-sm text-text-sub">No recent activity.</p>
                         )}
                     </div>
                 </div>
 
-                {/* Settings & Sign Out (Collapsible or Bottom) */}
-                <div className="mt-4 border-t border-gray-100 dark:border-white/5 pt-6">
-                    <form action={signOutAction} className="mt-2">
-                        <button type="submit" className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-red-50 dark:hover:bg-red-900/10 cursor-pointer text-text-sub dark:text-text-sub-dark hover:text-red-500 transition-colors text-sm font-bold">
-                            <span className="material-symbols-outlined text-[18px]">logout</span>
+                {/* Sign Out */}
+                <div className="mt-4">
+                    <form action={signOutAction}>
+                        <button type="submit" className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 font-bold transition-colors">
+                            <span className="material-symbols-outlined">logout</span>
                             Sign Out
                         </button>
                     </form>

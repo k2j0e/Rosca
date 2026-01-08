@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Work_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const workSans = Work_Sans({
-  variable: "--font-work-sans",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
 });
 
@@ -18,17 +18,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${workSans.variable}`}>
+    <html lang="en" className={`${jakarta.variable} antialiased`}>
       <head>
         <meta name="color-scheme" content="light dark" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8f6f6" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#221610" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F8F9FC" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0F172A" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased font-display bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark pb-0">
+      <body className="bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark selection:bg-primary selection:text-white pb-0 font-sans">
         <main className="min-h-screen">
           {children}
         </main>

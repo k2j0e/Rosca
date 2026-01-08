@@ -8,56 +8,63 @@ import { usePathname } from "next/navigation";
 export default function BottomNav() {
     const pathname = usePathname();
 
-    // BottomNav is now only rendered inside (app) layout, so simpler check.
-    // Still hide on admin and onboarding.
-    const hiddenPathPrefixes = ['/onboarding', '/admin'];
+    const hiddenPathPrefixes = ['/onboarding', '/admin', '/signin', '/signup', '/invite'];
     if (hiddenPathPrefixes.some(prefix => pathname.startsWith(prefix))) return null;
 
     const isActive = (path: string) => {
-        // Exact match for main nav paths
         if (pathname === path) return true;
-        // For /home, also match root app route
         if (path === "/home" && pathname === "/") return true;
         return false;
     };
 
-    const navItems = [
-        { name: "Home", path: "/home", icon: "home" },
-        { name: "Explore", path: "/explore", icon: "explore" },
-        { name: "My Circles", path: "/my-circles", icon: "groups" },
-        { name: "Profile", path: "/profile", icon: "person" },
-    ];
-
     return (
-        <>
-            {/* Spacer to prevent content overlap */}
-            <div className="h-20 w-full" aria-hidden="true" />
+        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/85 dark:bg-surface-dark/85 backdrop-blur-md border-t border-gray-200/50 dark:border-white/5 pb-[max(20px,env(safe-area-inset-bottom))] pt-3">
+            <ul className="flex justify-around items-end max-w-lg mx-auto px-6 h-full">
+                <li className="flex-1">
+                    <Link href="/home" className="flex flex-col items-center gap-1 group w-full">
+                        <div className="relative p-1">
+                            <span className={`material-symbols-outlined text-[26px] transition-transform group-active:scale-90 ${isActive('/home') ? 'text-primary filled font-bold' : 'text-text-muted group-hover:text-text-main dark:text-text-sub-dark dark:group-hover:text-white'}`}>
+                                home
+                            </span>
+                            {isActive('/home') && <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-primary rounded-full"></span>}
+                        </div>
+                        <span className={`text-[10px] font-bold ${isActive('/home') ? 'text-primary' : 'text-text-muted dark:text-text-sub-dark'}`}>Home</span>
+                    </Link>
+                </li>
+                <li className="flex-1">
+                    <Link href="/explore" className="flex flex-col items-center gap-1 group w-full">
+                        <span className={`material-symbols-outlined text-[26px] transition-colors group-active:scale-90 ${isActive('/explore') ? 'text-primary filled font-bold' : 'text-text-muted group-hover:text-text-main dark:text-text-sub-dark dark:group-hover:text-white'}`}>
+                            travel_explore
+                        </span>
+                        <span className={`text-[10px] font-medium ${isActive('/explore') ? 'text-primary font-bold' : 'text-text-muted dark:text-text-sub-dark'}`}>Explore</span>
+                    </Link>
+                </li>
 
-            <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-surface-dark border-t border-gray-100 dark:border-gray-800 pb-[env(safe-area-inset-bottom)]">
-                <div className="max-w-md mx-auto flex items-center justify-around h-16 px-2">
-                    {navItems.map((item) => {
-                        const active = isActive(item.path);
-                        return (
-                            <Link key={item.path} href={item.path} className="w-full h-full">
-                                <button
-                                    className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${active
-                                        ? "text-primary"
-                                        : "text-text-sub dark:text-text-sub-dark hover:text-primary"
-                                        }`}
-                                >
-                                    <span
-                                        className={`material-symbols-outlined text-2xl`}
-                                        style={active ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                                    >
-                                        {item.icon}
-                                    </span>
-                                    <span className="text-[10px] font-medium">{item.name}</span>
-                                </button>
-                            </Link>
-                        );
-                    })}
-                </div>
-            </nav>
-        </>
+                <li className="flex-1 relative -top-5 flex justify-center">
+                    <Link href="/create/financials">
+                        <button className="w-14 h-14 bg-text-main dark:bg-primary text-white rounded-full shadow-glow flex items-center justify-center active:scale-95 transition-transform hover:bg-black dark:hover:bg-primary-hover border-4 border-background-light dark:border-background-dark">
+                            <span className="material-symbols-outlined text-2xl">add</span>
+                        </button>
+                    </Link>
+                </li>
+
+                <li className="flex-1">
+                    <Link href="/my-circles" className="flex flex-col items-center gap-1 group w-full">
+                        <span className={`material-symbols-outlined text-[26px] transition-colors group-active:scale-90 ${isActive('/my-circles') ? 'text-primary filled font-bold' : 'text-text-muted group-hover:text-text-main dark:text-text-sub-dark dark:group-hover:text-white'}`}>
+                            groups
+                        </span>
+                        <span className={`text-[10px] font-medium ${isActive('/my-circles') ? 'text-primary font-bold' : 'text-text-muted dark:text-text-sub-dark'}`}>Circles</span>
+                    </Link>
+                </li>
+                <li className="flex-1">
+                    <Link href="/profile" className="flex flex-col items-center gap-1 group w-full">
+                        <span className={`material-symbols-outlined text-[26px] transition-colors group-active:scale-90 ${isActive('/profile') ? 'text-primary filled font-bold' : 'text-text-muted group-hover:text-text-main dark:text-text-sub-dark dark:group-hover:text-white'}`}>
+                            person
+                        </span>
+                        <span className={`text-[10px] font-medium ${isActive('/profile') ? 'text-primary font-bold' : 'text-text-muted dark:text-text-sub-dark'}`}>Profile</span>
+                    </Link>
+                </li>
+            </ul>
+        </nav>
     );
 }
