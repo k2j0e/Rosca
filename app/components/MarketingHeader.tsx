@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { Logo } from "./Logo";
 
 export async function MarketingHeader() {
     const cookieStore = await cookies();
@@ -10,9 +11,7 @@ export async function MarketingHeader() {
         <header className="sticky top-0 z-50 w-full bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b border-gray-100 dark:border-white/5">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
                 <Link href="/" className="flex items-center gap-2 group">
-                    <div className="w-8 h-8 rounded-full border-[3px] border-[#F25F15] flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
-                        <div className="w-2 h-2 rounded-full bg-[#F25F15]"></div>
-                    </div>
+                    <Logo size="md" variant="outline" className="group-hover:rotate-180 transition-transform duration-500" />
                     <span className="text-xl font-black tracking-tight text-text-main dark:text-white">Circle8</span>
                 </Link>
 

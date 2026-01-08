@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/app/components/Logo";
 
 // Reuse step logic from Onboarding, but customized for context
 export default function InviteTutorial({ params }: { params: { id: string } }) {
@@ -52,8 +53,9 @@ export default function InviteTutorial({ params }: { params: { id: string } }) {
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col font-display">
             {/* Header */}
             <div className="p-6 flex justify-between items-center">
-                <Link href="/" className="font-black text-2xl tracking-tighter text-text-main dark:text-white">
-                    Circle8<span className="text-primary">.</span>
+                <Link href="/" className="flex items-center gap-2 font-black text-2xl tracking-tighter text-text-main dark:text-white">
+                    <Logo size="md" variant="outline" />
+                    <span>Circle8<span className="text-primary">.</span></span>
                 </Link>
                 <div className="text-sm font-bold text-text-sub">
                     Step {step + 1} of 3

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "./Logo";
 
 interface SideNavProps {
     user?: {
@@ -35,9 +36,7 @@ export default function SideNav({ user }: SideNavProps) {
             {/* Brand Header */}
             <div className="p-6 border-b border-gray-100 dark:border-gray-800">
                 <Link href="/home" className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-orange-500 rounded-xl flex items-center justify-center">
-                        <span className="text-white font-black text-lg">O</span>
-                    </div>
+                    <Logo size="lg" variant="outline" />
                     <span className="text-xl font-black tracking-tight">Circle8</span>
                 </Link>
             </div>

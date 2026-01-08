@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCircle } from "@/lib/data";
+import { Logo } from "@/app/components/Logo";
 
 export default async function InvitePage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -21,8 +22,9 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
         <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col font-display">
             {/* Header */}
             <div className="p-6 flex justify-between items-center">
-                <Link href="/" className="font-black text-2xl tracking-tighter text-text-main dark:text-white">
-                    Circle8<span className="text-primary">.</span>
+                <Link href="/" className="flex items-center gap-2 font-black text-2xl tracking-tighter text-text-main dark:text-white">
+                    <Logo size="md" variant="outline" />
+                    <span>Circle8<span className="text-primary">.</span></span>
                 </Link>
                 <Link href="/signin">
                     <span className="text-sm font-bold text-text-main dark:text-white hover:opacity-70">Sign In</span>

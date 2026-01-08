@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "./Logo";
 
 export function MarketingFooter() {
     return (
@@ -6,6 +7,7 @@ export function MarketingFooter() {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="flex items-center gap-2">
+                        <Logo size="md" variant="outline" />
                         <span className="text-xl font-black text-text-main dark:text-white">Circle8</span>
                     </div>
                     <p className="text-sm text-gray-500">© {new Date().getFullYear()} Circle8 Financial Technologies.<br />All rights reserved.</p>
