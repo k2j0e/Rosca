@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signOutAction } from "@/app/actions";
 import ProfileEditModal from "./ProfileEditModal";
 import ProfileNudge from "@/app/components/ProfileNudge";
-import { ExplainRoscaTrigger } from "@/app/components/ExplainRosca";
+import { ExplainCircle8Trigger } from "@/app/components/ExplainCircle8";
 
 // Badge Config
 const BADGE_CONFIG: Record<string, { label: string, icon: string, color: string }> = {
@@ -51,7 +51,7 @@ export default function ProfileView({ user, history = [] }: ProfileViewProps) {
                     Your Saving Journey
                 </h2>
                 <div className="p-2 -mr-2 text-text-sub dark:text-text-sub-dark">
-                    <ExplainRoscaTrigger variant="icon" />
+                    <ExplainCircle8Trigger variant="icon" />
                 </div>
             </div>
 

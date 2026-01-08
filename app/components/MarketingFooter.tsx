@@ -6,9 +6,9 @@ export function MarketingFooter() {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex flex-col items-center md:items-start gap-4">
                     <div className="flex items-center gap-2">
-                        <span className="text-xl font-black text-text-main dark:text-white">Orbit</span>
+                        <span className="text-xl font-black text-text-main dark:text-white">Circle8</span>
                     </div>
-                    <p className="text-sm text-gray-500">© {new Date().getFullYear()} Orbit Financial Technologies.<br />All rights reserved.</p>
+                    <p className="text-sm text-gray-500">© {new Date().getFullYear()} Circle8 Financial Technologies.<br />All rights reserved.</p>
                 </div>
 
                 <div className="flex gap-8 text-sm font-medium text-gray-600 dark:text-gray-400">

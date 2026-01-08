@@ -53,7 +53,7 @@ export default function InviteTutorial({ params }: { params: { id: string } }) {
             {/* Header */}
             <div className="p-6 flex justify-between items-center">
                 <Link href="/" className="font-black text-2xl tracking-tighter text-text-main dark:text-white">
-                    Orbit<span className="text-primary">.</span>
+                    Circle8<span className="text-primary">.</span>
                 </Link>
                 <div className="text-sm font-bold text-text-sub">
                     Step {step + 1} of 3

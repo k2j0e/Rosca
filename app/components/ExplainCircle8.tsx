@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export function ExplainRoscaTrigger({ variant = "icon" }: { variant?: "icon" | "text" }) {
+export function ExplainCircle8Trigger({ variant = "icon" }: { variant?: "icon" | "text" }) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (

@@ -22,7 +22,7 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
             {/* Header */}
             <div className="p-6 flex justify-between items-center">
                 <Link href="/" className="font-black text-2xl tracking-tighter text-text-main dark:text-white">
-                    Orbit<span className="text-primary">.</span>
+                    Circle8<span className="text-primary">.</span>
                 </Link>
                 <Link href="/signin">
                     <span className="text-sm font-bold text-text-main dark:text-white hover:opacity-70">Sign In</span>
@@ -92,7 +92,7 @@ export default async function InvitePage(props: { params: Promise<{ id: string }
 
                     <div className="flex flex-col items-center gap-4 mt-6">
                         <p className="text-xs text-text-sub dark:text-text-sub-dark">
-                            New to Orbit? You'll create a free account to join.
+                            New to Circle8? You'll create a free account to join.
                         </p>
 
                         <Link href={`/signin?redirect=${encodeURIComponent(`/circles/${circle.id}/join`)}`}>

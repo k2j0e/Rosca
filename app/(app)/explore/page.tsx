@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from "next/link";
 import { getCircles } from "@/lib/data";
-import { ExplainRoscaTrigger } from "@/app/components/ExplainRosca";
+import { ExplainCircle8Trigger } from "@/app/components/ExplainCircle8";
 import { CircleCard } from "@/app/components/CircleCard";
 
 export default async function ExploreCircles(props: { searchParams: Promise<{ joined?: string }> }) {
@@ -40,7 +40,7 @@ export default async function ExploreCircles(props: { searchParams: Promise<{ jo
                                 notifications
                             </span>
                         </button>
-                        <ExplainRoscaTrigger variant="icon" />
+                        <ExplainCircle8Trigger variant="icon" />
                     </div>
                 </div>
             </div>

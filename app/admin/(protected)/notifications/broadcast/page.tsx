@@ -118,7 +118,7 @@ export default function BroadcastPage() {
                             <div className="w-5 h-5 rounded-md bg-slate-900 flex items-center justify-center">
                                 <span className="text-[10px] text-white font-bold">R</span>
                             </div>
-                            <span className="text-xs font-semibold text-slate-500 uppercase">ROSCA • NOW</span>
+                            <span className="text-xs font-semibold text-slate-500 uppercase">CIRCLE8 • NOW</span>
                         </div>
                         <p className="font-bold text-sm text-slate-900 dark:text-white mb-0.5">
                             {title || 'Notification Title'}

@@ -38,7 +38,7 @@ export default function SideNav({ user }: SideNavProps) {
                     <div className="w-10 h-10 bg-gradient-to-br from-primary to-orange-500 rounded-xl flex items-center justify-center">
                         <span className="text-white font-black text-lg">O</span>
                     </div>
-                    <span className="text-xl font-black tracking-tight">Orbit</span>
+                    <span className="text-xl font-black tracking-tight">Circle8</span>
                 </Link>
             </div>
 

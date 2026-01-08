@@ -13,7 +13,7 @@ export async function MarketingHeader() {
                     <div className="w-8 h-8 rounded-full border-[3px] border-[#F25F15] flex items-center justify-center group-hover:rotate-180 transition-transform duration-500">
                         <div className="w-2 h-2 rounded-full bg-[#F25F15]"></div>
                     </div>
-                    <span className="text-xl font-black tracking-tight text-text-main dark:text-white">Orbit</span>
+                    <span className="text-xl font-black tracking-tight text-text-main dark:text-white">Circle8</span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-8">

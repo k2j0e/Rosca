@@ -95,7 +95,7 @@ export async function sendOtpAction(formData: FormData) {
     }
 
     // Send SMS
-    const smsResult = await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
+    const smsResult = await sendSms(phone, `Your Circle8 verification code is: ${otp}`);
 
     if (!smsResult.success) {
         // Safe error for UI
@@ -136,7 +136,7 @@ export async function resendOtpAction(formData: FormData) {
         }
     });
 
-    const smsResult = await sendSms(phone, `Your ROSCA verification code is: ${otp}`);
+    const smsResult = await sendSms(phone, `Your Circle8 verification code is: ${otp}`);
 
     if (!smsResult.success) {
         return { error: 'Failed to send SMS' };
@@ -366,7 +366,7 @@ export async function createAccountAction(formData: FormData) {
         }
     }));
 
-    await sendSms(phone, `Welcome to ROSCA! Your verification code is: ${otp}`);
+    await sendSms(phone, `Welcome to Circle8! Your verification code is: ${otp}`);
 
     // Redirect to Verify Page
     redirect(`/signin/verify?phone=${encodeURIComponent(phone)}`);
@@ -817,7 +817,7 @@ export async function beginSignupAction(formData: FormData) {
     }
 
     // Send SMS
-    const smsResult = await sendSms(phone, `Your Orbit code is: ${otp}`);
+    const smsResult = await sendSms(phone, `Your Circle8 code is: ${otp}`);
 
     if (!smsResult.success) {
         console.error("SMS Send Failed:", smsResult.error);

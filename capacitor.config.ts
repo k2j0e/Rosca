@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-    appId: 'com.rosca.app',
-    appName: 'Rosca',
+    appId: 'com.circle8.app',
+    appName: 'Circle8',
     webDir: 'out',
     server: {
         // Load the production Vercel site directly

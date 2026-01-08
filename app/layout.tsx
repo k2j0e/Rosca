@@ -8,7 +8,7 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Orbit - Save Together",
+  title: "Circle8 - Save Together",
   description: "Join a circle and start saving together.",
 };
 
