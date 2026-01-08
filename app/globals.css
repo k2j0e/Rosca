@@ -187,3 +187,19 @@
   animation: breathing 3s ease-in-out infinite;
   animation-delay: 1.5s;
 }
+
+/* Continuous Clockwise Rotation */
+@keyframes spin-clockwise {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-clockwise {
+  animation: spin-clockwise 3s linear infinite;
+  display: inline-block;
+}

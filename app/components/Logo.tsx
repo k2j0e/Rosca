@@ -32,7 +32,7 @@ export function Logo({ className = "", size = "md", variant = "filled" }: LogoPr
 
     return (
         <div className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}>
-            8
+            <span className="animate-spin-clockwise">8</span>
         </div>
     );
 }
