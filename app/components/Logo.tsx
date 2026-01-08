@@ -32,7 +32,7 @@ export function Logo({ className = "", size = "md", variant = "filled" }: LogoPr
 
     return (
         <div className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}>
-            <span className="animate-spin-clockwise">8</span>
+            <span className="material-symbols-outlined animate-spin-clockwise" style={{ fontSize: '1.2em' }}>all_inclusive</span>
         </div>
     );
 }
