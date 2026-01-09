@@ -567,7 +567,7 @@ export async function markContributionPaidAction(circleId: string) {
     if (!currentUser) throw new Error("Unauthorized");
 
     // Fetch circle to check current status
-    const { getCircle } = await import("@/lib/data"); // Dynamic import to avoid circular dependency issues if any, though likely fine
+    const { getCircle, getCurrentRound } = await import("@/lib/data"); // Dynamic import to avoid circular dependency issues if any, though likely fine
     const circle = await getCircle(circleId);
     if (!circle) throw new Error("Circle not found");
 
@@ -586,6 +586,9 @@ export async function markContributionPaidAction(circleId: string) {
 
     await updateMemberStatus(circleId, currentUser.id, 'paid_pending');
 
+    // Get current round for metadata
+    const currentRound = await getCurrentRound(circleId);
+
     // Ledger: Log Payment Attempt
     await recordLedgerEntry({
         type: LedgerEntryType.CONTRIBUTION_MARKED_PAID,
@@ -594,7 +597,8 @@ export async function markContributionPaidAction(circleId: string) {
         circleId: circleId,
         userId: currentUser.id,
         amount: circle.amount,
-        currency: 'USD'
+        currency: 'USD',
+        metadata: { round: currentRound }
     });
 
     revalidatePath(`/circles/${circleId}`);
@@ -640,11 +644,13 @@ export async function confirmContributionAction(circleId: string, contributorId:
             : `Recipient ${currentUser.name} confirmed receipt from ${contributor.user.name}`,
         circleId: circleId,
         userId: contributorId,
-        metadata: { verifierId: currentUser.id, step: isRecipientAlsoAdmin ? 'admin_recipient' : 'recipient' }
+        metadata: { verifierId: currentUser.id, step: isRecipientAlsoAdmin ? 'admin_recipient' : 'recipient', round: currentRound }
     });
 
-    // If admin auto-finalized, the round completion check will happen naturally
-    // when the last member's payment is finalized (via existing verifyPaymentAction logic)
+    // If admin auto-finalized, we MUST check if round is complete
+    if (isRecipientAlsoAdmin) {
+        await checkAndCompleteRound(circleId);
+    }
 
     revalidatePath(`/circles/${circleId}`);
     revalidatePath(`/circles/${circleId}/dashboard`);

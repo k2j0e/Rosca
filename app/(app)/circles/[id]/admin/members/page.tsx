@@ -13,6 +13,7 @@ export default async function ManageMembers(props: { params: Promise<{ id: strin
 
     const pendingRequests = circle.members.filter(m => m.status === 'requested');
     const verifiedPayments = circle.members.filter(m => m.status === 'recipient_verified');
+    const awaitingRecipient = circle.members.filter(m => m.status === 'paid_pending');
     const activeMembers = circle.members.filter(m => m.status !== 'requested');
 
     return (
@@ -69,6 +70,37 @@ export default async function ManageMembers(props: { params: Promise<{ id: strin
                     </div>
                 )}
 
+                {/* Awaiting Recipient Confirmation (Admin can see who marked paid) */}
+                {awaitingRecipient.length > 0 && (
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-lg text-text-main dark:text-white">Awaiting Recipient</h3>
+                            <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{awaitingRecipient.length}</span>
+                        </div>
+                        <p className="text-xs text-text-sub dark:text-text-sub-dark -mt-1 mb-1">
+                            These members marked as paid. Waiting for recipient to confirm receipt.
+                        </p>
+
+                        {awaitingRecipient.map(member => (
+                            <div key={member.userId} className="flex items-center justify-between p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 bg-cover bg-center" style={{ backgroundImage: `url('${member.avatar}')` }}></div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-text-main dark:text-white">{member.name}</span>
+                                        <span className="text-xs text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[10px]">hourglass_top</span>
+                                            Marked as paid
+                                        </span>
+                                    </div>
+                                </div>
+                                <span className="text-xs text-amber-700 dark:text-amber-300 font-semibold">
+                                    Waiting
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {/* Verified Payments Section (Ready for Admin Finalization) */}
                 {verifiedPayments.length > 0 && (
                     <div className="flex flex-col gap-3">
@@ -118,9 +150,9 @@ export default async function ManageMembers(props: { params: Promise<{ id: strin
                                         {(member.role !== 'admin' || member.status !== 'pending') && (
                                             <>
                                                 <span className={`w-2 h-2 rounded-full ${member.status === 'paid' ? 'bg-green-500' :
-                                                        member.status === 'recipient_verified' ? 'bg-blue-500' :
-                                                            member.status === 'paid_pending' ? 'bg-orange-400' :
-                                                                'bg-yellow-500'
+                                                    member.status === 'recipient_verified' ? 'bg-blue-500' :
+                                                        member.status === 'paid_pending' ? 'bg-orange-400' :
+                                                            'bg-yellow-500'
                                                     }`}></span>
                                                 <span className="text-xs text-text-sub dark:text-text-sub-dark capitalize">
                                                     {member.status === 'pending' ? 'Unpaid' :
