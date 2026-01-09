@@ -45,8 +45,8 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                 </Link>
             </div>
 
-            {/* Cover Image Header */}
-            <div className="relative w-full h-80 overflow-hidden">
+            {/* Cover Image Header - Optimized height for mobile */}
+            <div className="relative w-full h-52 overflow-hidden">
                 {circle.coverImage ? (
                     <img
                         src={circle.coverImage}
@@ -147,34 +147,38 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     ))}
                 </div>
 
-                {/* Timeline Visual */}
+                {/* Why Join This Circle */}
                 <div>
-                    <h3 className="font-bold text-xl text-text-main dark:text-white mb-4">Timeline</h3>
-                    <div className="bg-surface-light dark:bg-surface-dark p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-white/5">
-                        <div className="relative flex items-center justify-between">
-                            <div className="absolute left-0 right-0 h-1 bg-gray-100 dark:bg-white/5 rounded-full -z-10 top-[7px]"></div>
-
-                            {/* Start */}
-                            <div className="flex flex-col gap-2">
-                                <div className="w-4 h-4 rounded-full bg-primary border-4 border-white dark:border-surface-dark shadow-sm"></div>
-                                <span className="text-[10px] font-bold uppercase text-text-muted">Start</span>
+                    <h3 className="font-bold text-xl text-text-main dark:text-white mb-4">Why Join?</h3>
+                    <div className="bg-gradient-to-br from-primary/5 to-orange-50 dark:from-primary/10 dark:to-surface-dark p-5 rounded-3xl border border-primary/10 dark:border-primary/20">
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-primary text-lg">savings</span>
+                                </div>
+                                <div>
+                                    <p className="font-bold text-sm text-text-main dark:text-white">Save ${circle.payoutTotal.toLocaleString()}</p>
+                                    <p className="text-xs text-text-sub dark:text-text-sub-dark">Receive the full pot when it&apos;s your turn</p>
+                                </div>
                             </div>
-
-                            {/* Middle */}
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="w-2 h-2 rounded-full bg-gray-300 dark:bg-white/20"></div>
-                            ))}
-
-                            {/* End */}
-                            <div className="flex flex-col  gap-2 items-end">
-                                <div className="w-4 h-4 rounded-full bg-text-main dark:bg-white border-4 border-white dark:border-surface-dark shadow-sm"></div>
-                                <span className="text-[10px] font-bold uppercase text-text-muted">Goal</span>
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-emerald-500 text-lg">group</span>
+                                </div>
+                                <div>
+                                    <p className="font-bold text-sm text-text-main dark:text-white">{circle.members.length}/{circle.maxMembers} Members</p>
+                                    <p className="text-xs text-text-sub dark:text-text-sub-dark">{circle.maxMembers - circle.members.length} spots remaining</p>
+                                </div>
                             </div>
-                        </div>
-                        <div className="mt-4 flex justify-between text-xs font-medium">
-                            <span>{new Date(circle.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                            <span className="text-text-muted">{circle.duration} rounds</span>
-                            <span>Target Achieved</span>
+                            <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+                                    <span className="material-symbols-outlined text-blue-500 text-lg">verified_user</span>
+                                </div>
+                                <div>
+                                    <p className="font-bold text-sm text-text-main dark:text-white">Zero Interest</p>
+                                    <p className="text-xs text-text-sub dark:text-text-sub-dark">Community-based, no fees or loans</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

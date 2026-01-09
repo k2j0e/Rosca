@@ -54,10 +54,10 @@ export default function CreateFinancials() {
                         <div className="w-8"></div> {/* Spacer for center alignment */}
                     </div>
 
-                    {/* Progress Bar */}
+                    {/* Progress Bar - Step 1 of 4 */}
                     <div className="flex gap-2 mb-6">
-                        <div className="h-1 flex-1 bg-gray-300 rounded-full"></div>
                         <div className="h-1 flex-1 bg-primary rounded-full"></div>
+                        <div className="h-1 flex-1 bg-gray-300 rounded-full"></div>
                         <div className="h-1 flex-1 bg-gray-300 rounded-full"></div>
                         <div className="h-1 flex-1 bg-gray-300 rounded-full"></div>
                     </div>
