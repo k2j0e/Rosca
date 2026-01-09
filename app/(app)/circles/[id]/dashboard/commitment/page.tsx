@@ -73,7 +73,6 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
 
                     <div className="flex w-full grow flex-col items-stretch justify-center gap-1 -mt-24 px-6 pb-8 relative z-10">
                         {/* Status Badge */}
-                        {/* Status Badge */}
                         <div className="flex justify-start mb-5">
                             <div className="bg-white dark:bg-[#2A2A2A] border border-gray-100 dark:border-white/10 shadow-sm rounded-full px-3 py-1.5 flex items-center gap-2">
                                 {myMember?.status === 'requested' ? (
@@ -83,11 +82,32 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
                                             Awaiting Approval
                                         </span>
                                     </>
+                                ) : myMember?.status === 'paid_pending' ? (
+                                    <>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                                            Waiting for Recipient
+                                        </span>
+                                    </>
+                                ) : myMember?.status === 'recipient_verified' ? (
+                                    <>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                                            Verified - Awaiting Admin
+                                        </span>
+                                    </>
+                                ) : myMember?.status === 'paid' ? (
+                                    <>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                                        <span className="text-[11px] font-bold uppercase tracking-wider text-green-600 dark:text-green-400">
+                                            Payment Complete
+                                        </span>
+                                    </>
                                 ) : (
                                     <>
-                                        <div className={`w-2.5 h-2.5 rounded-full ${myMember?.status === 'paid' ? 'bg-green-500' : 'bg-amber-400 animate-pulse'}`}></div>
+                                        <div className="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></div>
                                         <span className="text-[11px] font-bold uppercase tracking-wider text-text-main dark:text-white">
-                                            {myMember?.status === 'paid' ? 'Payment Complete' : 'Payment Due Soon'}
+                                            Payment Due Soon
                                         </span>
                                     </>
                                 )}
@@ -139,8 +159,13 @@ export default async function DashboardCommitment(props: { params: Promise<{ id:
                             </button>
                         ) : myMember?.status === 'paid_pending' ? (
                             <button disabled className="w-full h-14 bg-amber-100 text-amber-600 font-bold text-lg rounded-full flex items-center justify-center gap-2 cursor-wait">
-                                Awaiting Confirmation
+                                Waiting for Recipient to Confirm
                                 <span className="material-symbols-outlined text-[20px]">hourglass_top</span>
+                            </button>
+                        ) : myMember?.status === 'recipient_verified' ? (
+                            <button disabled className="w-full h-14 bg-blue-100 text-blue-600 font-bold text-lg rounded-full flex items-center justify-center gap-2 cursor-wait">
+                                Verified - Awaiting Admin Approval
+                                <span className="material-symbols-outlined text-[20px]">verified</span>
                             </button>
                         ) : myMember?.status !== 'paid' ? (
                             <form action={markContributionPaidAction.bind(null, circle.id)}>
