@@ -146,6 +146,37 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                 );
             })()}
 
+            {/* Payment Verification Alert (Recipient Verified) */}
+            {(() => {
+                const verifiedPayments = members.filter(m => m.status === 'recipient_verified');
+                if (verifiedPayments.length === 0) return null;
+
+                return (
+                    <div className="px-4 pb-4">
+                        <Link href={`/circles/${params.id}/admin/members`}>
+                            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-4 rounded-2xl text-white shadow-lg shadow-emerald-500/20 animate-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-xl animate-pulse">payments</span>
+                                        <span className="font-bold">Final Approvals Needed</span>
+                                    </div>
+                                    <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                                        {verifiedPayments.length} ready
+                                    </span>
+                                </div>
+                                <p className="text-sm text-white/90 mb-3">
+                                    {verifiedPayments.length} payment{verifiedPayments.length > 1 ? 's' : ''} confirmed by recipient.
+                                </p>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-white/70">Tap to finalize</span>
+                                    <span className="material-symbols-outlined">arrow_forward</span>
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+                );
+            })()}
+
             {/* Member Payment Grid */}
             <div className="px-4 pb-6">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark mb-3 px-2">

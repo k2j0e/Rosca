@@ -3,7 +3,7 @@ import { prisma } from './db';
 import { Prisma } from '@prisma/client';
 
 // Re-export types for compatibility, though ideally we switch to Prisma types
-export type MemberStatus = 'paid' | 'pending' | 'late' | 'requested' | 'paid_pending';
+export type MemberStatus = 'paid' | 'pending' | 'late' | 'requested' | 'paid_pending' | 'recipient_verified';
 export type CircleCategory = 'Travel' | 'Business' | 'Emergency' | 'Education' | 'Home Improvement' | 'Debt Consolidation' | 'Wedding' | 'Gadgets' | 'Health/Medical' | 'Vehicle' | 'Other';
 
 // Define interfaces that match the Prisma schema but with strict typing for JSON fields

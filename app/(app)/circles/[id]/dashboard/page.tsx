@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCircle, getCurrentUser } from "@/lib/data";
+import { getCircle, getCurrentUser, getCurrentRound } from "@/lib/data";
 import InviteButton from "@/app/components/InviteButton";
 import ShareLinkDisplay from "@/app/components/ShareLinkDisplay";
+import { confirmContributionAction } from "@/app/actions";
 
 export default async function CircleDashboard(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -17,31 +18,99 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
 
     // Calculate progress
     const totalMembers = circle.members.length;
-    const currentPayoutIndex = 0; // Fixed for MVP
+    const currentRound = await getCurrentRound(circle.id);
+
+    // Find recipient for this round (payoutMonth is 1-indexed usually, matching currentRound)
+    const recipientMember = circle.members.find(m => m.payoutMonth === currentRound);
+    const isRecipient = recipientMember?.userId === currentUser?.id;
+
+    // Filter payments awaiting MY confirmation (if I am recipient)
+    const paymentsToVerify = isRecipient
+        ? circle.members.filter(m => m.status === 'paid_pending')
+        : [];
+
     const nextPayoutDate = new Date(circle.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const collectedAmount = circle.amount * 3; // Mock collected amount
     const progress = (collectedAmount / circle.payoutTotal) * 100;
 
     // Find current user's status
     const myMember = circle.members.find(m => m.userId === currentUser?.id);
-    const isPaid = myMember?.status === 'paid';
+    const isPaid = myMember?.status === 'paid' || myMember?.status === 'paid_pending' || myMember?.status === 'recipient_verified';
 
     return (
 
 
         <div className="px-4 py-6 flex flex-col gap-6 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
+            {/* Recipient Verification Card (High Priority) */}
+            {isRecipient && paymentsToVerify.length > 0 && (
+                <div className="bg-white dark:bg-surface-dark p-5 rounded-2xl shadow-lg border-2 border-blue-500/20 animate-pulse-soft">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+                            <span className="material-symbols-outlined">verified</span>
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg">Confirm Receipts</h3>
+                            <p className="text-xs text-text-sub dark:text-text-sub-dark">
+                                {paymentsToVerify.length} members marked as paid. Did you receive the money?
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        {paymentsToVerify.map(member => (
+                            <div key={member.userId} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold overflow-hidden">
+                                        {member.avatar ? (
+                                            <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            member.name?.charAt(0).toUpperCase()
+                                        )}
+                                    </div>
+                                    <span className="font-bold text-sm">{member.name}</span>
+                                </div>
+                                <form action={async () => {
+                                    "use server";
+                                    await confirmContributionAction(circle.id, member.userId);
+                                }}>
+                                    <button className="bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+                                        Confirm
+                                    </button>
+                                </form>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Personal Status Card (Only show if active or completed) */}
             {myMember && circle.status !== 'recruiting' && (
                 <div className="flex items-center justify-between bg-white dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
                     <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPaid ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>
-                            <span className="material-symbols-outlined">{isPaid ? 'check' : 'priority_high'}</span>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${myMember.status === 'paid' ? 'bg-green-100 text-green-600' :
+                                myMember.status === 'recipient_verified' ? 'bg-blue-100 text-blue-600' :
+                                    myMember.status === 'paid_pending' ? 'bg-yellow-100 text-yellow-600' :
+                                        'bg-orange-100 text-orange-600'
+                            }`}>
+                            <span className="material-symbols-outlined">
+                                {myMember.status === 'paid' ? 'check_circle' :
+                                    myMember.status === 'recipient_verified' ? 'verified' :
+                                        myMember.status === 'paid_pending' ? 'hourglass_top' :
+                                            'priority_high'}
+                            </span>
                         </div>
                         <div className="flex flex-col">
-                            <span className="font-bold text-sm">Round 1 Contribution</span>
-                            <span className={`text-xs ${isPaid ? 'text-green-600' : 'text-orange-600'} font-medium`}>
-                                {isPaid ? 'Paid on time' : 'Due Now'}
+                            <span className="font-bold text-sm">Round {currentRound} Contribution</span>
+                            <span className={`text-xs font-medium ${myMember.status === 'paid' ? 'text-green-600' :
+                                    myMember.status === 'recipient_verified' ? 'text-blue-600' :
+                                        myMember.status === 'paid_pending' ? 'text-yellow-600' :
+                                            'text-orange-600'
+                                }`}>
+                                {myMember.status === 'paid' ? 'Complete' :
+                                    myMember.status === 'recipient_verified' ? 'Verified by Recipient' :
+                                        myMember.status === 'paid_pending' ? 'Waiting for Recipient' :
+                                            'Due Now'}
                             </span>
                         </div>
                     </div>

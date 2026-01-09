@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCircle, Member } from "@/lib/data";
-import { updateMemberStatusAction } from "@/app/actions";
+import { updateMemberStatusAction, verifyPaymentAction } from "@/app/actions";
 
 export default async function ManageMembers(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -12,6 +12,7 @@ export default async function ManageMembers(props: { params: Promise<{ id: strin
     }
 
     const pendingRequests = circle.members.filter(m => m.status === 'requested');
+    const verifiedPayments = circle.members.filter(m => m.status === 'recipient_verified');
     const activeMembers = circle.members.filter(m => m.status !== 'requested');
 
     return (
@@ -68,9 +69,40 @@ export default async function ManageMembers(props: { params: Promise<{ id: strin
                     </div>
                 )}
 
+                {/* Verified Payments Section (Ready for Admin Finalization) */}
+                {verifiedPayments.length > 0 && (
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-lg text-text-main dark:text-white">Pending Final Approval</h3>
+                            <span className="bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{verifiedPayments.length}</span>
+                        </div>
+
+                        {verifiedPayments.map(member => (
+                            <div key={member.userId} className="flex items-center justify-between p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 shadow-sm animate-in slide-in-from-right-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gray-200 bg-cover bg-center" style={{ backgroundImage: `url('${member.avatar}')` }}></div>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-text-main dark:text-white">{member.name}</span>
+                                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                            <span className="material-symbols-outlined text-[10px]">verified</span>
+                                            Verified by Recipient
+                                        </span>
+                                    </div>
+                                </div>
+                                <form action={verifyPaymentAction.bind(null, circle.id, member.userId)}>
+                                    <button className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-1">
+                                        Finalize
+                                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                                    </button>
+                                </form>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 {/* Active Members Section */}
                 <div className="flex flex-col gap-3">
-                    <h3 className="font-bold text-lg text-text-main dark:text-white">Active Members</h3>
+                    <h3 className="font-bold text-lg text-text-main dark:text-white">All Members</h3>
                     <div className="flex flex-col gap-2">
                         {activeMembers.map(member => (
                             <div key={member.userId} className="flex items-center p-3 rounded-xl bg-surface-light dark:bg-white/5 border border-transparent">
@@ -85,8 +117,17 @@ export default async function ManageMembers(props: { params: Promise<{ id: strin
                                     <div className="flex items-center gap-1.5">
                                         {(member.role !== 'admin' || member.status !== 'pending') && (
                                             <>
-                                                <span className={`w-2 h-2 rounded-full ${member.status === 'paid' ? 'bg-green-500' : 'bg-yellow-500'}`}></span>
-                                                <span className="text-xs text-text-sub dark:text-text-sub-dark capitalize">{member.status === 'pending' ? 'Unpaid' : member.status}</span>
+                                                <span className={`w-2 h-2 rounded-full ${member.status === 'paid' ? 'bg-green-500' :
+                                                        member.status === 'recipient_verified' ? 'bg-blue-500' :
+                                                            member.status === 'paid_pending' ? 'bg-orange-400' :
+                                                                'bg-yellow-500'
+                                                    }`}></span>
+                                                <span className="text-xs text-text-sub dark:text-text-sub-dark capitalize">
+                                                    {member.status === 'pending' ? 'Unpaid' :
+                                                        member.status === 'paid_pending' ? 'Waiting Recipient' :
+                                                            member.status === 'recipient_verified' ? 'Verified' :
+                                                                member.status}
+                                                </span>
                                             </>
                                         )}
                                         {member.role === 'admin' && member.status === 'pending' && (

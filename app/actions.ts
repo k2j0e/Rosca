@@ -601,6 +601,47 @@ export async function markContributionPaidAction(circleId: string) {
     revalidatePath(`/circles/${circleId}/dashboard/commitment`);
 }
 
+export async function confirmContributionAction(circleId: string, contributorId: string) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+
+    const { getCircle, getCurrentRound, getMember } = await import("@/lib/data");
+    const circle = await getCircle(circleId);
+    if (!circle) throw new Error("Circle not found");
+
+    // Verify current user is the Recipient for this round
+    const currentRound = await getCurrentRound(circleId);
+    const recipientMember = circle.members.find(m => m.payoutMonth === currentRound);
+
+    if (recipientMember?.userId !== currentUser.id) {
+        throw new Error("Only the current round recipient can confirm receipt");
+    }
+
+    // Verify contributor status
+    const contributor = await getMember(circleId, contributorId);
+    if (contributor?.status !== 'paid_pending') {
+        // Idempotency: if already verified, just return
+        if (contributor?.status === 'recipient_verified' || contributor?.status === 'paid') return;
+        throw new Error("Contributor has not marked payment as sent");
+    }
+
+    await updateMemberStatus(circleId, contributorId, 'recipient_verified');
+
+    // Ledger: Recipient Verification Log
+    await recordLedgerEntry({
+        type: LedgerEntryType.CONTRIBUTION_CONFIRMED, // Reusing existing type or creating specific one? Let's use INFO or similar for now to distinguish from Admin Final
+        direction: LedgerEntryDirection.NEUTRAL,
+        description: `Recipient ${currentUser.name} confirmed receipt from ${contributor.user.name}`,
+        circleId: circleId,
+        userId: contributorId,
+        metadata: { verifierId: currentUser.id, step: 'recipient' }
+    });
+
+    revalidatePath(`/circles/${circleId}`);
+    revalidatePath(`/circles/${circleId}/dashboard`);
+    revalidatePath(`/circles/${circleId}/admin`);
+}
+
 export async function verifyPaymentAction(circleId: string, memberId: string) {
     const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Unauthorized");
