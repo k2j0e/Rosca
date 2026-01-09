@@ -69,8 +69,10 @@ function SignInForm() {
                                 type="tel"
                                 name="phone"
                                 required
+                                minLength={10}
+                                maxLength={15}
                                 placeholder="(555) 000-0000"
-                                className="flex-1 bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-bold text-lg focus:outline-none focus:border-primary transition-colors placeholder:font-normal"
+                                className="flex-1 bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-bold text-lg focus:outline-none focus:border-primary transition-colors placeholder:font-normal invalid:border-red-500 invalid:text-red-600"
                             />
                         </div>
                     </div>

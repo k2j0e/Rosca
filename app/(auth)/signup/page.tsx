@@ -34,6 +34,12 @@ function SignUpForm() {
         setError('');
 
         try {
+            if (phone.length < 10 || phone.length > 15) {
+                setError('Please enter a valid phone number (10-15 digits).');
+                setIsLoading(false);
+                return;
+            }
+
             const exists = await checkUserExistsAction(phone);
             if (exists) {
                 setError('Account already exists. Please sign in.');
@@ -139,7 +145,7 @@ function SignUpForm() {
                                     <p className="text-sm font-bold text-red-500 flex items-center gap-1 mt-1">
                                         <span className="material-symbols-outlined text-sm">error</span>
                                         {error}
-                                        <Link href="/signin" className="underline ml-1">Log In instead</Link>
+                                        {error.includes("already exists") && <Link href="/signin" className="underline ml-1">Log In instead</Link>}
                                     </p>
                                 )}
                             </div>
@@ -162,7 +168,7 @@ function SignUpForm() {
 
                             <button
                                 type="submit"
-                                disabled={isLoading || phone.length < 10 || name.length < 2}
+                                disabled={isLoading || phone.length < 10 || phone.length > 15 || name.length < 2}
                                 className="mt-4 w-full h-14 bg-primary text-white font-bold text-lg rounded-full flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? <span className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> : "Continue"}

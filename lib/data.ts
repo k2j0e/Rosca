@@ -197,7 +197,9 @@ export async function getCircles(): Promise<Circle[]> {
                 events: true,
                 admin: true
             },
-            orderBy: { createdAt: 'desc' }
+
+            orderBy: { createdAt: 'desc' },
+            take: 20 // Limit to 20 for performance
         });
 
         return circles.map(c => ({

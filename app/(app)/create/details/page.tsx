@@ -6,6 +6,32 @@ import { useSearchParams } from "next/navigation";
 import { createCircleAction } from "@/app/actions";
 import CloudinaryUpload from "@/app/components/CloudinaryUpload";
 
+import { useFormStatus } from "react-dom";
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+
+    return (
+        <button
+            type="submit"
+            disabled={pending}
+            className="w-full bg-primary text-white font-bold text-lg py-4 rounded-full shadow-xl shadow-primary/30 flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+            {pending ? (
+                <>
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    Creating...
+                </>
+            ) : (
+                <>
+                    Create Circle
+                    <span className="material-symbols-outlined">check</span>
+                </>
+            )}
+        </button>
+    );
+}
+
 function CreateDetailsContent() {
     const searchParams = useSearchParams();
     const amount = searchParams.get("amount") || "100";
@@ -185,15 +211,9 @@ function CreateDetailsContent() {
                     </div>
 
 
-                    {/* Static Action Button */}
+                    {/* Action Button */}
                     <div className="mt-8 mb-4">
-                        <button
-                            type="submit"
-                            className="w-full bg-primary text-white font-bold text-lg py-4 rounded-full shadow-xl shadow-primary/30 flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all"
-                        >
-                            Create Circle
-                            <span className="material-symbols-outlined">check</span>
-                        </button>
+                        <SubmitButton />
                     </div>
                 </form>
             </div>
