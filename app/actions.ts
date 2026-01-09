@@ -707,8 +707,9 @@ async function checkAndCompleteRound(circleId: string) {
     const circle = await getCircle(circleId);
     if (!circle) return;
 
-    // Check if all members have status 'paid'
-    const allPaid = circle.members.every(m => m.status === 'paid');
+    // Check if all ACTIVE members have status 'paid' (exclude pending requests)
+    const activeMembers = circle.members.filter(m => m.status !== 'requested');
+    const allPaid = activeMembers.length > 0 && activeMembers.every(m => m.status === 'paid');
     if (!allPaid) {
         console.log(`[checkAndCompleteRound] Not all members paid yet for circle ${circleId}`);
         return;
@@ -779,10 +780,11 @@ export async function forceCompleteRoundAction(circleId: string) {
     const isAdmin = circle.members.some(m => m.userId === currentUser.id && m.role === 'admin');
     if (!isAdmin) throw new Error("Only admins can force complete a round");
 
-    // Check if all members have paid status
-    const allPaid = circle.members.every(m => m.status === 'paid');
+    // Check if all ACTIVE members have paid status (exclude pending requests)
+    const activeMembers = circle.members.filter(m => m.status !== 'requested');
+    const allPaid = activeMembers.length > 0 && activeMembers.every(m => m.status === 'paid');
     if (!allPaid) {
-        throw new Error("Cannot complete round: not all members have paid status");
+        throw new Error("Cannot complete round: not all active members have paid status");
     }
 
     // Trigger the round completion
