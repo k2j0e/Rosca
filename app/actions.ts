@@ -625,17 +625,26 @@ export async function confirmContributionAction(circleId: string, contributorId:
         throw new Error("Contributor has not marked payment as sent");
     }
 
-    await updateMemberStatus(circleId, contributorId, 'recipient_verified');
+    // Check if recipient is ALSO the admin - if so, auto-finalize
+    const isRecipientAlsoAdmin = circle.adminId === currentUser.id;
+    const newStatus = isRecipientAlsoAdmin ? 'paid' : 'recipient_verified';
+
+    await updateMemberStatus(circleId, contributorId, newStatus);
 
     // Ledger: Recipient Verification Log
     await recordLedgerEntry({
-        type: LedgerEntryType.CONTRIBUTION_CONFIRMED, // Reusing existing type or creating specific one? Let's use INFO or similar for now to distinguish from Admin Final
+        type: isRecipientAlsoAdmin ? LedgerEntryType.CONTRIBUTION_CONFIRMED : LedgerEntryType.CONTRIBUTION_CONFIRMED,
         direction: LedgerEntryDirection.NEUTRAL,
-        description: `Recipient ${currentUser.name} confirmed receipt from ${contributor.user.name}`,
+        description: isRecipientAlsoAdmin
+            ? `Admin/Recipient ${currentUser.name} confirmed and finalized payment from ${contributor.user.name}`
+            : `Recipient ${currentUser.name} confirmed receipt from ${contributor.user.name}`,
         circleId: circleId,
         userId: contributorId,
-        metadata: { verifierId: currentUser.id, step: 'recipient' }
+        metadata: { verifierId: currentUser.id, step: isRecipientAlsoAdmin ? 'admin_recipient' : 'recipient' }
     });
+
+    // If admin auto-finalized, the round completion check will happen naturally
+    // when the last member's payment is finalized (via existing verifyPaymentAction logic)
 
     revalidatePath(`/circles/${circleId}`);
     revalidatePath(`/circles/${circleId}/dashboard`);
