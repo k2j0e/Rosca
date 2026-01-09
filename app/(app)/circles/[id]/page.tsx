@@ -183,34 +183,30 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     </div>
                 </div>
             </div>
-
-            {/* Static Bottom Actions - positioned above bottom nav */}
-            <div className="fixed bottom-20 left-0 right-0 p-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-gray-100 dark:border-white/5 z-40">
-                <div className="max-w-md mx-auto w-full flex gap-3">
-                    <div className="flex-1">
-                        <InviteButton
-                            circleId={circle.id}
-                            circleName={circle.name}
-                            text="Share"
-                            className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark flex gap-2 items-center justify-center shadow-sm"
-                        />
-                    </div>
-                    {user && circle.members.some(m => m.userId === user.id) ? (
-                        <Link href={`/circles/${circle.id}/dashboard`} className="flex-[2]">
-                            <button className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition shadow-glow active:scale-95">
-                                Go to Dashboard
-                            </button>
-                        </Link>
-                    ) : (
-                        <Link href={`/circles/${circle.id}/join`} className="flex-[2]">
-                            <button className="w-full py-4 bg-text-main dark:bg-white text-white dark:text-text-main font-bold rounded-2xl hover:bg-black/90 dark:hover:bg-white/90 transition shadow-lg active:scale-95">
-                                Join Circle
-                            </button>
-                        </Link>
-                    )}
+            {/* Join/Share Actions - inline at bottom of content */}
+            <div className="mt-8 pb-28 flex gap-3">
+                <div className="flex-1">
+                    <InviteButton
+                        circleId={circle.id}
+                        circleName={circle.name}
+                        text="Share"
+                        className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark flex gap-2 items-center justify-center shadow-sm"
+                    />
                 </div>
+                {user && circle.members.some(m => m.userId === user.id) ? (
+                    <Link href={`/circles/${circle.id}/dashboard`} className="flex-[2]">
+                        <button className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition shadow-glow active:scale-95">
+                            Go to Dashboard
+                        </button>
+                    </Link>
+                ) : (
+                    <Link href={`/circles/${circle.id}/join`} className="flex-[2]">
+                        <button className="w-full py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary/90 transition shadow-glow active:scale-95">
+                            Join Circle
+                        </button>
+                    </Link>
+                )}
             </div>
-
-        </div >
+        </div>
     );
 }
