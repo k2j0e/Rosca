@@ -184,8 +184,8 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                 </div>
             </div>
 
-            {/* Static Bottom Actions */}
-            <div className="fixed bottom-0 left-0 right-0 p-6 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-white/20 dark:border-white/5 z-40 pb-[max(24px,env(safe-area-inset-bottom))]">
+            {/* Static Bottom Actions - positioned above bottom nav */}
+            <div className="fixed bottom-20 left-0 right-0 p-4 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-xl border-t border-gray-100 dark:border-white/5 z-40">
                 <div className="max-w-md mx-auto w-full flex gap-3">
                     <div className="flex-1">
                         <InviteButton
