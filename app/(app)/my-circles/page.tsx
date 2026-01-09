@@ -40,7 +40,7 @@ export default async function MyCirclesScreen() {
             .filter(c => c.members.some(m => m.userId === currentUser.id))
             .map(c => {
                 const myMember = c.members.find(m => m.userId === currentUser.id);
-                const isMyTurn = myMember?.payoutMonth === c.currentRound;
+                const isMyTurn = myMember?.payoutMonth === (c.currentRound ?? 1);
                 return {
                     circle: c,
                     memberStatus: myMember?.status as MemberStatus | undefined,
