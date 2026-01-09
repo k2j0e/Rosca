@@ -70,6 +70,7 @@ export interface Circle {
     amount: number;
     frequency: 'weekly' | 'monthly' | 'bi-weekly';
     duration: number;
+    currentRound: number;
     payoutTotal: number;
     startDate: string;
     members: Member[];

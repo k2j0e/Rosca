@@ -35,6 +35,7 @@ export async function GET() {
         amount: 500,
         frequency: 'monthly',
         duration: 10,
+        currentRound: 1,
         maxMembers: 10,
         payoutTotal: 5000,
         startDate: new Date().toISOString(),
