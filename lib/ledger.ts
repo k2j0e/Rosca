@@ -153,13 +153,13 @@ export async function getCircleLedgerGrid(circleId: string) {
         if (!grid[round]) continue;
 
         if (entry.type === LedgerEntryType.CONTRIBUTION_MARKED_PAID) {
-            if (entry.userId) {
+            if (entry.userId && grid[round].contributions[entry.userId]) {
                 grid[round].contributions[entry.userId].status = 'paid';
                 grid[round].contributions[entry.userId].paidAt = entry.createdAt;
             }
         }
         else if (entry.type === LedgerEntryType.CONTRIBUTION_CONFIRMED) {
-            if (entry.userId) {
+            if (entry.userId && grid[round].contributions[entry.userId]) {
                 grid[round].contributions[entry.userId].status = 'confirmed';
             }
         }
