@@ -9,7 +9,34 @@ const jakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "Circle8 - Save Together",
-  description: "Join a circle and start saving together.",
+  description: "Join a savings circle with people you trust. Zero interest, zero fees. Community-powered finance.",
+  metadataBase: new URL('https://circle8.ca'),
+  openGraph: {
+    title: "Circle8 - Save Together",
+    description: "Join a savings circle with people you trust. Zero interest, zero fees. Community-powered finance.",
+    url: "https://circle8.ca",
+    siteName: "Circle8",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1024,
+        height: 1024,
+        alt: "Circle8 - Community Savings Circles",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Circle8 - Save Together",
+    description: "Join a savings circle with people you trust. Zero interest, zero fees.",
+    images: ["/og-image.png"],
+  },
+  icons: {
+    icon: "/og-image.png",
+    apple: "/og-image.png",
+  },
 };
 
 export default function RootLayout({
