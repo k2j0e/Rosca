@@ -1,7 +1,8 @@
 
 import { notFound, redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/data";
+import { getCurrentUser, getCircle } from "@/lib/data";
 import { getCircleLedgerGrid } from "@/lib/ledger";
+import { forceCompleteRoundAction } from "@/app/actions";
 
 export default async function TransparencyPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
@@ -12,6 +13,17 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
     const grid = await getCircleLedgerGrid(params.id);
     if (!grid) notFound();
 
+    // Get circle for admin check and status info
+    const circle = await getCircle(params.id);
+    const isAdmin = circle?.adminId === user.id;
+
+    // Check if there's a round where all members paid but payout is pending
+    const currentRoundData = grid.rounds.find(r => {
+        const allPaid = Object.values(r.contributions).every(c => c.status === 'paid' || c.status === 'confirmed');
+        return allPaid && !r.payoutRecipient;
+    });
+    const hasStuckRound = !!currentRoundData;
+
     // Calculate round stats
     const totalRounds = grid.rounds.length;
     const completedRounds = grid.rounds.filter(r =>
@@ -20,6 +32,34 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
 
     return (
         <div className="px-4 py-6 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+            {/* Admin Action: Complete Stuck Round */}
+            {isAdmin && hasStuckRound && circle?.status === 'active' && (
+                <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-4 rounded-2xl text-white shadow-lg shadow-amber-500/20 animate-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-xl">savings</span>
+                            <span className="font-bold">Round #{currentRoundData?.roundId} Complete!</span>
+                        </div>
+                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                            All Paid
+                        </span>
+                    </div>
+                    <p className="text-sm text-white/90 mb-3">
+                        All contributions verified but payout not distributed. Tap to complete this round.
+                    </p>
+                    <form action={async () => {
+                        "use server";
+                        await forceCompleteRoundAction(params.id);
+                    }}>
+                        <button className="w-full bg-white text-amber-600 font-bold py-3 rounded-xl shadow-md hover:bg-white/90 transition-colors flex items-center justify-center gap-2">
+                            <span className="material-symbols-outlined">payments</span>
+                            Distribute Payout & Start Next Round
+                        </button>
+                    </form>
+                </div>
+            )}
+
             {/* Header with Stats */}
             <div className="flex flex-col gap-1">
                 <div className="flex items-center justify-between">
@@ -68,8 +108,8 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
                                     >
                                         {/* Round Column */}
                                         <td className={`px-4 py-3 font-bold sticky left-0 z-10 border-r border-gray-100 dark:border-white/5 ${isRoundComplete
-                                                ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                                                : 'bg-white dark:bg-[#121212] text-text-main dark:text-white'
+                                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                                            : 'bg-white dark:bg-[#121212] text-text-main dark:text-white'
                                             }`}>
                                             <div className="flex items-center gap-1.5">
                                                 #{round.roundId}
@@ -122,13 +162,13 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
 
                                         {/* Payout Column */}
                                         <td className={`px-4 py-3 text-right font-medium border-l border-gray-100 dark:border-white/5 ${isRoundComplete
-                                                ? 'bg-amber-100/50 dark:bg-amber-900/20'
-                                                : 'bg-amber-50/30 dark:bg-amber-900/5'
+                                            ? 'bg-amber-100/50 dark:bg-amber-900/20'
+                                            : 'bg-amber-50/30 dark:bg-amber-900/5'
                                             }`}>
                                             {round.payoutRecipient ? (
                                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105 ${isRoundComplete
-                                                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                                                        : 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300'
+                                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                                    : 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300'
                                                     }`}>
                                                     <span className="material-symbols-outlined text-[14px]">
                                                         {isRoundComplete ? 'check_circle' : 'savings'}
