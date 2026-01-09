@@ -74,22 +74,27 @@ export default async function HomePage() {
                         <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-transparent to-primary-soft/30 dark:to-primary/5 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         <div className="relative z-10 flex justify-between items-start">
                             <div className="w-10 h-10 rounded-full bg-primary-soft dark:bg-primary/10 flex items-center justify-center">
-                                <span className="material-symbols-outlined text-primary text-[20px]">pie_chart</span>
+                                <span className="material-symbols-outlined text-primary text-[20px]">groups</span>
                             </div>
                         </div>
                         <div className="relative z-10 mt-2">
-                            <span className="block text-text-muted text-xs font-bold tracking-wider uppercase mb-1">Active Circles</span>
-                            <div className="flex items-baseline gap-1">
-                                <h2 className="text-4xl font-bold text-text-main dark:text-white">{stats.activeCircles}</h2>
-                                <span className="text-sm text-text-muted font-medium">ongoing</span>
+                            <span className="block text-text-muted text-xs font-bold tracking-wider uppercase mb-1">My Circles</span>
+                            <div className="flex items-baseline gap-1 mb-2">
+                                <h2 className="text-3xl font-bold text-text-main dark:text-white">{stats.activeCircles}</h2>
+                                <span className="text-sm text-text-muted font-medium">circles</span>
                             </div>
-                            {/* Avatars of first 3 active circles */}
-                            <div className="flex -space-x-2 mt-3 pl-1">
-                                {activeCircles.slice(0, 3).map((circle, i) => (
-                                    <div key={circle.id} className="w-6 h-6 rounded-full bg-gray-100 border-2 border-white dark:border-surface-dark ring-1 ring-gray-50 dark:ring-white/10 overflow-hidden">
-                                        {circle.coverImage && <img src={circle.coverImage} className="w-full h-full object-cover" />}
-                                    </div>
-                                ))}
+                            {/* Breakdown badges */}
+                            <div className="flex gap-2 flex-wrap">
+                                {stats.circlesActive > 0 && (
+                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+                                        {stats.circlesActive} Active
+                                    </span>
+                                )}
+                                {stats.circlesRecruiting > 0 && (
+                                    <span className="px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                                        {stats.circlesRecruiting} Recruiting
+                                    </span>
+                                )}
                             </div>
                         </div>
                     </div>

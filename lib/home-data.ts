@@ -11,7 +11,10 @@ export interface HomePageData {
     };
     stats: {
         totalCircles: number;
-        activeCircles: number;
+        activeCircles: number;      // Total circles user is in (active + recruiting)
+        circlesActive: number;      // Only status === 'active'
+        circlesRecruiting: number;  // Only status === 'recruiting'
+        totalMembers: number;       // Total members across all circles
         totalContributed: number;
         totalReceived: number;
     };
@@ -97,7 +100,9 @@ export async function getHomePageData(userId: string): Promise<HomePageData | nu
 
     // Calculate stats
     const totalCircles = memberships.filter(m => m.status !== 'requested').length;
-    const activeCircleCount = activeCircles.filter(c => c.status === 'active').length;
+    const circlesActive = activeCircles.filter(c => c.status === 'active').length;
+    const circlesRecruiting = activeCircles.filter(c => c.status === 'recruiting').length;
+    const totalMembers = activeCircles.reduce((sum, c) => sum + c.memberCount, 0);
 
     // Get contribution ledger entries for totals
     const contributions = await prisma.userLedgerEntry.findMany({
@@ -173,7 +178,10 @@ export async function getHomePageData(userId: string): Promise<HomePageData | nu
         user,
         stats: {
             totalCircles,
-            activeCircles: activeCircleCount,
+            activeCircles: totalCircles,  // Total circles user is in
+            circlesActive,
+            circlesRecruiting,
+            totalMembers,
             totalContributed,
             totalReceived
         },
