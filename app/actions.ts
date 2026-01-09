@@ -757,6 +757,37 @@ async function checkAndCompleteRound(circleId: string) {
     console.log(`[checkAndCompleteRound] Round ${nextRound} initiated for circle ${circleId}`);
 }
 
+/**
+ * Admin action to force complete the current round.
+ * Call this when all payments are verified but payout wasn't distributed.
+ */
+export async function forceCompleteRoundAction(circleId: string) {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) throw new Error("Unauthorized");
+
+    const { getCircle, getCurrentRound } = await import("@/lib/data");
+    const circle = await getCircle(circleId);
+    if (!circle) throw new Error("Circle not found");
+
+    // Verify admin permission
+    const isAdmin = circle.members.some(m => m.userId === currentUser.id && m.role === 'admin');
+    if (!isAdmin) throw new Error("Only admins can force complete a round");
+
+    // Check if all members have paid status
+    const allPaid = circle.members.every(m => m.status === 'paid');
+    if (!allPaid) {
+        throw new Error("Cannot complete round: not all members have paid status");
+    }
+
+    // Trigger the round completion
+    await checkAndCompleteRound(circleId);
+
+    revalidatePath(`/circles/${circleId}`);
+    revalidatePath(`/circles/${circleId}/dashboard`);
+    revalidatePath(`/circles/${circleId}/dashboard/transparency`);
+    revalidatePath(`/circles/${circleId}/admin`);
+}
+
 export async function launchCircleAction(circleId: string) {
     const currentUser = await getCurrentUser();
     if (!currentUser) throw new Error("Unauthorized");

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getCircleAdminDashboardData } from "@/lib/admin-circle";
 import { getCurrentUser } from "@/lib/data";
 import { redirect, notFound } from "next/navigation";
+import { forceCompleteRoundAction } from "@/app/actions";
 
 export const dynamic = 'force-dynamic';
 
@@ -175,6 +176,45 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
                         </Link>
                     </div>
                 );
+            })()}
+
+            {/* Force Distribute Payout (When all paid but payout not distributed) */}
+            {(() => {
+                const allActiveMembers = members.filter(m => m.status !== 'requested');
+                const allPaid = allActiveMembers.every(m => m.status === 'paid');
+                const noVerifiedPending = members.filter(m => m.status === 'recipient_verified').length === 0;
+
+                // Show if all members paid but we might have missed the payout distribution
+                if (allPaid && noVerifiedPending && circle.status === 'active') {
+                    return (
+                        <div className="px-4 pb-4">
+                            <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-4 rounded-2xl text-white shadow-lg shadow-amber-500/20 animate-in slide-in-from-top-2 duration-300">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-xl">savings</span>
+                                        <span className="font-bold">All Payments Complete!</span>
+                                    </div>
+                                    <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-bold">
+                                        {allActiveMembers.length}/{allActiveMembers.length} paid
+                                    </span>
+                                </div>
+                                <p className="text-sm text-white/90 mb-3">
+                                    All contributions verified. Distribute payout to advance to next round.
+                                </p>
+                                <form action={async () => {
+                                    "use server";
+                                    await forceCompleteRoundAction(circle.id);
+                                }}>
+                                    <button className="w-full bg-white text-amber-600 font-bold py-3 rounded-xl shadow-md hover:bg-white/90 transition-colors flex items-center justify-center gap-2">
+                                        <span className="material-symbols-outlined">payments</span>
+                                        Distribute Payout & Start Next Round
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    );
+                }
+                return null;
             })()}
 
             {/* Member Payment Grid */}
