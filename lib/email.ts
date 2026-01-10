@@ -27,22 +27,28 @@ export async function sendEmailOtp(email: string, code: string): Promise<{ succe
             return { success: false, error: 'Email service not configured' };
         }
 
-        // Use Resend sandbox email for testing (works without domain verification)
-        const fromEmail = 'Orbit <onboarding@resend.dev>';
+        // Production email from verified domain
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'Circle8 <noreply@circle8.ca>';
         console.log('[sendEmailOtp] Sending to:', email, 'from:', fromEmail);
 
         const { error, data } = await resend.emails.send({
             from: fromEmail,
             to: email,
-            subject: `Your verification code: ${code}`,
+            subject: `Your Circle8 verification code: ${code}`,
             html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 400px; margin: 0 auto; padding: 40px 20px;">
-                    <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a;">Your verification code</h1>
-                    <p style="color: #666; margin-bottom: 24px;">Enter this code to verify your identity:</p>
-                    <div style="background: #f5f5f5; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-                        <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #1a1a1a;">${code}</span>
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <span style="font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #FF6B35, #FF8F5E); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Circle8</span>
                     </div>
-                    <p style="color: #999; font-size: 14px;">This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.</p>
+                    <h1 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; text-align: center;">Verify your identity</h1>
+                    <p style="color: #666; margin-bottom: 24px; text-align: center;">Enter this code to sign in to your Circle8 account:</p>
+                    <div style="background: linear-gradient(135deg, #FFF5F0, #FFF0E8); border: 2px solid #FF6B35; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+                        <span style="font-size: 40px; font-weight: 800; letter-spacing: 8px; color: #FF6B35;">${code}</span>
+                    </div>
+                    <p style="color: #999; font-size: 14px; text-align: center;">This code expires in 10 minutes.</p>
+                    <p style="color: #bbb; font-size: 12px; text-align: center; margin-top: 32px;">If you didn't request this code, you can safely ignore this email.</p>
+                    <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
+                    <p style="color: #999; font-size: 11px; text-align: center;">Circle8 - Community Savings Circles<br/>Save together, grow together.</p>
                 </div>
             `,
         });
