@@ -17,11 +17,15 @@ export async function updateProfileAction(prevState: any, formData: FormData) {
     const user = await getCurrentUser();
     if (!user) return { message: "Unauthorized" };
 
+    const city = formData.get('city') as string || '';
+    const country = formData.get('country') as string || '';
+    const location = city && country ? `${city}, ${country}` : (city || country);
+
     const rawData = {
         name: formData.get('name'),
         email: formData.get('email'),
         bio: formData.get('bio'),
-        location: formData.get('location'),
+        location: location,
         avatar: formData.get('avatar'),
     };
 

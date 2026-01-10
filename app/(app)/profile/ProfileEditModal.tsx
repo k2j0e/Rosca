@@ -80,13 +80,47 @@ export default function ProfileEditModal({ user, isOpen, onClose }: ProfileEditM
                     </div>
 
                     <div>
-                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Location</label>
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">City</label>
                         <input
-                            name="location"
-                            defaultValue={user.location || ''}
-                            placeholder="e.g. Dubai, UAE"
+                            name="city"
+                            defaultValue={user.location?.split(',')[0]?.trim() || ''}
+                            placeholder="e.g. Toronto"
                             className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white"
                         />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Country</label>
+                        <select
+                            name="country"
+                            defaultValue={user.location?.split(',')[1]?.trim() || ''}
+                            className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white appearance-none cursor-pointer"
+                        >
+                            <option value="">Select Country</option>
+                            <option value="United States">United States</option>
+                            <option value="Canada">Canada</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Germany">Germany</option>
+                            <option value="France">France</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Mexico">Mexico</option>
+                            <option value="India">India</option>
+                            <option value="Japan">Japan</option>
+                            <option value="South Korea">South Korea</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="UAE">UAE</option>
+                            <option value="Saudi Arabia">Saudi Arabia</option>
+                            <option value="South Africa">South Africa</option>
+                            <option value="Nigeria">Nigeria</option>
+                            <option value="Kenya">Kenya</option>
+                            <option value="Ghana">Ghana</option>
+                            <option value="Egypt">Egypt</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
                     <div>
