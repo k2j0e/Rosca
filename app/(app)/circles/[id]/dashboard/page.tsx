@@ -163,6 +163,7 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
                             <InviteButton
                                 circleId={circle.id}
                                 circleName={circle.name}
+                                inviteCode={circle.inviteCode || undefined}
                                 text="Invite"
                                 className="flex-1 bg-white text-blue-700 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-50 transition-colors shadow-lg cursor-pointer"
                             />
@@ -189,7 +190,7 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
                         </div>
 
                         {/* Share Link Display */}
-                        <ShareLinkDisplay circleId={circle.id} />
+                        <ShareLinkDisplay circleId={circle.id} inviteCode={circle.inviteCode || undefined} />
                     </div>
                 </div>
             ) : (

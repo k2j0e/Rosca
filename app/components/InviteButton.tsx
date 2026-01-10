@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 
-export default function InviteButton({ circleId, className, text, circleName }: { circleId: string, className?: string, text?: string, circleName?: string }) {
+export default function InviteButton({ circleId, className, text, circleName, inviteCode }: { circleId: string, className?: string, text?: string, circleName?: string, inviteCode?: string }) {
     const [status, setStatus] = useState<'idle' | 'copied' | 'shared'>('idle');
 
     const handleInvite = async () => {
-        const origin = typeof window !== 'undefined' ? window.location.origin : '';
-        const inviteLink = `${origin}/invite/${circleId}`;
+        const origin = 'https://circle8.ca';
+        const inviteLink = inviteCode
+            ? `${origin}/join/${inviteCode}`
+            : `${origin}/invite/${circleId}`;
 
         console.log('[DEBUG] InviteButton Link:', inviteLink);
 

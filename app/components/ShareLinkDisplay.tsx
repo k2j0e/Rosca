@@ -1,15 +1,14 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function ShareLinkDisplay({ circleId }: { circleId: string }) {
-    const [origin, setOrigin] = useState("");
+export default function ShareLinkDisplay({ circleId, inviteCode }: { circleId: string, inviteCode?: string }) {
     const [copied, setCopied] = useState(false);
 
-    useEffect(() => {
-        setOrigin(window.location.origin);
-    }, []);
-
-    const shareUrl = `${origin}/invite/${circleId}`;
+    // Use canonical domain + short link if available
+    const origin = 'https://circle8.ca';
+    const shareUrl = inviteCode
+        ? `${origin}/join/${inviteCode}`
+        : `${origin}/invite/${circleId}`;
 
     const handleCopy = () => {
         navigator.clipboard.writeText(shareUrl);

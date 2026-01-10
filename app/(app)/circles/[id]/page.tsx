@@ -189,6 +189,7 @@ export default async function CircleDetail(props: { params: Promise<{ id: string
                     <InviteButton
                         circleId={circle.id}
                         circleName={circle.name}
+                        inviteCode={circle.inviteCode || undefined}
                         text="Share"
                         className="w-full py-4 text-text-main dark:text-white font-bold rounded-2xl hover:bg-gray-100 dark:hover:bg-white/5 transition border border-gray-200 dark:border-white/10 bg-white dark:bg-surface-dark flex gap-2 items-center justify-center shadow-sm"
                     />
