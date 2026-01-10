@@ -39,23 +39,22 @@ export async function sendOtpAction(formData: FormData) {
     const { sendSms, generateOtp } = await import("@/lib/sms");
     const { prisma } = await import("@/lib/db");
 
-    // Test phone bypass
-    const TEST_PHONE = '+15551234567';
-    const TEST_CODE = '123456';
-
     const rawPhone = formData.get('phone') as string;
     const redirectUrl = formData.get('redirect') as string;
     // Normalize: If no '+', assume US (+1) because UI shows +1 prefix hardcoded
     const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
 
+    // Test phone bypass - supports +15551234567 AND all +1555000XXXX test numbers
+    const TEST_PHONE = '+15551234567';
+    const TEST_CODE = '123456';
+    const isTestPhone = phone === TEST_PHONE || phone.startsWith('+1555000');
+
     const rawData = { phone };
     const validated = signInSchema.safeParse(rawData);
 
     if (!validated.success) {
-        const redirectUrl = formData.get('redirect') as string;
         redirect(`/signin?error=invalid_phone${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
-
 
     // const { phone } = validated.data; // Removed to avoid shadowing 'phone' variable defined above
     // valid 'phone' variable is already available and normalized
@@ -78,19 +77,14 @@ export async function sendOtpAction(formData: FormData) {
     await prisma.user.update({
         where: { id: user.id },
         data: {
-            otpCode: phone === TEST_PHONE ? TEST_CODE : otp,
+            otpCode: isTestPhone ? TEST_CODE : otp,
             otpExpiresAt: expiresAt
         }
     });
 
-    // Skip SMS for test phone
-    if (phone === TEST_PHONE) {
-        // Reset onboarding so user can test tutorial again
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { hasCompletedOnboarding: false }
-        });
-        console.log('[TEST MODE] Skipping SMS for test phone. Use code:', TEST_CODE);
+    // Skip SMS for test phones (both the original test phone and +1555000XXXX range)
+    if (isTestPhone) {
+        console.log('[TEST MODE] Skipping SMS for test phone:', phone, 'Use code:', TEST_CODE);
         redirect(`/signin/verify?phone=${encodeURIComponent(phone)}${redirectUrl ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`);
     }
 
