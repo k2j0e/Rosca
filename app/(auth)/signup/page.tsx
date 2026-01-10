@@ -59,7 +59,9 @@ function SignUpForm() {
                 setStep('otp');
             }
         } catch (err) {
-            setError('Failed to connect. Please try again.');
+            console.error('[Signup Error]', err);
+            const message = err instanceof Error ? err.message : 'Failed to connect. Please try again.';
+            setError(message);
         }
         setIsLoading(false);
     };
