@@ -1005,25 +1005,48 @@ export async function verifySignupOtpAction(formData: FormData) {
 }
 
 export async function completeSignupAction(formData: FormData) {
-    const rawPhone = formData.get('phone') as string;
-    const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
-    const location = formData.get('location') as string;
+    try {
+        const rawPhone = formData.get('phone') as string;
+        if (!rawPhone) throw new Error("Phone number missing");
 
-    const { prisma } = await import("@/lib/db");
-    const { findUserByPhone } = await import("@/lib/data");
-    const user = await findUserByPhone(phone);
+        const phone = rawPhone.startsWith('+') ? rawPhone : `+1${rawPhone.replace(/\D/g, '')}`;
+        const location = formData.get('location') as string;
+        const avatarFile = formData.get('avatar') as File;
 
-    if (!user) {
-        // Redirect to start if user lost
-        redirect('/signup?error=session_expired');
-    }
+        const { prisma } = await import("@/lib/db");
+        // We find user by phone because session might not be fully established or we want to be sure
+        const user = await prisma.user.findUnique({ where: { phoneNumber: phone } });
 
-    await prisma.user.update({
-        where: { id: user.id },
-        data: {
-            location,
+        if (!user) {
+            redirect('/signup?error=session_expired');
         }
-    });
+
+        // Handle Avatar (Simple Base64 Storage for MVP)
+        let avatarBase64: string | undefined;
+        if (avatarFile && avatarFile.size > 0 && avatarFile.size < 5 * 1024 * 1024) { // 5MB limit
+            try {
+                const buffer = Buffer.from(await avatarFile.arrayBuffer());
+                const mimeType = avatarFile.type || 'image/jpeg';
+                avatarBase64 = `data:${mimeType};base64,${buffer.toString('base64')}`;
+            } catch (e) {
+                console.error("Avatar processing failed", e);
+            }
+        }
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                location: location || undefined,
+                avatar: avatarBase64 || undefined,
+                hasCompletedOnboarding: true
+            }
+        });
+
+    } catch (e) {
+        console.error("Complete Signup Error:", e);
+        // Note: we continue to redirect even if update failed, to avoid "stuck" state.
+        // In a real app we might want to stay and show error, but preventing stuck state is priority.
+    }
 
     redirect('/onboarding' + (formData.get('redirect') ? `?redirect=${encodeURIComponent(formData.get('redirect') as string)}` : ''));
 }
