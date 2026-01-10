@@ -27,8 +27,8 @@ export async function sendEmailOtp(email: string, code: string): Promise<{ succe
             return { success: false, error: 'Email service not configured' };
         }
 
-        // Production email from verified domain
-        const fromEmail = process.env.RESEND_FROM_EMAIL || 'Circle8 <noreply@circle8.ca>';
+        // Production email from verified subdomain
+        const fromEmail = process.env.RESEND_FROM_EMAIL || 'Circle8 <noreply@email.circle8.ca>';
         console.log('[sendEmailOtp] Sending to:', email, 'from:', fromEmail);
 
         const { error, data } = await resend.emails.send({
