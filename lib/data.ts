@@ -89,6 +89,7 @@ export interface Circle {
         allowLateJoins?: boolean;
         requireVerification?: boolean;
     };
+    admin?: User; // Added for frontend access
 }
 
 // Helper to map Prisma User to our User type (handling JSON parsing and Date serialization)
@@ -233,7 +234,8 @@ export async function getCircles(): Promise<Circle[]> {
                 meta: e.meta as any
             })),
             payoutSchedule: (c.payoutSchedule as string[]) || undefined,
-            settings: (c.settings as any) || undefined
+            settings: (c.settings as any) || undefined,
+            admin: c.admin ? mapUser(c.admin) : undefined
         }));
     } catch (error) {
         console.error("Error fetching circles:", error);
@@ -274,7 +276,6 @@ export async function getCircle(id: string): Promise<Circle | undefined> {
             payoutMonth: m.payoutMonth ?? undefined
         })),
         events: c.events.map(e => ({
-            // ...e, 
             id: e.id,
             type: e.type as any,
             message: e.message,
@@ -282,7 +283,56 @@ export async function getCircle(id: string): Promise<Circle | undefined> {
             meta: e.meta as any
         })),
         payoutSchedule: (c.payoutSchedule as string[]) || undefined,
-        settings: (c.settings as any) || undefined
+        settings: (c.settings as any) || undefined,
+        admin: c.admin ? mapUser(c.admin) : undefined
+    };
+}
+
+export async function getCircleByInviteCode(code: string): Promise<Circle | undefined> {
+    // Case-insensitive search requires raw query or finding first then filtering?
+    // Prisma unique constraint is case sensitive usually unless configured.
+    // Let's try exact match first.
+    const c = await prisma.circle.findFirst({ // findFirst because inviteCode might not be marked unique in schema yet? It should be.
+        where: { inviteCode: code },
+        include: {
+            members: { include: { user: true }, orderBy: { joinedAt: 'asc' } },
+            events: { orderBy: { timestamp: 'desc' } },
+            admin: true
+        }
+    });
+
+    if (!c) return undefined;
+
+    return {
+        ...c,
+        inviteCode: c.inviteCode || undefined,
+        category: c.category as CircleCategory,
+        frequency: c.frequency as any,
+        status: c.status as any,
+        startDate: c.startDate.toISOString(),
+        description: (c.description || undefined) as string | undefined,
+        coverImage: (c.coverImage || undefined) as string | undefined,
+        members: c.members.map(m => ({
+            id: m.id,
+            userId: m.userId,
+            name: m.user.name,
+            avatar: m.user.avatar || '',
+            joinedAt: m.joinedAt.toISOString(),
+            role: m.role as any,
+            status: m.status as any,
+            payoutPreference: m.payoutPreference as any,
+            payoutMonth: m.payoutMonth ?? undefined
+        })),
+        events: c.events.map(e => ({
+            id: e.id,
+            type: e.type as any,
+            message: e.message,
+            timestamp: e.timestamp.toISOString(),
+            meta: e.meta as any
+        })),
+        payoutSchedule: (c.payoutSchedule as string[]) || undefined,
+        settings: (c.settings as any) || undefined,
+        admin: c.admin ? mapUser(c.admin) : undefined
     };
 }
 
