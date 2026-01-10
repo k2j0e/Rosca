@@ -1,6 +1,6 @@
 
 import { notFound, redirect } from "next/navigation";
-import { getCurrentUser, getCircle } from "@/lib/data";
+import { getCurrentUser, getCircle, getCurrentRound } from "@/lib/data";
 import { getCircleLedgerGrid } from "@/lib/ledger";
 import { forceCompleteRoundAction } from "@/app/actions";
 
@@ -11,7 +11,10 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
     if (!user) redirect('/signin');
 
     const grid = await getCircleLedgerGrid(params.id);
+
     if (!grid) notFound();
+
+    const currentRoundNumber = await getCurrentRound(params.id);
 
     // Get circle for admin check and status info
     const circle = await getCircle(params.id);
@@ -101,64 +104,65 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
                                 const isRoundComplete = Object.values(round.contributions).every(
                                     c => c.status === 'paid' || c.status === 'confirmed'
                                 );
+                                const isCurrent = round.roundId === currentRoundNumber;
                                 return (
                                     <tr
                                         key={round.roundId}
-                                        className={`transition-colors ${isRoundComplete ? 'bg-green-50/50 dark:bg-green-900/10' : 'hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                                        className={`transition-colors ${isCurrent ? 'bg-amber-50/20 border-l-4 border-l-amber-500' : isRoundComplete ? 'bg-green-50/50 dark:bg-green-900/10' : 'hover:bg-gray-50 dark:hover:bg-white/5'} border-b border-gray-100 dark:border-white/5 last:border-0`}
                                     >
                                         {/* Round Column */}
-                                        <td className={`px-4 py-3 font-bold sticky left-0 z-10 border-r border-gray-100 dark:border-white/5 ${isRoundComplete
-                                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                                            : 'bg-white dark:bg-[#121212] text-text-main dark:text-white'
-                                            }`}>
-                                            <div className="flex items-center gap-1.5">
+                                        {/* Round Column */}
+                                        <td className={`px-4 py-3 font-bold sticky left-0 z-10 border-r border-gray-100 dark:border-white/5 ${isRoundComplete ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-white dark:bg-surface-dark'}`}>
+                                            <div className="flex items-center gap-2">
                                                 #{round.roundId}
-                                                {isRoundComplete && (
-                                                    <span className="material-symbols-outlined text-[14px] text-green-500 animate-bounce">
-                                                        celebration
+                                                {isCurrent && (
+                                                    <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[10px] px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                                                        Current
                                                     </span>
                                                 )}
                                             </div>
                                         </td>
 
                                         {/* Member Columns */}
-                                        {grid.members.map((member, memberIdx) => {
-                                            const contribution = round.contributions[member.id];
-                                            const isPaid = contribution && (contribution.status === 'paid' || contribution.status === 'confirmed');
-                                            return (
-                                                <td key={member.id} className="px-4 py-3 text-center">
-                                                    {contribution ? (
-                                                        <div className="flex justify-center">
-                                                            {isPaid ? (
-                                                                <div
-                                                                    className="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center transition-all hover:scale-110 animate-in zoom-in duration-300"
-                                                                    title={`Paid: $${contribution.amount}`}
-                                                                    style={{ animationDelay: `${memberIdx * 50}ms` }}
-                                                                >
-                                                                    <span className="material-symbols-outlined text-lg">check</span>
-                                                                </div>
-                                                            ) : contribution.status === 'pending' ? (
-                                                                <div
-                                                                    className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 text-gray-400 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-primary hover:text-primary transition-all cursor-pointer"
-                                                                    title="Pending"
-                                                                >
-                                                                    <span className="material-symbols-outlined text-sm">schedule</span>
-                                                                </div>
-                                                            ) : (
-                                                                <div
-                                                                    className="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center animate-pulse"
-                                                                    title="Late/Missing"
-                                                                >
-                                                                    <span className="material-symbols-outlined text-lg">priority_high</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-gray-300">-</span>
-                                                    )}
-                                                </td>
-                                            );
-                                        })}
+                                        {
+                                            grid.members.map((member, memberIdx) => {
+                                                const contribution = round.contributions[member.id];
+                                                const isPaid = contribution && (contribution.status === 'paid' || contribution.status === 'confirmed');
+                                                return (
+                                                    <td key={member.id} className="px-4 py-3 text-center">
+                                                        {contribution ? (
+                                                            <div className="flex justify-center">
+                                                                {isPaid ? (
+                                                                    <div
+                                                                        className="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center transition-all hover:scale-110 animate-in zoom-in duration-300"
+                                                                        title={`Paid: $${contribution.amount}`}
+                                                                        style={{ animationDelay: `${memberIdx * 50}ms` }}
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-lg">check</span>
+                                                                    </div>
+                                                                ) : contribution.status === 'pending' ? (
+                                                                    <div
+                                                                        className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/5 text-gray-400 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-white/10 hover:border-primary hover:text-primary transition-all cursor-pointer"
+                                                                        title="Pending"
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-sm">schedule</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div
+                                                                        className="w-9 h-9 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center animate-pulse"
+                                                                        title="Late/Missing"
+                                                                    >
+                                                                        <span className="material-symbols-outlined text-lg">priority_high</span>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-gray-300">-</span>
+                                                        )}
+                                                    </td>
+                                                );
+                                            })
+                                        }
 
                                         {/* Payout Column */}
                                         <td className={`px-4 py-3 text-right font-medium border-l border-gray-100 dark:border-white/5 ${isRoundComplete
@@ -210,6 +214,6 @@ export default async function TransparencyPage(props: { params: Promise<{ id: st
             <div className="text-center text-xs text-text-sub dark:text-text-sub-dark mt-2">
                 <p>🔒 All records are immutable and cryptographically verifiable.</p>
             </div>
-        </div>
+        </div >
     );
 }

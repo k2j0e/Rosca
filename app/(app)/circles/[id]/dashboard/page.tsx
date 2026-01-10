@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getCircle, getCurrentUser, getCurrentRound } from "@/lib/data";
 import InviteButton from "@/app/components/InviteButton";
 import ShareLinkDisplay from "@/app/components/ShareLinkDisplay";
+import RoundCelebration from "@/app/components/RoundCelebration";
 import { confirmContributionAction } from "@/app/actions";
 
 export default async function CircleDashboard(props: { params: Promise<{ id: string }> }) {
@@ -41,6 +42,13 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
 
 
         <div className="px-4 py-6 flex flex-col gap-6 pb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <RoundCelebration
+                currentRound={currentRound}
+                latestEvent={circle.events?.[0] ? {
+                    type: circle.events[0].type,
+                    timestamp: circle.events[0].timestamp
+                } : undefined}
+            />
 
             {/* Recipient Verification Card (High Priority) */}
             {isRecipient && paymentsToVerify.length > 0 && (
@@ -89,9 +97,9 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
                 <div className="flex items-center justify-between bg-white dark:bg-surface-dark p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-white/5">
                     <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${myMember.status === 'paid' ? 'bg-green-100 text-green-600' :
-                                myMember.status === 'recipient_verified' ? 'bg-blue-100 text-blue-600' :
-                                    myMember.status === 'paid_pending' ? 'bg-yellow-100 text-yellow-600' :
-                                        'bg-orange-100 text-orange-600'
+                            myMember.status === 'recipient_verified' ? 'bg-blue-100 text-blue-600' :
+                                myMember.status === 'paid_pending' ? 'bg-yellow-100 text-yellow-600' :
+                                    'bg-orange-100 text-orange-600'
                             }`}>
                             <span className="material-symbols-outlined">
                                 {myMember.status === 'paid' ? 'check_circle' :
@@ -103,9 +111,9 @@ export default async function CircleDashboard(props: { params: Promise<{ id: str
                         <div className="flex flex-col">
                             <span className="font-bold text-sm">Round {currentRound} Contribution</span>
                             <span className={`text-xs font-medium ${myMember.status === 'paid' ? 'text-green-600' :
-                                    myMember.status === 'recipient_verified' ? 'text-blue-600' :
-                                        myMember.status === 'paid_pending' ? 'text-yellow-600' :
-                                            'text-orange-600'
+                                myMember.status === 'recipient_verified' ? 'text-blue-600' :
+                                    myMember.status === 'paid_pending' ? 'text-yellow-600' :
+                                        'text-orange-600'
                                 }`}>
                                 {myMember.status === 'paid' ? 'Complete' :
                                     myMember.status === 'recipient_verified' ? 'Verified by Recipient' :

@@ -98,99 +98,113 @@ export default async function AdminDashboard(props: { params: Promise<{ id: stri
             </div>
 
             {/* Action Center Section */}
-            {(health.pendingRequests > 0 || members.some(m => m.status === 'recipient_verified')) && (
-                <div className="px-4 pb-6">
-                    <h3 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark mb-3 px-2">
-                        Action Center
-                    </h3>
+            <div className="px-4 pb-6">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-text-sub dark:text-text-sub-dark mb-3 px-2">
+                    Action Center
+                </h3>
 
-                    {/* Pending Requests List */}
-                    {health.pendingRequests > 0 && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800/50 mb-4 overflow-hidden">
-                            <div className="p-3 bg-blue-100/50 dark:bg-blue-800/30 flex items-center justify-between">
-                                <span className="font-bold text-blue-700 dark:text-blue-300 text-sm">New Member Requests</span>
-                                <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">{health.pendingRequests}</span>
+                {/* Empty State - All Caught Up */}
+                {health.pendingRequests === 0 && !members.some(m => m.status === 'recipient_verified') && (
+                    <div className="bg-white dark:bg-surface-dark rounded-2xl border border-gray-100 dark:border-white/5 p-6 flex flex-col items-center justify-center text-center">
+                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-3">
+                            <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-2xl">check_circle</span>
+                        </div>
+                        <h4 className="font-bold text-base text-text-main dark:text-white">All Caught Up!</h4>
+                        <p className="text-sm text-text-sub dark:text-text-sub-dark mt-1">
+                            No pending member requests or payments to verify.
+                        </p>
+                    </div>
+                )}
+
+                {/* Pending Actions */}
+                {(health.pendingRequests > 0 || members.some(m => m.status === 'recipient_verified')) && (
+                    <div className="space-y-4">
+
+                        {/* Pending Requests List */}
+                        {health.pendingRequests > 0 && (
+                            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-100 dark:border-blue-800/50 mb-4 overflow-hidden">
+                                <div className="p-3 bg-blue-100/50 dark:bg-blue-800/30 flex items-center justify-between">
+                                    <span className="font-bold text-blue-700 dark:text-blue-300 text-sm">New Member Requests</span>
+                                    <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">{health.pendingRequests}</span>
+                                </div>
+                                <div className="divide-y divide-blue-100 dark:divide-blue-800/50">
+                                    {members.filter(m => m.status === 'requested').map((member) => (
+                                        <div key={member.id} className="p-3 flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sm font-bold border border-blue-100">
+                                                {member.avatar ? (
+                                                    <img src={member.avatar} alt={member.name} className="w-full h-full rounded-full object-cover" />
+                                                ) : (
+                                                    member.name.charAt(0).toUpperCase()
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-sm text-text-main dark:text-white">{member.name}</p>
+                                                <p className="text-xs text-text-sub dark:text-text-sub-dark">Requested to join</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <form action={async () => {
+                                                    "use server";
+                                                    await updateMemberStatusAction(circle.id, member.userId, 'rejected');
+                                                }}>
+                                                    <button className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors" title="Reject">
+                                                        <span className="material-symbols-outlined text-xl">close</span>
+                                                    </button>
+                                                </form>
+                                                <form action={async () => {
+                                                    "use server";
+                                                    await updateMemberStatusAction(circle.id, member.userId, 'approved');
+                                                }}>
+                                                    <button className="p-2 bg-blue-600 text-white rounded-full shadow-sm hover:bg-blue-700 transition-colors" title="Approve">
+                                                        <span className="material-symbols-outlined text-xl">check</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <div className="divide-y divide-blue-100 dark:divide-blue-800/50">
-                                {members.filter(m => m.status === 'requested').map((member) => (
-                                    <div key={member.id} className="p-3 flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sm font-bold border border-blue-100">
-                                            {member.avatar ? (
-                                                <img src={member.avatar} alt={member.name} className="w-full h-full rounded-full object-cover" />
-                                            ) : (
-                                                member.name.charAt(0).toUpperCase()
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-sm text-text-main dark:text-white">{member.name}</p>
-                                            <p className="text-xs text-text-sub dark:text-text-sub-dark">Requested to join</p>
-                                        </div>
-                                        <div className="flex gap-2">
+                        )}
+
+                        {/* Pending Verifications List */}
+                        {members.filter(m => m.status === 'recipient_verified').length > 0 && (
+                            <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 overflow-hidden">
+                                <div className="p-3 bg-emerald-100/50 dark:bg-emerald-800/30 flex items-center justify-between">
+                                    <span className="font-bold text-emerald-700 dark:text-emerald-300 text-sm">Pending Verification</span>
+                                    <span className="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        {members.filter(m => m.status === 'recipient_verified').length}
+                                    </span>
+                                </div>
+                                <div className="divide-y divide-emerald-100 dark:divide-emerald-800/50">
+                                    {members.filter(m => m.status === 'recipient_verified').map((member) => (
+                                        <div key={member.id} className="p-3 flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sm font-bold border border-emerald-100">
+                                                {member.avatar ? (
+                                                    <img src={member.avatar} alt={member.name} className="w-full h-full rounded-full object-cover" />
+                                                ) : (
+                                                    member.name.charAt(0).toUpperCase()
+                                                )}
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-sm text-text-main dark:text-white">{member.name}</p>
+                                                <p className="text-xs text-text-sub dark:text-text-sub-dark">Recipient confirmed receipt</p>
+                                            </div>
                                             <form action={async () => {
                                                 "use server";
-                                                await updateMemberStatusAction(circle.id, member.userId, 'rejected');
+                                                await verifyPaymentAction(circle.id, member.userId);
                                             }}>
-                                                <button className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-colors" title="Reject">
-                                                    <span className="material-symbols-outlined text-xl">close</span>
-                                                </button>
-                                            </form>
-                                            <form action={async () => {
-                                                "use server";
-                                                await updateMemberStatusAction(circle.id, member.userId, 'approved');
-                                            }}>
-                                                <button className="p-2 bg-blue-600 text-white rounded-full shadow-sm hover:bg-blue-700 transition-colors" title="Approve">
-                                                    <span className="material-symbols-outlined text-xl">check</span>
+                                                <button className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-emerald-600 transition-colors flex items-center gap-1">
+                                                    <span className="material-symbols-outlined text-sm">verified</span>
+                                                    VERIFY
                                                 </button>
                                             </form>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
-
-                    {/* Pending Verifications List */}
-                    {members.filter(m => m.status === 'recipient_verified').length > 0 && (
-                        <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 overflow-hidden">
-                            <div className="p-3 bg-emerald-100/50 dark:bg-emerald-800/30 flex items-center justify-between">
-                                <span className="font-bold text-emerald-700 dark:text-emerald-300 text-sm">Pending Verification</span>
-                                <span className="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                                    {members.filter(m => m.status === 'recipient_verified').length}
-                                </span>
-                            </div>
-                            <div className="divide-y divide-emerald-100 dark:divide-emerald-800/50">
-                                {members.filter(m => m.status === 'recipient_verified').map((member) => (
-                                    <div key={member.id} className="p-3 flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-sm font-bold border border-emerald-100">
-                                            {member.avatar ? (
-                                                <img src={member.avatar} alt={member.name} className="w-full h-full rounded-full object-cover" />
-                                            ) : (
-                                                member.name.charAt(0).toUpperCase()
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-bold text-sm text-text-main dark:text-white">{member.name}</p>
-                                            <p className="text-xs text-text-sub dark:text-text-sub-dark">Recipient confirmed receipt</p>
-                                        </div>
-                                        <form action={async () => {
-                                            "use server";
-                                            await verifyPaymentAction(circle.id, member.userId);
-                                        }}>
-                                            <button className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:bg-emerald-600 transition-colors flex items-center gap-1">
-                                                <span className="material-symbols-outlined text-sm">verified</span>
-                                                VERIFY
-                                            </button>
-                                        </form>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-
-
-
+                        )}
+                    </div>
+                )}
+            </div>
             {/* Force Distribute Payout (When all paid but payout not distributed) */}
             {(() => {
                 const allActiveMembers = members.filter(m => m.status !== 'requested');
