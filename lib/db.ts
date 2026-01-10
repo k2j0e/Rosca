@@ -10,7 +10,7 @@ const prismaClientSingleton = () => {
         datasources: {
             db: {
                 // Force connection limit to avoid Supabase Transaction/Session mode pool exhaustion
-                url: process.env.DATABASE_URL + (process.env.DATABASE_URL?.includes('?') ? '&' : '?') + "connection_limit=3"
+                url: process.env.DATABASE_URL + (process.env.DATABASE_URL?.includes('?') ? '&' : '?') + "connection_limit=1"
             },
         },
     });
