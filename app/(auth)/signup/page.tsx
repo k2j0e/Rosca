@@ -20,7 +20,30 @@ function SignUpForm() {
     const [otp, setOtp] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [location, setLocation] = useState('');
+    const [city, setCity] = useState('');
+    const [country, setCountry] = useState('');
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+    // Common countries for dropdown
+    const countries = [
+        'United States', 'Canada', 'United Kingdom', 'Australia', 'Germany',
+        'France', 'Spain', 'Italy', 'Netherlands', 'Brazil', 'Mexico',
+        'India', 'Japan', 'South Korea', 'Singapore', 'UAE', 'Saudi Arabia',
+        'South Africa', 'Nigeria', 'Kenya', 'Ghana', 'Egypt', 'Other'
+    ];
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setAvatarFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setAvatarPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     useEffect(() => {
         if (searchParams.get('error')) {
@@ -261,27 +284,65 @@ function SignUpForm() {
                             {/* Hidden inputs to carry over data from previous steps */}
                             <input type="hidden" name="phone" value={phone} />
                             <input type="hidden" name="redirect" value={searchParams.get('redirect') || ''} />
+                            <input type="hidden" name="location" value={city && country ? `${city}, ${country}` : city || country} />
 
-                            {/* Photo Upload Mock */}
+                            {/* Photo Upload */}
                             <div className="flex justify-center mb-2">
-                                <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <span className="material-symbols-outlined text-gray-400 text-3xl">add_a_photo</span>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase mt-1">Add Photo</span>
-                                </div>
+                                <label className="cursor-pointer group">
+                                    <input
+                                        type="file"
+                                        name="avatar"
+                                        accept="image/*"
+                                        onChange={handlePhotoChange}
+                                        className="hidden"
+                                    />
+                                    <div className={`w-24 h-24 rounded-full border-2 border-dashed flex flex-col items-center justify-center transition-all overflow-hidden
+                                        ${avatarPreview
+                                            ? 'border-primary bg-primary/5'
+                                            : 'border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                        }`}>
+                                        {avatarPreview ? (
+                                            <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <>
+                                                <span className="material-symbols-outlined text-gray-400 text-3xl group-hover:text-primary transition-colors">add_a_photo</span>
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase mt-1 group-hover:text-primary transition-colors">Add Photo</span>
+                                            </>
+                                        )}
+                                    </div>
+                                    {avatarPreview && (
+                                        <p className="text-xs text-center text-primary font-medium mt-2">Tap to change</p>
+                                    )}
+                                </label>
                             </div>
 
-                            {/* Name input removed as it is collected in Step 1 */}
-
+                            {/* City Input */}
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Location <span className="text-gray-400 font-normal normal-case">(Optional)</span></label>
+                                <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">City <span className="text-gray-400 font-normal normal-case">(Optional)</span></label>
                                 <input
                                     type="text"
-                                    name="location"
-                                    value={location}
-                                    onChange={(e) => setLocation(e.target.value)}
-                                    placeholder="City, Country"
+                                    name="city"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    placeholder="e.g. Toronto"
                                     className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-medium focus:outline-none focus:border-primary transition-colors placeholder:font-normal"
                                 />
+                            </div>
+
+                            {/* Country Dropdown */}
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold uppercase tracking-wide text-text-sub dark:text-text-sub-dark">Country <span className="text-gray-400 font-normal normal-case">(Optional)</span></label>
+                                <select
+                                    name="country"
+                                    value={country}
+                                    onChange={(e) => setCountry(e.target.value)}
+                                    className="w-full bg-gray-50 dark:bg-gray-900 border-2 border-gray-100 dark:border-gray-800 rounded-xl p-4 font-medium focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer"
+                                >
+                                    <option value="">Select Country</option>
+                                    {countries.map(c => (
+                                        <option key={c} value={c}>{c}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <button

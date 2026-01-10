@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,134 +7,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enums for strict typing
-enum LedgerEntryType {
-  // Obligation Lifecycle
-  CONTRIBUTION_OBLIGATION_CREATED
-  CONTRIBUTION_MARKED_PAID
-  CONTRIBUTION_CONFIRMED
-  CONTRIBUTION_MARKED_UNPAID
-  CONTRIBUTION_OVERDUE_FLAGGED
-  CONTRIBUTION_REJECTED
-  
-  // Payout Lifecycle
-  PAYOUT_RECIPIENT_ASSIGNED
-  PAYOUT_DISTRIBUTED
-  PAYOUT_MARKED_SENT
-  PAYOUT_ACKNOWLEDGED
-  
-  // Membership & Governance
-  MEMBER_JOINED
-  MEMBER_REMOVED
-  CIRCLE_PAUSED
-  CIRCLE_RESUMED
-  CIRCLE_STARTED
-  
-  // Admin Actions
-  GRACE_APPLIED
-  DUE_DATE_EXTENDED
-  ADMIN_ANNOUNCEMENT_SENT
-  ADMIN_REMINDER_SENT
-  SUPPORT_CASE_OPENED
-  
-  // Corrections
-  CORRECTION_ENTRY_POSTED
-}
-
-enum LedgerEntryDirection {
-  DEBIT  // Increases obligation / money out
-  CREDIT // Decreases obligation / money in
-  NEUTRAL // Status change
-}
-
-enum LedgerEntryStatus {
-  POSTED
-  VOIDED // Only via compensating entry
-}
-
 model User {
-  id           String   @id @default(uuid())
-  phoneNumber  String   @unique
-  email        String?  @unique // Optional for normal users, required for admin login
-  password     String?  // Hashed password for admin login
-  name         String
-  avatar       String?
-  location     String?
-  bio          String?
-  trustScore   Int      @default(850)
-  memberSince  String   @default("2025") // Could be DateTime, but keeping string for MVP compat
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
-  // Onboarding State
-  hasCompletedOnboarding Boolean @default(false)
-  
-  // Auth Fields
-  otpCode      String?
-  otpExpiresAt DateTime?
-
-  // JSON fields for complex unstructured data
-  badges       String[] // e.g. ['early-backer']
-  stats        Json?    // { circlesCompleted: number, ... }
-  history      Json?    // Array of history objects
-
-  // Relations
-  memberships  Member[]
-  createdCircles Circle[] @relation("CreatedCircles")
-  
-  // Admin Portal Roles
-  role         String   @default("user") // 'user', 'platform_admin', 'support_agent', 'read_only_analyst'
-  isBanned     Boolean  @default(false)
-  
-  // Relations for Admin Portal
-  supportCasesCreated SupportCase[] @relation("CreatedCases")
-  supportCasesAssigned SupportCase[] @relation("AssignedCases")
-  auditLogs    AuditLog[]
-
-  // Ledger Relations
-  ledgerEntries UserLedgerEntry[] @relation("UserLedger")
-  ledgerActions UserLedgerEntry[] @relation("AdminLedger")
+  id                     String            @id @default(uuid())
+  phoneNumber            String            @unique
+  email                  String?           @unique
+  password               String?
+  name                   String
+  avatar                 String?
+  location               String?
+  bio                    String?
+  trustScore             Int               @default(850)
+  memberSince            String            @default("2025")
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  hasCompletedOnboarding Boolean           @default(false)
+  otpCode                String?
+  otpExpiresAt           DateTime?
+  badges                 String[]
+  stats                  Json?
+  history                Json?
+  role                   String            @default("user")
+  isBanned               Boolean           @default(false)
+  auditLogs              AuditLog[]
+  createdCircles         Circle[]          @relation("CreatedCircles")
+  ledgerActions          UserLedgerEntry[] @relation("AdminLedger")
+  ledgerEntries          UserLedgerEntry[] @relation("UserLedger")
+  memberships            Member[]
+  supportCasesAssigned   SupportCase[]     @relation("AssignedCases")
+  supportCasesCreated    SupportCase[]     @relation("CreatedCases")
 }
 
 model AuditLog {
-  id           String   @id @default(uuid())
-  adminId      String
-  admin        User     @relation(fields: [adminId], references: [id])
-  action       String   // 'UPDATE_CIRCLE_STATUS', 'BAN_USER', etc.
-  targetType   String   // 'CIRCLE', 'USER', 'MEMBER'
-  targetId     String
-  changes      Json?    // { before: {...}, after: {...} }
-  reason       String?
-  timestamp    DateTime @default(now())
+  id         String   @id @default(uuid())
+  adminId    String
+  action     String
+  targetType String
+  targetId   String
+  changes    Json?
+  reason     String?
+  timestamp  DateTime @default(now())
+  admin      User     @relation(fields: [adminId], references: [id])
 }
 
 model SupportCase {
-  id           String   @id @default(uuid())
-  caseId       String   @unique @default(cuid()) // Human friendlyish ID
-  category     String   // 'dispute', 'bug', 'verification', 'other'
-  priority     String   // 'low', 'medium', 'high', 'critical'
-  status       String   // 'open', 'in_progress', 'resolved', 'closed'
-  subject      String
-  description  String?
-  messages     Json?    // Array of message objects
-  
-  // Relations
-  createdById  String
-  createdBy    User     @relation("CreatedCases", fields: [createdById], references: [id])
-  assignedToId String?
-  assignedTo   User?    @relation("AssignedCases", fields: [assignedToId], references: [id])
-  
+  id              String   @id @default(uuid())
+  caseId          String   @unique @default(cuid())
+  category        String
+  priority        String
+  status          String
+  subject         String
+  description     String?
+  messages        Json?
+  createdById     String
+  assignedToId    String?
   relatedCircleId String?
   relatedUserId   String?
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  assignedTo      User?    @relation("AssignedCases", fields: [assignedToId], references: [id])
+  createdBy       User     @relation("CreatedCases", fields: [createdById], references: [id])
 }
 
 model NotificationLog {
   id           String   @id @default(uuid())
-  type         String   // 'broadcast', 'segment', 'direct'
-  audience     Json     // { role: 'admin' } or { circleId: '...' }
+  type         String
+  audience     Json
   title        String
   body         String
   sentAt       DateTime @default(now())
@@ -145,121 +79,129 @@ model NotificationLog {
 }
 
 model Circle {
-  id           String   @id @default(uuid())
-  name         String
-  category     String   // 'Travel', 'Business', etc.
-  amount       Float
-  frequency    String   // 'weekly', 'monthly'
-  duration     Int      // Number of cycles
-  maxMembers   Int
-  payoutTotal  Float
-  startDate    DateTime
-  description  String?
-  rules        String[]
-  coverImage   String?
-  isPrivate    Boolean  @default(false)
-  isFrozen     Boolean  @default(false)
-  status       String   // 'recruiting', 'active', 'completed', 'paused'
-  
-  // Round Tracking
-  currentRound Int      @default(1)
-  
-  // Pause State
-  pausedAt     DateTime?
-  pauseReason  String?
-  
-  // Advanced Settings
-  payoutSchedule Json?  // Array of dates for rounds
-  settings       Json?  // { allowLateJoins: boolean, ... }
-
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  adminId      String
-  admin        User     @relation("CreatedCircles", fields: [adminId], references: [id])
-  members      Member[]
-  events       CircleEvent[]
-  ledgerEntries UserLedgerEntry[]
-  announcements CircleAnnouncement[]
+  id             String               @id @default(uuid())
+  name           String
+  category       String
+  amount         Float
+  frequency      String
+  duration       Int
+  maxMembers     Int
+  payoutTotal    Float
+  startDate      DateTime
+  description    String?
+  rules          String[]
+  coverImage     String?
+  isPrivate      Boolean              @default(false)
+  isFrozen       Boolean              @default(false)
+  status         String
+  currentRound   Int                  @default(1)
+  pausedAt       DateTime?
+  pauseReason    String?
+  payoutSchedule Json?
+  settings       Json?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  adminId        String
+  admin          User                 @relation("CreatedCircles", fields: [adminId], references: [id])
+  announcements  CircleAnnouncement[]
+  events         CircleEvent[]
+  ledgerEntries  UserLedgerEntry[]
+  members        Member[]
 }
 
 model Member {
-  id               String   @id @default(uuid())
-  joinedAt         DateTime @default(now())
-  role             String   // 'admin' | 'member'
+  id               String    @id @default(uuid())
+  joinedAt         DateTime  @default(now())
+  role             String
   payoutMonth      Int?
-  payoutPreference String?  // 'early' | 'late' | 'any'
-  status           String   // 'paid' | 'pending' | 'late' | 'requested' | 'paid_pending'
-  
-  // Exception Handling
-  graceApplied     Boolean  @default(false)
+  payoutPreference String?
+  status           String
+  graceApplied     Boolean   @default(false)
   graceReason      String?
   dueDateExtension DateTime?
-  
-  // Relations
   userId           String
-  user             User     @relation(fields: [userId], references: [id])
   circleId         String
-  circle           Circle   @relation(fields: [circleId], references: [id])
+  circle           Circle    @relation(fields: [circleId], references: [id])
+  user             User      @relation(fields: [userId], references: [id])
 
-  @@unique([userId, circleId]) // Compound unique constraint
+  @@unique([userId, circleId])
 }
 
 model CircleEvent {
   id        String   @id @default(uuid())
-  type      String   // 'payment', 'join', etc.
+  type      String
   message   String
   timestamp DateTime @default(now())
-  meta      Json?    // Extra data like userId, amount
-
-  // Relations
+  meta      Json?
   circleId  String
   circle    Circle   @relation(fields: [circleId], references: [id])
 }
 
 model CircleAnnouncement {
-  id        String   @id @default(uuid())
-  title     String
-  body      String
-  isPinned  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  
-  // Relations
-  circleId  String
-  circle    Circle   @relation(fields: [circleId], references: [id])
-  createdById String // Admin userId who created
+  id          String   @id @default(uuid())
+  title       String
+  body        String
+  isPinned    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  circleId    String
+  createdById String
+  circle      Circle   @relation(fields: [circleId], references: [id])
 }
 
-// Renamed to avoid confusion with internal 'Ledger' terms if any
 model UserLedgerEntry {
-  id        String   @id @default(cuid())
-  
-  // Core Identifiers (Denormalized for queries)
-  circleId  String?  // Optional: Global platform events might not have circle
-  userId    String?  // Optional: System events might not have user
-  adminId   String?  // Creator if manual action
-  
-  // The Data
-  type      LedgerEntryType
-  direction LedgerEntryDirection
-  amount    Float?   // Null for non-financial events
-  currency  String   @default("USD")
-  
-  // Audit
+  id          String               @id @default(cuid())
+  circleId    String?
+  userId      String?
+  adminId     String?
+  type        LedgerEntryType
+  direction   LedgerEntryDirection
+  amount      Float?
+  currency    String               @default("USD")
   description String?
-  metadata    Json?    // For proofs, references, snapshots
-  createdAt   DateTime @default(now())
-  
-  status    LedgerEntryStatus @default(POSTED)
-  
-  // Relations
-  circle    Circle? @relation(fields: [circleId], references: [id])
-  user      User?   @relation("UserLedger", fields: [userId], references: [id])
-  admin     User?   @relation("AdminLedger", fields: [adminId], references: [id])
+  metadata    Json?
+  createdAt   DateTime             @default(now())
+  status      LedgerEntryStatus    @default(POSTED)
+  admin       User?                @relation("AdminLedger", fields: [adminId], references: [id])
+  circle      Circle?              @relation(fields: [circleId], references: [id])
+  user        User?                @relation("UserLedger", fields: [userId], references: [id])
 
   @@index([circleId])
   @@index([userId])
   @@index([type])
-  @@map("LedgerEntry") // Map to actual table name
+  @@map("LedgerEntry")
+}
+
+enum LedgerEntryType {
+  CONTRIBUTION_OBLIGATION_CREATED
+  CONTRIBUTION_MARKED_PAID
+  CONTRIBUTION_CONFIRMED
+  CONTRIBUTION_MARKED_UNPAID
+  CONTRIBUTION_OVERDUE_FLAGGED
+  PAYOUT_RECIPIENT_ASSIGNED
+  PAYOUT_MARKED_SENT
+  PAYOUT_ACKNOWLEDGED
+  MEMBER_JOINED
+  MEMBER_REMOVED
+  CIRCLE_PAUSED
+  CIRCLE_RESUMED
+  CORRECTION_ENTRY_POSTED
+  PAYOUT_DISTRIBUTED
+  CONTRIBUTION_REJECTED
+  CIRCLE_STARTED
+  GRACE_APPLIED
+  DUE_DATE_EXTENDED
+  ADMIN_ANNOUNCEMENT_SENT
+  ADMIN_REMINDER_SENT
+  SUPPORT_CASE_OPENED
+}
+
+enum LedgerEntryDirection {
+  DEBIT
+  CREDIT
+  NEUTRAL
+}
+
+enum LedgerEntryStatus {
+  POSTED
+  VOIDED
 }
