@@ -40,6 +40,7 @@ export interface User {
 }
 
 export interface Member {
+    id: string;
     userId: string;
     name?: string; // These are joined fields, often need flattening
     avatar?: string;
@@ -66,6 +67,7 @@ export interface CircleEvent {
 export interface Circle {
     id: string;
     name: string;
+    inviteCode?: string;
     category: CircleCategory;
     amount: number;
     frequency: 'weekly' | 'monthly' | 'bi-weekly';
@@ -205,6 +207,7 @@ export async function getCircles(): Promise<Circle[]> {
 
         return circles.map(c => ({
             ...c,
+            inviteCode: c.inviteCode || undefined,
             category: c.category as CircleCategory,
             frequency: c.frequency as any,
             status: c.status as any,
@@ -212,6 +215,7 @@ export async function getCircles(): Promise<Circle[]> {
             description: (c.description || undefined) as string | undefined,
             coverImage: (c.coverImage || undefined) as string | undefined,
             members: c.members.map(m => ({
+                id: m.id,
                 userId: m.userId,
                 name: m.user?.name || 'Unknown User',
                 avatar: m.user?.avatar || '',
@@ -251,6 +255,7 @@ export async function getCircle(id: string): Promise<Circle | undefined> {
 
     return {
         ...c,
+        inviteCode: c.inviteCode || undefined,
         category: c.category as CircleCategory,
         frequency: c.frequency as any,
         status: c.status as any,
@@ -258,6 +263,7 @@ export async function getCircle(id: string): Promise<Circle | undefined> {
         description: (c.description || undefined) as string | undefined,
         coverImage: (c.coverImage || undefined) as string | undefined,
         members: c.members.map(m => ({
+            id: m.id,
             userId: m.userId,
             name: m.user.name,
             avatar: m.user.avatar || '',
@@ -283,6 +289,7 @@ export async function getCircle(id: string): Promise<Circle | undefined> {
 export async function createCircle(data: Partial<Circle>, creator: User) {
     const newCircle = await prisma.circle.create({
         data: {
+            inviteCode: Math.random().toString(36).substring(2, 8).toUpperCase(), // Generate 6-char code
             name: data.name || 'New Circle',
             category: data.category || 'Other',
             amount: data.amount || 0,
@@ -476,25 +483,58 @@ export async function getCurrentRound(circleId: string): Promise<number> {
 }
 
 /**
- * Resets all member statuses to 'pending' for a new round.
- * Called after a round is completed.
+ * Resets all member statuses for a new round.
+ * - Recipient of the round is auto-set to 'paid' (they don't pay themselves)
+ * - All other members are set to 'pending'
  */
 export async function resetMemberStatusesForNewRound(circleId: string): Promise<void> {
+    // Get the circle to find the next round's recipient
+    const circle = await prisma.circle.findUnique({
+        where: { id: circleId },
+        include: { members: true }
+    });
+    if (!circle) return;
+
+    // Determine the next round number
+    const currentRound = circle.currentRound ?? 1;
+    const nextRound = currentRound + 1;
+
+    // Find the recipient for the next round (member with payoutMonth === nextRound)
+    const recipientMember = circle.members.find(m => m.payoutMonth === nextRound);
+
+    // Update circle's currentRound
+    await prisma.circle.update({
+        where: { id: circleId },
+        data: { currentRound: nextRound }
+    });
+
+    // Reset all members to pending first
     await prisma.member.updateMany({
         where: { circleId },
         data: { status: 'pending' }
     });
+
+    // Then set the recipient's status to 'paid' (they don't pay themselves)
+    if (recipientMember) {
+        await prisma.member.update({
+            where: {
+                id: recipientMember.id
+            },
+            data: { status: 'paid' }
+        });
+        console.log(`[resetMemberStatusesForNewRound] Recipient ${recipientMember.userId} auto-marked as paid for round ${nextRound}`);
+    }
 
     // Log event
     await prisma.circleEvent.create({
         data: {
             circleId,
             type: 'round_start',
-            message: 'New round started - contributions reset',
+            message: `Round ${nextRound} started - contributions reset`,
             timestamp: new Date()
         }
     });
 
-    console.log(`[resetMemberStatusesForNewRound] All members reset to pending for circle ${circleId}`);
+    console.log(`[resetMemberStatusesForNewRound] Round ${nextRound}: All members set to pending, recipient auto-paid`);
 }
 

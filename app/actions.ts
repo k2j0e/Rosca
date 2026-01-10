@@ -510,7 +510,11 @@ export async function joinCircleJsonAction(formData: FormData) {
     if (!currentUser) return { error: "Must be logged in to join" };
 
     // Add real user to circle
-    await joinCircle(circleId, currentUser, preference);
+    try {
+        await joinCircle(circleId, currentUser, preference);
+    } catch (error: any) {
+        return { error: error.message || "Failed to join circle" };
+    }
 
     // Ledger: Log Member Join
     try {
@@ -814,6 +818,17 @@ export async function launchCircleAction(circleId: string) {
                 metadata: { round: 1 }
             });
         }
+
+        // Auto-mark Round 1 Recipient as 'paid'
+        const round1Recipient = circle.members.find(m => m.payoutMonth === 1);
+        if (round1Recipient) {
+            const { prisma } = await import("@/lib/db");
+            await prisma.member.update({
+                where: { id: round1Recipient.id },
+                data: { status: 'paid' }
+            });
+            console.log(`[launchCircleAction] Auto-marked Round 1 recipient ${round1Recipient.userId} as paid`);
+        }
     }
 
     revalidatePath(`/circles/${circleId}`);
@@ -995,8 +1010,6 @@ export async function completeOnboardingAction(redirectUrl?: string) {
         where: { id: user.id },
         data: { hasCompletedOnboarding: true }
     });
-
-
 
     if (redirectUrl) {
         console.log('[completeOnboardingAction] Redirecting to:', redirectUrl);

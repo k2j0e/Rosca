@@ -97,6 +97,7 @@ model Circle {
   currentRound   Int                  @default(1)
   pausedAt       DateTime?
   pauseReason    String?
+  inviteCode     String?              @unique
   payoutSchedule Json?
   settings       Json?
   createdAt      DateTime             @default(now())

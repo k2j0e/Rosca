@@ -46,6 +46,7 @@ export async function GET() {
         status: 'active',
         adminId: 'u1',
         members: users.map((u, i) => ({
+            id: `seed_m_${i}`,
             userId: u.id,
             name: u.name,
             avatar: u.avatar,
