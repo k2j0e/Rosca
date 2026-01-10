@@ -1,11 +1,16 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getCircle } from "@/lib/data";
+import { notFound, redirect } from "next/navigation";
+import { getCircle, getCurrentUser } from "@/lib/data";
 import { JoinIntentForm } from "./JoinIntentForm";
 
 export default async function JoinCircleIntent(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
     const circle = await getCircle(params.id);
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+        redirect(`/signin?redirect=${encodeURIComponent(`/circles/${params.id}/join/intent`)}`);
+    }
 
     if (!circle) {
         notFound();

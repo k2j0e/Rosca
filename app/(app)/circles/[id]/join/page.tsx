@@ -13,6 +13,10 @@ export default async function JoinCircleConfirm(props: { params: Promise<{ id: s
         redirect('/home?error=circle_not_found');
     }
 
+    if (!currentUser) {
+        redirect(`/signin?redirect=${encodeURIComponent(`/circles/${circle.id}/join`)}`);
+    }
+
     // Redirect if already a member
     if (currentUser && circle.members.some(m => m.userId === currentUser.id)) {
         redirect(`/circles/${circle.id}/dashboard`);
