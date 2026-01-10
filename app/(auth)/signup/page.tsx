@@ -280,7 +280,29 @@ function SignUpForm() {
                         <h1 className="text-3xl font-extrabold tracking-tight mb-2">Profile Setup</h1>
                         <p className="text-text-sub dark:text-text-sub-dark mb-8">How you'll appear to your circle.</p>
 
-                        <form action={completeSignupAction} className="flex flex-col gap-6">
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            setIsLoading(true);
+                            setError('');
+
+                            const formData = new FormData(e.currentTarget);
+                            const file = formData.get('avatar') as File;
+
+                            if (file && file.size > 5 * 1024 * 1024) {
+                                setError("Image too large. Please choose an image under 5MB.");
+                                setIsLoading(false);
+                                return;
+                            }
+
+                            try {
+                                await completeSignupAction(formData);
+                                // Redirect handles the rest, we stay loading until nav
+                            } catch (err) {
+                                console.error(err);
+                                setError("Something went wrong. Please try again.");
+                                setIsLoading(false);
+                            }
+                        }} className="flex flex-col gap-6">
                             {/* Hidden inputs to carry over data from previous steps */}
                             <input type="hidden" name="phone" value={phone} />
                             <input type="hidden" name="redirect" value={searchParams.get('redirect') || ''} />
@@ -292,7 +314,7 @@ function SignUpForm() {
                                     <input
                                         type="file"
                                         name="avatar"
-                                        accept="image/*"
+                                        accept="image/png, image/jpeg, image/jpg"
                                         onChange={handlePhotoChange}
                                         className="hidden"
                                     />
@@ -344,6 +366,15 @@ function SignUpForm() {
                                     ))}
                                 </select>
                             </div>
+
+                            {error && (
+                                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3">
+                                    <p className="text-sm font-medium text-red-600 dark:text-red-400 flex items-center gap-2">
+                                        <span className="material-symbols-outlined text-lg">error</span>
+                                        {error}
+                                    </p>
+                                </div>
+                            )}
 
                             <button
                                 type="submit"
