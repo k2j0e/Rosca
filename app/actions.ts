@@ -701,65 +701,79 @@ export async function verifyPaymentAction(circleId: string, memberId: string) {
  * If so, records payout to recipient and resets statuses for next round.
  */
 async function checkAndCompleteRound(circleId: string) {
-    const { getCircle, resetMemberStatusesForNewRound, getCurrentRound } = await import("@/lib/data");
-    const circle = await getCircle(circleId);
-    if (!circle) return;
+    console.log(`[checkAndCompleteRound] Checking completion for circle ${circleId}`);
+    try {
+        const { getCircle, resetMemberStatusesForNewRound, getCurrentRound } = await import("@/lib/data");
+        const circle = await getCircle(circleId);
+        if (!circle) {
+            console.error(`[checkAndCompleteRound] Circle ${circleId} not found`);
+            return;
+        }
 
-    // Check if all ACTIVE members have status 'paid' (exclude pending requests)
-    const activeMembers = circle.members.filter(m => m.status !== 'requested');
-    const allPaid = activeMembers.length > 0 && activeMembers.every(m => m.status === 'paid');
-    if (!allPaid) {
-        console.log(`[checkAndCompleteRound] Not all members paid yet for circle ${circleId}`);
-        return;
+        // Check if all ACTIVE members have status 'paid' (exclude pending requests)
+        const activeMembers = circle.members.filter(m => m.status !== 'requested');
+        const allPaid = activeMembers.length > 0 && activeMembers.every(m => m.status === 'paid');
+        if (!allPaid) {
+            console.log(`[checkAndCompleteRound] Not all members paid yet for circle ${circleId}`);
+            return;
+        }
+
+        console.log(`[checkAndCompleteRound] 🎉 Round complete for circle ${circleId}!`);
+
+        // Determine current round (from payout events or obligations)
+        const currentRound = await getCurrentRound(circleId);
+        console.log(`[checkAndCompleteRound] Current round determined as: ${currentRound}`);
+
+        // Find recipient for this round (member with payoutMonth === currentRound)
+        const recipient = circle.members.find(m => m.payoutMonth === currentRound);
+
+        if (recipient) {
+            console.log(`[checkAndCompleteRound] Found recipient for round ${currentRound}: ${recipient.name} (${recipient.userId})`);
+            // Record payout to recipient
+            await recordLedgerEntry({
+                type: LedgerEntryType.PAYOUT_DISTRIBUTED,
+                direction: LedgerEntryDirection.CREDIT,
+                description: `Round ${currentRound} payout distributed to ${recipient.name}`,
+                circleId: circleId,
+                userId: recipient.userId,
+                amount: circle.payoutTotal,
+                metadata: { round: currentRound }
+            });
+            console.log(`[checkAndCompleteRound] Payout of $${circle.payoutTotal} recorded for ${recipient.name}`);
+        } else {
+            console.warn(`[checkAndCompleteRound] WARNING: No recipient found for round ${currentRound}`);
+        }
+
+        // Check if this was the last round
+        if (currentRound >= circle.duration) {
+            console.log(`[checkAndCompleteRound] Circle ${circleId} completed all ${circle.duration} rounds!`);
+            await updateCircleStatus(circleId, 'completed');
+            return;
+        }
+
+        // Reset all member statuses to 'pending' for next round
+        console.log(`[checkAndCompleteRound] Resetting member statuses for next round...`);
+        await resetMemberStatusesForNewRound(circleId);
+
+        // Create contribution obligations for next round
+        const nextRound = currentRound + 1;
+        for (const member of circle.members) {
+            await recordLedgerEntry({
+                type: LedgerEntryType.CONTRIBUTION_OBLIGATION_CREATED,
+                direction: LedgerEntryDirection.DEBIT,
+                description: `Round ${nextRound} Contribution Due`,
+                circleId: circle.id,
+                userId: member.userId,
+                amount: circle.amount,
+                metadata: { round: nextRound }
+            });
+        }
+
+        console.log(`[checkAndCompleteRound] Round ${nextRound} initiated for circle ${circleId}`);
+    } catch (error) {
+        console.error(`[checkAndCompleteRound] FATAL ERROR:`, error);
+        throw error; // Re-throw so caller knows it failed
     }
-
-    console.log(`[checkAndCompleteRound] 🎉 Round complete for circle ${circleId}!`);
-
-    // Determine current round (from payout events or obligations)
-    const currentRound = await getCurrentRound(circleId);
-
-    // Find recipient for this round (member with payoutMonth === currentRound)
-    const recipient = circle.members.find(m => m.payoutMonth === currentRound);
-
-    if (recipient) {
-        // Record payout to recipient
-        await recordLedgerEntry({
-            type: LedgerEntryType.PAYOUT_DISTRIBUTED,
-            direction: LedgerEntryDirection.CREDIT,
-            description: `Round ${currentRound} payout distributed to ${recipient.name}`,
-            circleId: circleId,
-            userId: recipient.userId,
-            amount: circle.payoutTotal,
-            metadata: { round: currentRound }
-        });
-        console.log(`[checkAndCompleteRound] Payout of $${circle.payoutTotal} recorded for ${recipient.name}`);
-    }
-
-    // Check if this was the last round
-    if (currentRound >= circle.duration) {
-        console.log(`[checkAndCompleteRound] Circle ${circleId} completed all ${circle.duration} rounds!`);
-        await updateCircleStatus(circleId, 'completed');
-        return;
-    }
-
-    // Reset all member statuses to 'pending' for next round
-    await resetMemberStatusesForNewRound(circleId);
-
-    // Create contribution obligations for next round
-    const nextRound = currentRound + 1;
-    for (const member of circle.members) {
-        await recordLedgerEntry({
-            type: LedgerEntryType.CONTRIBUTION_OBLIGATION_CREATED,
-            direction: LedgerEntryDirection.DEBIT,
-            description: `Round ${nextRound} Contribution Due`,
-            circleId: circle.id,
-            userId: member.userId,
-            amount: circle.amount,
-            metadata: { round: nextRound }
-        });
-    }
-
-    console.log(`[checkAndCompleteRound] Round ${nextRound} initiated for circle ${circleId}`);
 }
 
 /**
@@ -767,31 +781,49 @@ async function checkAndCompleteRound(circleId: string) {
  * Call this when all payments are verified but payout wasn't distributed.
  */
 export async function forceCompleteRoundAction(circleId: string) {
-    const currentUser = await getCurrentUser();
-    if (!currentUser) throw new Error("Unauthorized");
+    console.log(`[forceCompleteRoundAction] Initiated for circle ${circleId}`);
+    try {
+        const currentUser = await getCurrentUser();
+        if (!currentUser) throw new Error("Unauthorized");
 
-    const { getCircle, getCurrentRound } = await import("@/lib/data");
-    const circle = await getCircle(circleId);
-    if (!circle) throw new Error("Circle not found");
+        const { getCircle, getCurrentRound } = await import("@/lib/data");
+        const circle = await getCircle(circleId);
+        if (!circle) throw new Error("Circle not found");
 
-    // Verify admin permission
-    const isAdmin = circle.members.some(m => m.userId === currentUser.id && m.role === 'admin');
-    if (!isAdmin) throw new Error("Only admins can force complete a round");
+        console.log(`[forceCompleteRoundAction] Found circle ${circle.name}, Current Round: ${circle.currentRound}`);
 
-    // Check if all ACTIVE members have paid status (exclude pending requests)
-    const activeMembers = circle.members.filter(m => m.status !== 'requested');
-    const allPaid = activeMembers.length > 0 && activeMembers.every(m => m.status === 'paid');
-    if (!allPaid) {
-        throw new Error("Cannot complete round: not all active members have paid status");
+        // Verify admin permission
+        const isAdmin = circle.members.some(m => m.userId === currentUser.id && m.role === 'admin');
+        if (!isAdmin) throw new Error("Only admins can force complete a round");
+
+        // Check if all ACTIVE members have paid status (exclude pending requests)
+        const activeMembers = circle.members.filter(m => m.status !== 'requested');
+        const allPaid = activeMembers.length > 0 && activeMembers.every(m => m.status === 'paid');
+
+        console.log(`[forceCompleteRoundAction] Active Members: ${activeMembers.length}, All Paid: ${allPaid}`);
+        if (!allPaid) {
+            // Log who hasn't paid
+            const unpaid = activeMembers.filter(m => m.status !== 'paid');
+            console.log(`[forceCompleteRoundAction] Unpaid members: ${unpaid.map(m => m.userId).join(', ')}`);
+            throw new Error("Cannot complete round: not all active members have paid status");
+        }
+
+        // Trigger the round completion
+        await checkAndCompleteRound(circleId);
+        console.log(`[forceCompleteRoundAction] Successfully forwarded to checkAndCompleteRound`);
+
+        revalidatePath(`/circles/${circleId}`);
+        revalidatePath(`/circles/${circleId}/dashboard`);
+        revalidatePath(`/circles/${circleId}/dashboard/transparency`);
+        revalidatePath(`/circles/${circleId}/admin`);
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("[forceCompleteRoundAction] CRITICAL ERROR:", error);
+        // Instead of throwing, revalidate to refresh UI and potentially show error state if we had one
+        // Ideally returns error to show in toast
+        throw new Error(error.message || "Failed to force complete round");
     }
-
-    // Trigger the round completion
-    await checkAndCompleteRound(circleId);
-
-    revalidatePath(`/circles/${circleId}`);
-    revalidatePath(`/circles/${circleId}/dashboard`);
-    revalidatePath(`/circles/${circleId}/dashboard/transparency`);
-    revalidatePath(`/circles/${circleId}/admin`);
 }
 
 export async function launchCircleAction(circleId: string) {
